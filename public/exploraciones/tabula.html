@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tabula — La Pulpería</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=Libre+Bodoni:ital,wght@0,500;0,600;1,500&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --limestone: #d5d0c4;
+        --tablet: #ece7db;
+        --ink: #141210;
+        --oxide: #7a2418;
+        --pine: #1f3d32;
+        --brass: #8a7340;
+        --ash: #8f877a;
+        --joint: #b7b09f;
+        --studio: #2a2622;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; }
+      body {
+        font-family: "Source Sans 3", sans-serif;
+        background: var(--studio);
+        color: #efece6;
+      }
+      button, a { font: inherit; }
+      button { cursor: pointer; }
+      .studio {
+        position: sticky;
+        top: 0;
+        z-index: 4;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem 1rem;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.85rem 1.25rem;
+        background: #1a1714;
+        border-bottom: 1px solid #3a342c;
+      }
+      .studio strong { font-weight: 600; }
+      .studio .muted { color: #b8b09f; font-size: 0.85rem; }
+      .studio nav { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+      .studio button {
+        background: transparent;
+        color: #efece6;
+        border: 1px solid #5a5348;
+        padding: 0.35rem 0.7rem;
+      }
+      .studio button[aria-pressed="true"] {
+        background: #efece6;
+        color: #1a1714;
+        border-color: #efece6;
+      }
+      .studio a { color: #efece6; }
+      .floor {
+        min-height: calc(100vh - 4rem);
+        padding: 2rem 1rem 4rem;
+      }
+      .stage {
+        margin: 0 auto;
+        background: var(--limestone);
+        color: var(--ink);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+        overflow: hidden;
+      }
+      body[data-width="390"] .stage { width: 390px; }
+      body[data-width="1440"] .stage { width: min(1440px, 100%); }
+      .screen { display: none; }
+      .screen.is-on { display: block; }
+      .top {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 1rem;
+        align-items: end;
+        padding: 1.25rem 1.25rem 1rem;
+        border-bottom: 3px solid var(--ink);
+      }
+      .mark {
+        font-family: "Libre Bodoni", serif;
+        font-size: 1.35rem;
+        line-height: 1;
+      }
+      .mark small {
+        display: block;
+        margin-top: 0.25rem;
+        font-family: "Source Sans 3", sans-serif;
+        font-size: 0.68rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--ash);
+      }
+      .nav-links {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.92rem;
+      }
+      .nav-links span { color: var(--ash); }
+      .cart-count { font-variant-numeric: tabular-nums; }
+      .lintel {
+        margin: 0 1.25rem 1.25rem;
+        padding: 1rem 1rem 0.85rem;
+        background: var(--tablet);
+        border: 2px solid var(--ink);
+        box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.35);
+      }
+      .lintel label {
+        display: block;
+        font-size: 0.72rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ash);
+        margin-bottom: 0.35rem;
+      }
+      .lintel input {
+        width: 100%;
+        border: 0;
+        background: transparent;
+        font-family: "Libre Bodoni", serif;
+        font-size: 1.7rem;
+        color: var(--ink);
+        outline: none;
+      }
+      .hint { padding: 0 1.25rem 1rem; color: var(--ash); font-size: 0.92rem; }
+      .list { border-top: 2px solid var(--joint); }
+      .row {
+        display: grid;
+        grid-template-columns: 6.5rem 1fr auto;
+        gap: 1rem;
+        padding: 1.1rem 1.25rem;
+        border-bottom: 2px solid var(--joint);
+        align-items: start;
+      }
+      .marginalia {
+        font-size: 0.75rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--pine);
+      }
+      .marginalia.stale { color: var(--oxide); }
+      .marginalia.confirm { color: var(--brass); }
+      .row h2 {
+        font-family: "Libre Bodoni", serif;
+        font-size: 1.35rem;
+        margin: 0 0 0.2rem;
+        font-weight: 600;
+      }
+      .row .who { margin: 0; color: #3d3830; }
+      .price {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 1rem;
+        white-space: nowrap;
+      }
+      .price small { display: block; color: var(--ash); font-size: 0.72rem; }
+      article.offer, article.cart {
+        padding: 1.25rem;
+      }
+      .crumb { color: var(--ash); font-size: 0.85rem; margin-bottom: 1rem; }
+      h1 {
+        font-family: "Libre Bodoni", serif;
+        font-size: 2.2rem;
+        margin: 0 0 0.35rem;
+        font-weight: 600;
+      }
+      .meta-line { color: #3d3830; margin: 0 0 1rem; }
+      .band {
+        display: inline-block;
+        border: 1px solid var(--ink);
+        padding: 0.15rem 0.45rem;
+        font-size: 0.75rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .prose { max-width: 38rem; font-size: 1.05rem; }
+      .actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 1.25rem 0; }
+      .btn {
+        border: 2px solid var(--ink);
+        background: var(--ink);
+        color: var(--tablet);
+        padding: 0.7rem 1rem;
+        text-decoration: none;
+      }
+      .btn.ghost { background: transparent; color: var(--ink); }
+      .note {
+        border-left: 3px solid var(--ink);
+        padding: 0.2rem 0 0.2rem 0.8rem;
+        color: #3d3830;
+        max-width: 36rem;
+      }
+      .stall {
+        border: 2px solid var(--ink);
+        margin-bottom: 1rem;
+        background: var(--tablet);
+      }
+      .stall header {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.8rem 1rem;
+        border-bottom: 2px solid var(--ink);
+        font-family: "Libre Bodoni", serif;
+      }
+      .item {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 0.5rem;
+        padding: 0.85rem 1rem;
+        border-bottom: 1px solid var(--joint);
+      }
+      .item:last-child { border-bottom: 0; }
+      .wa {
+        display: block;
+        margin: 0.8rem 1rem 1rem;
+        text-align: center;
+        background: var(--oxide);
+        color: #f7f1e6;
+        border: 0;
+        padding: 0.8rem 1rem;
+        text-decoration: none;
+      }
+      .disclaimer {
+        font-size: 0.92rem;
+        color: #3d3830;
+        max-width: 40rem;
+      }
+      @media (max-width: 700px) {
+        .top { grid-template-columns: 1fr auto; }
+        .nav-links { display: none; }
+        .row { grid-template-columns: 1fr; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * { transition: none !important; }
+      }
+    </style>
+  </head>
+  <body data-width="1440" data-screen="buscar">
+    <div class="studio">
+      <div>
+        <strong>Tabula</strong>
+        <div class="muted">Exploración A · no es la aplicación · <a href="./">volver</a></div>
+      </div>
+      <nav aria-label="Pantalla">
+        <button type="button" data-screen="buscar" aria-pressed="true">Buscar</button>
+        <button type="button" data-screen="oferta" aria-pressed="false">Oferta</button>
+        <button type="button" data-screen="carrito" aria-pressed="false">Carrito</button>
+      </nav>
+      <nav aria-label="Ancho">
+        <button type="button" data-width="390" aria-pressed="false">390</button>
+        <button type="button" data-width="1440" aria-pressed="true">1440</button>
+      </nav>
+    </div>
+    <div class="floor">
+      <div class="stage">
+        <header class="top">
+          <div class="mark">La Pulpería<small>Siguatepeque</small></div>
+          <div class="nav-links">
+            <span>Buscar</span>
+            <span>Mapa</span>
+            <span>Vender</span>
+          </div>
+          <div class="cart-count">Selección 3</div>
+        </header>
+
+        <section class="screen is-on" data-screen="buscar">
+          <div class="lintel">
+            <label for="q">Inscripción</label>
+            <input id="q" value="zambos picantes" readonly />
+          </div>
+          <p class="hint">3 ofertas en Siguatepeque. El orden mezcla texto, disponibilidad y frescura. El precio no empuja en silencio.</p>
+          <div class="list">
+            <article class="row">
+              <div class="marginalia">Física · 1,2 km<br />Reciente</div>
+              <div>
+                <h2>Zambos picantes</h2>
+                <p class="who">Pulpería El Pino · bolsa</p>
+              </div>
+              <div class="price">L 35.00<small>precio publicado</small></div>
+            </article>
+            <article class="row">
+              <div class="marginalia confirm">Virtual<br />Conviene confirmar</div>
+              <div>
+                <h2>Zambos picantes</h2>
+                <p class="who">La Canasta Virtual · bolsa</p>
+              </div>
+              <div class="price">desde L 32.00<small>precio publicado</small></div>
+            </article>
+            <article class="row">
+              <div class="marginalia stale">Física · 2,8 km<br />Antigua</div>
+              <div>
+                <h2>Zambo picante artesanal</h2>
+                <p class="who">Mercado La Estación · bolsa</p>
+              </div>
+              <div class="price">L 40.00<small>precio publicado</small></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="screen" data-screen="oferta">
+          <article class="offer">
+            <p class="crumb">Buscar / zambos picantes / Pulpería El Pino</p>
+            <p class="band">Confirmada recientemente</p>
+            <h1>Zambos picantes</h1>
+            <p class="meta-line">Pulpería El Pino · física · 1,2 km · bolsa</p>
+            <p class="price" style="font-size:1.4rem">L 35.00 <small>precio publicado, no es el precio final</small></p>
+            <p class="prose">
+              Bolsa de zambos con chile, de la misma receta que sale los sábados
+              en el mercado. El Pino los confirma cuando llegan. Si se acaban,
+              el vendedor lo dice por WhatsApp.
+            </p>
+            <div class="actions">
+              <button class="btn" type="button">Agregar a la selección</button>
+              <button class="btn ghost" type="button">Ver la pulpería</button>
+            </div>
+            <p class="note">
+              Esta coordenada es del negocio, no de una casa particular, y el
+              vendedor la hizo pública.
+            </p>
+          </article>
+        </section>
+
+        <section class="screen" data-screen="carrito">
+          <article class="cart">
+            <h1>Selección por vendedor</h1>
+            <p class="disclaimer">
+              Cada mostrador abre su propio WhatsApp. La Pulpería no cobra, no
+              entrega y no registra una venta.
+            </p>
+            <div class="stall">
+              <header>
+                <span>Pulpería El Pino</span>
+                <span class="price">L 70.00</span>
+              </header>
+              <div class="item">
+                <div>2 × Zambos picantes</div>
+                <div class="price">L 35.00 c/u</div>
+              </div>
+              <a class="wa" href="#">Abrir WhatsApp de El Pino</a>
+            </div>
+            <div class="stall">
+              <header>
+                <span>La Canasta Virtual</span>
+                <span class="price">desde L 80.00</span>
+              </header>
+              <div class="item">
+                <div>1 × Queso seco</div>
+                <div class="price">desde L 80.00</div>
+              </div>
+              <a class="wa" href="#">Abrir WhatsApp de La Canasta</a>
+            </div>
+            <p class="disclaimer">
+              Disponibilidad, precio final, pago y entrega se confirman
+              directamente con el vendedor.
+            </p>
+          </article>
+        </section>
+      </div>
+    </div>
+    <script>
+      const body = document.body;
+      document.querySelectorAll("nav[aria-label='Pantalla'] button").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-screen");
+          body.dataset.screen = id;
+          document.querySelectorAll(".screen").forEach((el) => {
+            el.classList.toggle("is-on", el.getAttribute("data-screen") === id);
+          });
+          document.querySelectorAll("nav[aria-label='Pantalla'] button").forEach((b) => {
+            b.setAttribute("aria-pressed", String(b === btn));
+          });
+        });
+      });
+      document.querySelectorAll("nav[aria-label='Ancho'] button").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          body.dataset.width = btn.getAttribute("data-width");
+          document.querySelectorAll("nav[aria-label='Ancho'] button").forEach((b) => {
+            b.setAttribute("aria-pressed", String(b === btn));
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

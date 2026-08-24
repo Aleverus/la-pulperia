@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mostrador — La Pulpería</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&family=IBM+Plex+Mono:wght@500&family=Zilla+Slab:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --enamel: #102820;
+        --leaf: #1d4a3c;
+        --cream: #f2e4c4;
+        --chile: #c83628;
+        --tin: #c9c3b4;
+        --night: #0e1612;
+        --gold: #e6b422;
+        --wood: #6a4328;
+        --studio: #1a1f1c;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; }
+      body {
+        font-family: Figtree, sans-serif;
+        background: var(--studio);
+        color: #efece6;
+      }
+      button, a { font: inherit; }
+      button { cursor: pointer; }
+      .studio {
+        position: sticky;
+        top: 0;
+        z-index: 4;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem 1rem;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.85rem 1.25rem;
+        background: #111613;
+        border-bottom: 1px solid #2c3832;
+      }
+      .studio .muted { color: #b7c0b6; font-size: 0.85rem; }
+      .studio nav { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+      .studio button {
+        background: transparent;
+        color: #efece6;
+        border: 1px solid #4a5c52;
+        border-radius: 999px;
+        padding: 0.35rem 0.75rem;
+      }
+      .studio button[aria-pressed="true"] {
+        background: var(--gold);
+        color: var(--night);
+        border-color: var(--gold);
+      }
+      .studio a { color: #efece6; }
+      .floor { min-height: calc(100vh - 4rem); padding: 2rem 1rem 4rem; }
+      .stage {
+        margin: 0 auto;
+        background: var(--cream);
+        color: var(--night);
+        border-radius: 18px 18px 8px 8px;
+        overflow: hidden;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+      }
+      body[data-width="390"] .stage { width: 390px; }
+      body[data-width="1440"] .stage { width: min(1440px, 100%); }
+      .screen { display: none; }
+      .screen.is-on { display: block; }
+      .bar {
+        background: var(--enamel);
+        color: #f6ecd0;
+        padding: 0.9rem 1rem 0.8rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        background-image: repeating-linear-gradient(
+          90deg,
+          transparent 0 10px,
+          rgba(255, 255, 255, 0.04) 10px 12px
+        );
+      }
+      .bar strong {
+        font-family: "Zilla Slab", serif;
+        font-size: 1.35rem;
+      }
+      .bar small { display: block; opacity: 0.7; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
+      .search {
+        margin: 1rem;
+        background: #fffaf0;
+        border: 2px solid var(--enamel);
+        border-radius: 14px;
+        padding: 0.7rem 0.9rem;
+        display: flex;
+        gap: 0.6rem;
+        align-items: center;
+      }
+      .bell {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        background: var(--gold);
+        color: var(--night);
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        flex: none;
+      }
+      .search input {
+        border: 0;
+        background: transparent;
+        width: 100%;
+        font-size: 1.15rem;
+        outline: none;
+        font-family: "Zilla Slab", serif;
+      }
+      .chips {
+        display: flex;
+        gap: 0.4rem;
+        padding: 0 1rem 0.8rem;
+        flex-wrap: wrap;
+      }
+      .chips span {
+        background: var(--enamel);
+        color: #f6ecd0;
+        border-radius: 999px;
+        padding: 0.2rem 0.6rem;
+        font-size: 0.8rem;
+      }
+      .bays {
+        display: grid;
+        gap: 0.9rem;
+        padding: 0 1rem 1.2rem;
+      }
+      body[data-width="1440"] .bays { grid-template-columns: 1.1fr 0.9fr; }
+      .bay {
+        background: #fff8e8;
+        border: 2px solid var(--enamel);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .bay.head, .bay > header {
+        background: var(--leaf);
+        color: #f6ecd0;
+        padding: 0.65rem 0.85rem;
+        font-family: "Zilla Slab", serif;
+        display: flex;
+        justify-content: space-between;
+      }
+      .goods { padding: 0.85rem; }
+      .goods h2 {
+        font-family: "Zilla Slab", serif;
+        margin: 0 0 0.2rem;
+        font-size: 1.3rem;
+      }
+      .tag {
+        display: inline-block;
+        background: var(--gold);
+        color: var(--night);
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.85rem;
+        padding: 0.15rem 0.4rem;
+        transform: rotate(-2deg);
+        margin: 0.4rem 0;
+      }
+      .fresh { font-size: 0.85rem; color: #3d4a40; }
+      .fresh.old { color: var(--chile); }
+      .mapless {
+        font-size: 0.8rem;
+        color: #5b4a32;
+        border: 1px dashed var(--wood);
+        padding: 0.3rem 0.5rem;
+        margin-top: 0.5rem;
+      }
+      .pulperia { padding: 1rem; }
+      .sign {
+        background: var(--chile);
+        color: #fff6e4;
+        font-family: "Zilla Slab", serif;
+        padding: 0.8rem 1rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+      }
+      .sign h1 { margin: 0; font-size: 1.8rem; }
+      .shelf {
+        display: grid;
+        gap: 0.7rem;
+      }
+      body[data-width="1440"] .shelf { grid-template-columns: 1fr 1fr; }
+      .tin {
+        border: 2px solid var(--tin);
+        background: #fffdf6;
+        border-radius: 10px;
+        padding: 0.8rem;
+        display: flex;
+        justify-content: space-between;
+        gap: 0.6rem;
+      }
+      .cart { padding: 1rem; }
+      .counter {
+        background: var(--enamel);
+        color: #f6ecd0;
+        border-radius: 12px;
+        margin: 0.8rem 0;
+        overflow: hidden;
+      }
+      .counter header {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.7rem 0.9rem;
+        font-family: "Zilla Slab", serif;
+        background: var(--leaf);
+      }
+      .line {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.7rem 0.9rem;
+        border-top: 1px solid rgba(246, 236, 208, 0.15);
+      }
+      .wa {
+        display: block;
+        margin: 0.7rem 0.8rem 0.9rem;
+        background: var(--gold);
+        color: var(--night);
+        text-align: center;
+        text-decoration: none;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 0.75rem;
+      }
+      .fine { color: #3d4a40; font-size: 0.95rem; }
+      @media (prefers-reduced-motion: reduce) {
+        * { transition: none !important; }
+      }
+    </style>
+  </head>
+  <body data-width="1440" data-screen="buscar">
+    <div class="studio">
+      <div>
+        <strong>Mostrador</strong>
+        <div class="muted">Exploración B · no es la aplicación · <a href="./">volver</a></div>
+      </div>
+      <nav aria-label="Pantalla">
+        <button type="button" data-screen="buscar" aria-pressed="true">Buscar</button>
+        <button type="button" data-screen="pulperia" aria-pressed="false">Pulpería</button>
+        <button type="button" data-screen="carrito" aria-pressed="false">Carrito</button>
+      </nav>
+      <nav aria-label="Ancho">
+        <button type="button" data-width="390" aria-pressed="false">390</button>
+        <button type="button" data-width="1440" aria-pressed="true">1440</button>
+      </nav>
+    </div>
+    <div class="floor">
+      <div class="stage">
+        <div class="bar">
+          <strong>La Pulpería<small>Siguatepeque · mostrador abierto</small></strong>
+          <span>3 en el canasto</span>
+        </div>
+
+        <section class="screen is-on" data-screen="buscar">
+          <div class="search">
+            <span class="bell" aria-hidden="true">?</span>
+            <input value="zambos picantes" readonly />
+          </div>
+          <div class="chips">
+            <span>Siguatepeque</span>
+            <span>Disponibles primero</span>
+            <span>Cerca de mí apagado</span>
+          </div>
+          <div class="bays">
+            <article class="bay">
+              <header>Pulpería El Pino · física</header>
+              <div class="goods">
+                <h2>Zambos picantes</h2>
+                <div class="tag">L 35.00</div>
+                <p class="fresh">Confirmada recientemente · 1,2 km</p>
+              </div>
+            </article>
+            <article class="bay">
+              <header>La Canasta Virtual · virtual</header>
+              <div class="goods">
+                <h2>Zambos picantes</h2>
+                <div class="tag">desde L 32.00</div>
+                <p class="fresh">Conviene confirmar</p>
+                <p class="mapless">No aparece en el mapa. Se atiende Siguatepeque por WhatsApp.</p>
+              </div>
+            </article>
+            <article class="bay">
+              <header>Mercado La Estación · física</header>
+              <div class="goods">
+                <h2>Zambo picante artesanal</h2>
+                <div class="tag">L 40.00</div>
+                <p class="fresh old">Información antigua · 2,8 km</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="screen" data-screen="pulperia">
+          <div class="pulperia">
+            <div class="sign">
+              <h1>Pulpería El Pino</h1>
+              <p>Física en Siguatepeque · pin público confirmado por la dueña</p>
+            </div>
+            <p class="fine">Catálogo de la pulpería. Lo que no está vigente sigue visible aquí, aunque pierde lugar en la búsqueda.</p>
+            <div class="shelf">
+              <div class="tin">
+                <div>
+                  <strong>Zambos picantes</strong>
+                  <div class="fresh">Confirmada recientemente</div>
+                </div>
+                <div class="tag">L 35.00</div>
+              </div>
+              <div class="tin">
+                <div>
+                  <strong>Queso seco</strong>
+                  <div class="fresh">Confirmada recientemente</div>
+                </div>
+                <div class="tag">desde L 80.00</div>
+              </div>
+              <div class="tin">
+                <div>
+                  <strong>Pan de yema</strong>
+                  <div class="fresh old">No disponible hoy</div>
+                </div>
+                <div class="tag">L 12.00</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" data-screen="carrito">
+          <div class="cart">
+            <h1 style="font-family:'Zilla Slab',serif;margin:0 0 .4rem">Dos mostradores</h1>
+            <p class="fine">Un WhatsApp por vendedor. Nada de esto es un pedido aceptado.</p>
+            <div class="counter">
+              <header>
+                <span>Pulpería El Pino</span>
+                <span>L 70.00</span>
+              </header>
+              <div class="line"><span>2 × Zambos picantes</span><span>L 35.00 c/u</span></div>
+              <a class="wa" href="#">Abrir WhatsApp de El Pino</a>
+            </div>
+            <div class="counter">
+              <header>
+                <span>La Canasta Virtual</span>
+                <span>desde L 80.00</span>
+              </header>
+              <div class="line"><span>1 × Queso seco</span><span>desde L 80.00</span></div>
+              <a class="wa" href="#">Abrir WhatsApp de La Canasta</a>
+            </div>
+            <p class="fine">
+              Disponibilidad, precio final, pago y entrega se confirman
+              directamente con el vendedor.
+            </p>
+          </div>
+        </section>
+      </div>
+    </div>
+    <script>
+      const body = document.body;
+      document.querySelectorAll("nav[aria-label='Pantalla'] button").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-screen");
+          body.dataset.screen = id;
+          document.querySelectorAll(".screen").forEach((el) => {
+            el.classList.toggle("is-on", el.getAttribute("data-screen") === id);
+          });
+          document.querySelectorAll("nav[aria-label='Pantalla'] button").forEach((b) => {
+            b.setAttribute("aria-pressed", String(b === btn));
+          });
+        });
+      });
+      document.querySelectorAll("nav[aria-label='Ancho'] button").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          body.dataset.width = btn.getAttribute("data-width");
+          document.querySelectorAll("nav[aria-label='Ancho'] button").forEach((b) => {
+            b.setAttribute("aria-pressed", String(b === btn));
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
