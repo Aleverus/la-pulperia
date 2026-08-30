@@ -43,7 +43,7 @@ export default async function Home() {
       <SearchForm />
       <div className="section-heading">
         <div>
-          <p className="eyebrow">Mostrador abierto</p>
+          <p className="eyebrow">Oferta local</p>
           <h2>Ofertas publicadas</h2>
         </div>
       </div>

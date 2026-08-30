@@ -1,17 +1,25 @@
-import type { Availability, PresenceKind } from "@/lib/catalog";
+import type {
+  AvailabilityDetails,
+  AvailabilityModel,
+  AvailabilityState,
+  FulfillmentMode,
+  OfferClass,
+  PresenceMode,
+} from "@/lib/catalog";
 import type { PriceMode } from "@/lib/money";
 
 export type PresenceStatus = "draft" | "published" | "archived";
 export type OfferStatus = "draft" | "published" | "paused" | "archived";
-export type OfferKind = "product" | "service";
 
 export type OwnedPresence = {
   id: string;
   name: string;
   slug: string;
   description: string;
-  kind: PresenceKind;
+  mode: PresenceMode;
   whatsapp_e164: string;
+  coverage_label: string | null;
+  service_territory: string | null;
   status: PresenceStatus;
   location_public_confirmed: boolean;
   lat: number | null;
@@ -21,13 +29,16 @@ export type OwnedPresence = {
 export type OwnedOffer = {
   id: string;
   slug: string;
-  kind: OfferKind;
+  offer_class: OfferClass;
   title: string;
   description: string;
-  price_cents: number;
+  price_cents: number | null;
   price_mode: PriceMode;
   unit: string | null;
-  availability: Availability;
+  availability_model: AvailabilityModel;
+  availability_state: AvailabilityState;
+  availability_details: AvailabilityDetails;
+  fulfillment_modes: FulfillmentMode[];
   confirmed_at: string;
   status: OfferStatus;
 };
@@ -74,16 +85,19 @@ export function parseLocation(
 }
 
 const FORM_ERRORS: Record<string, string> = {
-  name: "El nombre de la pulpería es obligatorio.",
-  kind: "Elegí si la pulpería es física o virtual.",
+  name: "El nombre del negocio es obligatorio.",
+  mode: "Elegí cómo atiende el negocio.",
+  coverage: "La atención móvil necesita una cobertura declarada.",
+  territory: "La atención remota necesita un territorio o alcance.",
   whatsapp: "El WhatsApp tiene que ser un número hondureño usable.",
-  pin: "Para publicar un negocio físico hay que confirmar que el pin será público.",
+  pin: "Para publicar una ubicación fija hay que confirmar que el pin será público.",
   bounds: "El pin publicado tiene que quedar dentro de Siguatepeque.",
   status: "Ese estado no es válido.",
   save: "No se pudo guardar. Revisá los datos e intentá de nuevo.",
   title: "La oferta necesita un título.",
-  price: "Toda oferta necesita un precio HNL, fijo o desde.",
-  availability: "Elegí una disponibilidad.",
+  price: "Revisá la modalidad y el precio publicado.",
+  availability: "La disponibilidad no corresponde a esta clase de oferta.",
+  fulfillment: "Elegí una forma de cumplimiento compatible.",
   image: "No se pudo guardar la imagen. Usá un archivo de foto de hasta 5 MB.",
   confirm: "No se pudo confirmar la vigencia.",
   signup: "No se pudo crear la cuenta de prueba.",

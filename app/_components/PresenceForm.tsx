@@ -11,7 +11,7 @@ import {
 } from "@/lib/geo";
 import { normalizeWhatsapp, waMeUrl, whatsappProbeMessage } from "@/lib/phone";
 import type { OwnedPresence } from "@/lib/seller";
-import type { PresenceKind } from "@/lib/catalog";
+import type { PresenceMode } from "@/lib/catalog";
 
 export function PresenceForm({
   presence,
@@ -20,7 +20,9 @@ export function PresenceForm({
   presence: OwnedPresence | null;
   error?: string;
 }) {
-  const [kind, setKind] = useState<PresenceKind>(presence?.kind ?? "physical");
+  const [mode, setMode] = useState<PresenceMode>(
+    presence?.mode ?? "fixed_location",
+  );
   const [name, setName] = useState(presence?.name ?? "");
   const [whatsapp, setWhatsapp] = useState(presence?.whatsapp_e164 ?? "");
   const [lat, setLat] = useState<number | null>(presence?.lat ?? null);
@@ -66,7 +68,7 @@ export function PresenceForm({
   }
 
   const pin =
-    kind === "physical" && lat !== null && lng !== null
+    mode === "fixed_location" && lat !== null && lng !== null
       ? [{ id: "draft", name: name || "Tu pulpería", lat, lng }]
       : [];
 
@@ -96,29 +98,70 @@ export function PresenceForm({
         <label>
           <input
             type="radio"
-            name="kind"
-            value="physical"
-            checked={kind === "physical"}
-            onChange={() => setKind("physical")}
+            name="mode"
+            value="fixed_location"
+            checked={mode === "fixed_location"}
+            onChange={() => setMode("fixed_location")}
           />
-          Física: aparece en el mapa con un pin público
+          Ubicación fija: aparece en el mapa con un pin público confirmado
         </label>
         <label>
           <input
             type="radio"
-            name="kind"
-            value="virtual"
-            checked={kind === "virtual"}
+            name="mode"
+            value="mobile"
+            checked={mode === "mobile"}
             onChange={() => {
-              setKind("virtual");
+              setMode("mobile");
               setLat(null);
               setLng(null);
               setIssue(null);
             }}
           />
-          Virtual: catálogo y WhatsApp, sin coordenadas
+          Atención móvil: cobertura declarada, sin marcador puntual
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="mode"
+            value="remote"
+            checked={mode === "remote"}
+            onChange={() => {
+              setMode("remote");
+              setLat(null);
+              setLng(null);
+              setIssue(null);
+            }}
+          />
+          Atención remota: alcance o entrega digital, sin marcador físico
         </label>
       </fieldset>
+
+      {mode === "mobile" ? (
+        <>
+          <label htmlFor="presence-coverage">Cobertura declarada</label>
+          <input
+            id="presence-coverage"
+            name="coverage_label"
+            defaultValue={presence?.coverage_label ?? "Siguatepeque"}
+            required
+            maxLength={240}
+          />
+        </>
+      ) : null}
+
+      {mode === "remote" ? (
+        <>
+          <label htmlFor="presence-territory">Territorio o alcance</label>
+          <input
+            id="presence-territory"
+            name="service_territory"
+            defaultValue={presence?.service_territory ?? "Atención remota"}
+            required
+            maxLength={240}
+          />
+        </>
+      ) : null}
 
       <label htmlFor="presence-whatsapp">WhatsApp</label>
       <input
@@ -146,7 +189,7 @@ export function PresenceForm({
         <p>Escribí un número hondureño para ver la prueba.</p>
       )}
 
-      {kind === "physical" ? (
+      {mode === "fixed_location" ? (
         <div>
           <h2 id="pin-map-label">Pin del negocio</h2>
           <p>
@@ -183,7 +226,7 @@ export function PresenceForm({
           ) : null}
         </div>
       ) : (
-        <p>Una pulpería virtual no entra al mapa y no guarda coordenadas.</p>
+        <p>Esta presencia no entra al mapa y no guarda coordenadas.</p>
       )}
 
       <input type="hidden" name="lat" value={lat ?? ""} />

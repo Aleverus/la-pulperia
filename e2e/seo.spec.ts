@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("public offer and physical seller expose safe indexable metadata", async ({
+test("public offer and fixed-location seller expose safe indexable metadata", async ({
   page,
   request,
 }) => {

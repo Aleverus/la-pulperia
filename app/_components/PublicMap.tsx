@@ -14,7 +14,7 @@ import {
 export function PublicMap({ places }: { places: CatalogPresence[] }) {
   const pins = places.filter(
     (place): place is CatalogPresence & { lat: number; lng: number } =>
-      place.kind === "physical" && place.lat !== null && place.lng !== null,
+      place.mode === "fixed_location" && place.lat !== null && place.lng !== null,
   );
   const [selectedId, setSelectedId] = useState<string | null>(pins[0]?.id ?? null);
   const [here, setHere] = useState<{ lat: number; lng: number } | null>(null);
@@ -70,7 +70,7 @@ export function PublicMap({ places }: { places: CatalogPresence[] }) {
       {issue ? <p>{GEO_ISSUE_LABEL[issue]}</p> : null}
       <h2 id="public-map-label">Mapa de Siguatepeque</h2>
       {pins.length === 0 ? (
-        <p>Todavía no hay negocios físicos publicados.</p>
+        <p>Todavía no hay ubicaciones fijas publicadas.</p>
       ) : null}
       <CityMap
         labelledBy="public-map-label"
@@ -84,7 +84,7 @@ export function PublicMap({ places }: { places: CatalogPresence[] }) {
         onSelect={setSelectedId}
         here={here}
       />
-      <ul className="offer-list" aria-label="Negocios físicos">
+      <ul className="offer-list" aria-label="Ubicaciones fijas">
         {ordered.map((place) => {
           const selected = place.id === selectedId;
           const distance =

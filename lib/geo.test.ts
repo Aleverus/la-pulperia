@@ -8,7 +8,7 @@ import {
 } from "./geo";
 
 describe("withinSiguatepeque", () => {
-  it("accepts the seeded physical pin", () => {
+  it("accepts the seeded fixed-location pin", () => {
     expect(withinSiguatepeque(14.5969, -87.831)).toBe(true);
   });
 

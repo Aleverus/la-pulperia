@@ -1,8 +1,11 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { cartToPrepareItems, type CartLine } from "@/lib/cart";
 import { getCatalogOffersByIds } from "@/lib/data";
+import {
+  selectionToPrepareItems,
+  type SelectionLine,
+} from "@/lib/selection";
 import { createClient } from "@/lib/supabase/server";
 
 export async function signInAction(formData: FormData) {
@@ -49,11 +52,11 @@ export async function signUpAction(formData: FormData) {
   redirect(next);
 }
 
-export async function refreshCartAction(ids: string[]) {
+export async function refreshSelectionAction(ids: string[]) {
   return getCatalogOffersByIds(ids);
 }
 
-export async function prepareBatchAction(lines: CartLine[]) {
+export async function prepareBatchAction(lines: SelectionLine[]) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -63,7 +66,7 @@ export async function prepareBatchAction(lines: CartLine[]) {
   }
 
   const { data, error } = await supabase.rpc("prepare_request_batch", {
-    p_items: cartToPrepareItems(lines),
+    p_items: selectionToPrepareItems(lines),
   });
   if (error || !data) {
     redirect("/carrito?error=prepare");

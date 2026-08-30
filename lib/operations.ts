@@ -23,7 +23,7 @@ export type MetricsSummary = {
   events: Record<
     | "search"
     | "offer_open"
-    | "cart_add"
+    | "selection_add"
     | "request_prepared"
     | "handoff_opened"
     | "seller_update",
@@ -31,7 +31,11 @@ export type MetricsSummary = {
   >;
   useful_searches: number;
   empty_searches: number;
-  published_presences: { physical: number; virtual: number };
+  published_presences: {
+    fixed_location: number;
+    mobile: number;
+    remote: number;
+  };
 };
 
 export async function getPublicContextNotes(input: {
@@ -52,7 +56,7 @@ export async function getPublicContextNotes(input: {
 }
 
 export async function recordPublicEvent(
-  eventKind: "offer_open" | "cart_add",
+  eventKind: "offer_open" | "selection_add",
 ): Promise<void> {
   const supabase = createPublicClient();
   await supabase.rpc("record_public_event", { p_event_kind: eventKind });

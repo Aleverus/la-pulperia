@@ -153,8 +153,9 @@ insert into public.operator_members (user_id)
 values ('10000000-0000-0000-0000-000000000004');
 
 insert into public.seller_presences (
-  id, owner_id, name, slug, description, kind, whatsapp_e164,
-  served_city, location, location_public_confirmed, status
+  id, owner_id, name, slug, description, mode, whatsapp_e164,
+  served_city, coverage_label, service_territory, location,
+  location_public_confirmed, status
 ) values
   (
     '10000000-0000-0000-0000-000000000010',
@@ -162,9 +163,11 @@ insert into public.seller_presences (
     'Pulpería El Pino',
     'el-pino',
     'Pulpería de barrio en Siguatepeque. Pin público del negocio.',
-    'physical',
+    'fixed_location',
     '+50499991111',
     'Siguatepeque',
+    null,
+    null,
     extensions.st_point(-87.8310, 14.5969)::extensions.geography,
     true,
     'published'
@@ -172,88 +175,161 @@ insert into public.seller_presences (
   (
     '10000000-0000-0000-0000-000000000011',
     '10000000-0000-0000-0000-000000000003',
-    'La Canasta Virtual',
+    'La Canasta Móvil',
     'la-canasta-virtual',
-    'Atiende Siguatepeque por WhatsApp. Sin ubicación en el mapa.',
-    'virtual',
+    'Fixture local móvil con ofertas de prueba. Sin ubicación en el mapa.',
+    'mobile',
     '+50499992222',
     'Siguatepeque',
+    'Siguatepeque; confirmar cobertura con el vendedor',
+    null,
     null,
     false,
     'published'
   );
 
 insert into public.offers (
-  id, presence_id, slug, kind, title, description,
-  price_cents, price_mode, unit, availability, confirmed_at, status
+  id, presence_id, slug, offer_class, title, description,
+  price_cents, price_mode, unit, availability_model, availability_state,
+  availability_details, confirmed_at, status
 ) values
   (
     '10000000-0000-0000-0000-000000000020',
     '10000000-0000-0000-0000-000000000010',
     'zambos-picantes-el-pino',
-    'product',
+    'stocked_product',
     'Zambos picantes',
     'Bolsa de zambos con chile, receta de sábado de mercado.',
     3500,
     'fixed',
     'bolsa',
+    'stock',
     'available',
+    '{}'::jsonb,
     now(),
-    'published'
+    'draft'
   ),
   (
     '10000000-0000-0000-0000-000000000021',
     '10000000-0000-0000-0000-000000000010',
     'queso-seco-el-pino',
-    'product',
+    'stocked_product',
     'Queso seco',
     'Queso seco de la zona. El peso se confirma al pedir.',
     8000,
     'from',
     'libra',
+    'stock',
     'available',
+    '{}'::jsonb,
     now(),
-    'published'
+    'draft'
   ),
   (
     '10000000-0000-0000-0000-000000000022',
     '10000000-0000-0000-0000-000000000011',
     'zambos-picantes-canasta',
-    'product',
+    'stocked_product',
     'Zambos picantes',
     'Zambos picantes por encargo. Conviene confirmar existencia.',
     3200,
     'from',
     'bolsa',
+    'stock',
     'available',
+    '{}'::jsonb,
     now() - interval '12 days',
-    'published'
+    'draft'
   ),
   (
     '10000000-0000-0000-0000-000000000023',
     '10000000-0000-0000-0000-000000000011',
     'queso-seco-canasta',
-    'product',
+    'stocked_product',
     'Queso seco',
     'Queso seco empacado. Precio publicado por libra.',
     7500,
     'fixed',
     'libra',
+    'stock',
     'available',
+    '{}'::jsonb,
     now() - interval '12 days',
-    'published'
+    'draft'
   ),
   (
     '10000000-0000-0000-0000-000000000024',
     '10000000-0000-0000-0000-000000000010',
     'pan-de-yema-el-pino',
-    'product',
+    'stocked_product',
     'Pan de yema',
     'No disponible hoy. Sigue visible en la pulpería.',
     1200,
     'fixed',
     'unidad',
+    'stock',
     'unavailable',
+    '{}'::jsonb,
     now() - interval '40 days',
-    'published'
+    'draft'
+  ),
+  (
+    '10000000-0000-0000-0000-000000000025',
+    '10000000-0000-0000-0000-000000000011',
+    'pan-por-encargo-canasta',
+    'scheduled_food',
+    'Pan por encargo',
+    'Fixture de comida con una ventana y corte explícitos.',
+    1200,
+    'fixed',
+    'unidad',
+    'window',
+    'available',
+    '{"starts_at":"2030-01-10T14:00:00-06:00","ends_at":"2030-01-10T17:00:00-06:00","cutoff_at":"2030-01-10T12:00:00-06:00","capacity_note":"Cupo de prueba"}'::jsonb,
+    now(),
+    'draft'
+  ),
+  (
+    '10000000-0000-0000-0000-000000000026',
+    '10000000-0000-0000-0000-000000000011',
+    'armado-canastas-evento',
+    'local_service',
+    'Armado de canastas para evento',
+    'Fixture de servicio local que requiere alcance y cita.',
+    null,
+    'quote',
+    null,
+    'schedule',
+    'available',
+    '{"schedule_note":"Horario a confirmar con el vendedor"}'::jsonb,
+    now(),
+    'draft'
+  ),
+  (
+    '10000000-0000-0000-0000-000000000027',
+    '10000000-0000-0000-0000-000000000011',
+    'tarjeta-digital-fixture',
+    'digital_offer',
+    'Tarjeta digital para evento',
+    'Fixture digital bajo solicitud con entrega fuera de la plataforma.',
+    null,
+    'quote',
+    null,
+    'on_request',
+    'on_request',
+    '{"requirements":"Describir texto, formato y fecha deseada"}'::jsonb,
+    now(),
+    'draft'
   );
+
+insert into public.offer_fulfillment_modes (offer_id, mode) values
+  ('10000000-0000-0000-0000-000000000020', 'direct_agreement'),
+  ('10000000-0000-0000-0000-000000000021', 'direct_agreement'),
+  ('10000000-0000-0000-0000-000000000022', 'direct_agreement'),
+  ('10000000-0000-0000-0000-000000000023', 'direct_agreement'),
+  ('10000000-0000-0000-0000-000000000024', 'direct_agreement'),
+  ('10000000-0000-0000-0000-000000000025', 'local_coverage'),
+  ('10000000-0000-0000-0000-000000000026', 'appointment'),
+  ('10000000-0000-0000-0000-000000000027', 'digital_delivery');
+
+update public.offers set status = 'published';

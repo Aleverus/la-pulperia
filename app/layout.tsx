@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Header } from "@/app/_components/Header";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_ORIGIN } from "@/lib/site";
 import "maplibre-gl/dist/maplibre-gl.css";
-import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_ORIGIN),

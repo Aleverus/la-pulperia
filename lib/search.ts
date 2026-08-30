@@ -1,8 +1,8 @@
-import type { PresenceKind } from "@/lib/catalog";
+import type { PresenceMode } from "@/lib/catalog";
 
 export const SEARCH_PAGE_SIZE = 20;
 
-export type SearchPresenceFilter = "all" | PresenceKind;
+export type SearchPresenceFilter = "all" | PresenceMode;
 export type SearchSort =
   | "organic"
   | "price_asc"
@@ -14,7 +14,9 @@ export function parseSearchPresenceFilter(
   value: string | string[] | undefined,
 ): SearchPresenceFilter {
   const candidate = first(value);
-  return candidate === "physical" || candidate === "virtual"
+  return candidate === "fixed_location" ||
+    candidate === "mobile" ||
+    candidate === "remote"
     ? candidate
     : "all";
 }

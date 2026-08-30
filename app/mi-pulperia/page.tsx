@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { PresenceForm } from "@/app/_components/PresenceForm";
+import { PRESENCE_MODE_LABEL } from "@/lib/catalog";
 import { FRESHNESS_LABEL, freshnessBand } from "@/lib/freshness";
 import { formatPublishedPrice } from "@/lib/money";
 import {
@@ -35,7 +36,7 @@ export default async function MiPulperiaPage({
       <h1>Mi pulpería</h1>
       <p>
         {PRESENCE_STATUS_LABEL[presence.status]} ·{" "}
-        {presence.kind === "physical" ? "Física" : "Virtual"}
+        {PRESENCE_MODE_LABEL[presence.mode]}
         {presence.status === "published" ? (
           <>
             {" · "}

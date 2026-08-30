@@ -23,11 +23,12 @@ export function SearchForm({
         />
       </label>
       <label className="form-field" htmlFor="tipo">
-        Tipo de pulpería
+        Forma de atención
         <select id="tipo" name="tipo" defaultValue={defaultPresence}>
           <option value="all">Todas</option>
-          <option value="physical">Físicas</option>
-          <option value="virtual">Virtuales</option>
+          <option value="fixed_location">Ubicación fija</option>
+          <option value="mobile">Atención móvil</option>
+          <option value="remote">Atención remota</option>
         </select>
       </label>
       <label className="form-field" htmlFor="orden">

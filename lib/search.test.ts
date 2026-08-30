@@ -8,7 +8,7 @@ import {
 
 describe("public search parameters", () => {
   it("accepts only the public filter and sort vocabulary", () => {
-    expect(parseSearchPresenceFilter("physical")).toBe("physical");
+    expect(parseSearchPresenceFilter("fixed_location")).toBe("fixed_location");
     expect(parseSearchPresenceFilter("anything")).toBe("all");
     expect(parseSearchSort("price_desc")).toBe("price_desc");
     expect(parseSearchSort("nearby")).toBe("nearby");
@@ -25,12 +25,12 @@ describe("public search parameters", () => {
     expect(
       searchHref({
         query: "zambos picantes",
-        presence: "virtual",
+        presence: "mobile",
         sort: "price_asc",
         page: 2,
       }),
     ).toBe(
-      "/buscar?q=zambos+picantes&tipo=virtual&orden=price_asc&pagina=2",
+      "/buscar?q=zambos+picantes&tipo=mobile&orden=price_asc&pagina=2",
     );
     expect(
       searchHref({ query: "", presence: "all", sort: "organic", page: 1 }),

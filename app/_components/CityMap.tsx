@@ -132,6 +132,7 @@ export function CityMap({
         className="city-map"
         role="region"
         aria-labelledby={labelledBy}
+        style={{ minHeight: "20rem", width: "100%" }}
         data-map-status={failed ? "failed" : ready ? "ready" : "loading"}
         data-map-error={mapError ?? undefined}
       />

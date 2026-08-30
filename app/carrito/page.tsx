@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { CartClient } from "@/app/_components/CartClient";
+import { SelectionClient } from "@/app/_components/SelectionClient";
 import { hasPublicSupabaseEnv } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "Carrito",
+  title: "Selección",
   robots: { index: false, follow: false },
 };
 
@@ -19,10 +19,10 @@ export default async function CartPage() {
 
   return (
     <main className="cart-page">
-      <p className="eyebrow">Tu canasto</p>
-      <h1>Carrito</h1>
+      <p className="eyebrow">Intención por vendedor</p>
+      <h1>Selección</h1>
       <p>La selección se agrupa por vendedor. No es un pedido único de la plataforma.</p>
-      <CartClient signedIn={signedIn} />
+      <SelectionClient signedIn={signedIn} />
     </main>
   );
 }

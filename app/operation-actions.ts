@@ -33,7 +33,7 @@ export async function reviewReportAction(formData: FormData) {
 }
 
 export async function recordPublicEventAction(
-  eventKind: "offer_open" | "cart_add",
+  eventKind: "offer_open" | "selection_add",
 ) {
   const { recordPublicEvent } = await import("@/lib/operations");
   await recordPublicEvent(eventKind);

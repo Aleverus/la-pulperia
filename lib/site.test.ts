@@ -30,5 +30,6 @@ describe("site metadata helpers", () => {
     expect(availabilitySchemaUrl("unavailable")).toBe(
       "https://schema.org/OutOfStock",
     );
+    expect(availabilitySchemaUrl("on_request")).toBeNull();
   });
 });

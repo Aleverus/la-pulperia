@@ -5,9 +5,9 @@ import { getPhysicalCatalogPlaces } from "@/lib/seller-data";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Mapa de pulperías físicas",
+  title: "Mapa de ubicaciones fijas",
   description:
-    "Descubrí negocios físicos de Siguatepeque con ubicación pública confirmada.",
+    "Descubrí ubicaciones fijas de Siguatepeque con punto público confirmado.",
   alternates: { canonical: "/mapa" },
 };
 
@@ -19,8 +19,8 @@ export default async function MapaPage() {
       <p className="eyebrow">Siguatepeque</p>
       <h1>Mapa</h1>
       <p>
-        Sólo negocios físicos con pin confirmado. Las pulperías virtuales
-        aparecen en el catálogo, nunca aquí.
+        Sólo ubicaciones fijas con punto confirmado. La atención móvil y remota
+        aparece en el catálogo, nunca como un marcador falso.
       </p>
       <PublicMap places={places} />
     </main>

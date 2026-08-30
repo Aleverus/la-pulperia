@@ -15,7 +15,7 @@ select is(
     where slug = 'la-canasta-virtual'
   ),
   true,
-  'virtual presence has no public coordinates'
+  'mobile presence has no public coordinates'
 );
 
 select ok(
@@ -24,7 +24,7 @@ select ok(
     from public.catalog_presences
     where slug = 'el-pino'
   ),
-  'physical published presence exposes coordinates'
+  'fixed published presence exposes coordinates'
 );
 
 select is(
@@ -59,11 +59,11 @@ select is(
     select count(*)::integer
     from public.search_offers(
       p_query => 'zambos picantes',
-      p_presence_kind => 'physical'
+      p_presence_mode => 'fixed_location'
     )
   ),
   1,
-  'physical filter excludes virtual offers'
+  'fixed-location filter excludes mobile offers'
 );
 
 select is(
@@ -75,7 +75,7 @@ select is(
     )
     limit 1
   ),
-  'La Canasta Virtual',
+  'La Canasta Móvil',
   'price ascending is explicit and deterministic'
 );
 
@@ -105,14 +105,14 @@ select ok(
     )
     where presence_slug = 'el-pino'
   ),
-  'nearby sorting returns an ephemeral distance for a physical seller'
+  'nearby sorting returns an ephemeral distance for a fixed seller'
 );
 
 select is(
   (
     select count(*)::integer
     from public.search_offers('zambos picantes') s
-    where s.availability = 'unavailable'
+    where s.availability_state = 'unavailable'
   ),
   0,
   'unavailable offers stay out of default search'
@@ -188,7 +188,7 @@ set local role anon;
 select throws_ok(
   $$
     select public.prepare_request_batch(
-      '[{"offer_id":"10000000-0000-0000-0000-000000000020","quantity":1}]'::jsonb
+      '[{"offer_id":"10000000-0000-0000-0000-000000000020","request":{"quantity":1}}]'::jsonb
     )
   $$,
   '42501',

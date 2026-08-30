@@ -9,15 +9,19 @@ const message = composeHandoffMessage({
   items: [
     {
       title: "Zambos picantes",
-      quantity: 2,
+      offerClass: "stocked_product",
+      request: { quantity: 2 },
       priceCents: 3500,
       priceMode: "fixed",
+      fulfillmentModes: ["direct_agreement"],
     },
     {
       title: "Queso seco",
-      quantity: 1,
+      offerClass: "stocked_product",
+      request: { quantity: 1 },
       priceCents: 8000,
       priceMode: "from",
+      fulfillmentModes: ["direct_agreement"],
     },
   ],
 });

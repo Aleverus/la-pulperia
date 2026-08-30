@@ -1,4 +1,4 @@
-import type { Availability } from "@/lib/catalog";
+import type { AvailabilityState } from "@/lib/catalog";
 
 export const SITE_NAME = "La Pulpería";
 export const SITE_DESCRIPTION =
@@ -35,7 +35,10 @@ export function metadataDescription(value: string): string {
     : `${normalized.slice(0, 157).trimEnd()}…`;
 }
 
-export function availabilitySchemaUrl(availability: Availability): string {
+export function availabilitySchemaUrl(
+  availability: AvailabilityState,
+): string | null {
+  if (availability === "on_request") return null;
   const type = {
     available: "InStock",
     limited: "LimitedAvailability",

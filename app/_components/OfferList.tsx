@@ -1,5 +1,9 @@
 import Link from "next/link";
-import type { SearchOffer } from "@/lib/catalog";
+import {
+  OFFER_CLASS_LABEL,
+  PRESENCE_MODE_LABEL,
+  type SearchOffer,
+} from "@/lib/catalog";
 import { FRESHNESS_LABEL, freshnessBand } from "@/lib/freshness";
 import { formatPublishedPrice } from "@/lib/money";
 
@@ -17,11 +21,12 @@ export function OfferList({ offers }: { offers: SearchOffer[] }) {
               <Link href={`/pulperia/${offer.presence_slug}`}>
                 {offer.presence_name}
               </Link>
-              <span>{offer.presence_kind === "physical" ? "Física" : "Virtual"}</span>
+              <span>{PRESENCE_MODE_LABEL[offer.presence_mode]}</span>
             </p>
             <h2>
               <Link href={`/oferta/${offer.offer_slug}`}>{offer.title}</Link>
             </h2>
+            <p>{OFFER_CLASS_LABEL[offer.offer_class]}</p>
             <p className="price-tag">
               {formatPublishedPrice(offer.price_cents, offer.price_mode)}
             </p>

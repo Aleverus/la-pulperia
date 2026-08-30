@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("seller publishes a physical pulpería and manages an offer", async ({
+test("seller publishes a fixed presence and manages a stock offer", async ({
   page,
 }) => {
   const suffix = crypto.randomUUID().slice(0, 8);
@@ -17,7 +17,7 @@ test("seller publishes a physical pulpería and manages an offer", async ({
   await expect(page.getByRole("heading", { name: "Abrir una pulpería" })).toBeVisible();
   await page.getByLabel("Nombre de la pulpería").fill(presenceName);
   await page.getByLabel("WhatsApp", { exact: true }).fill("99993333");
-  await page.getByRole("radio", { name: /Física/ }).check();
+  await page.getByRole("radio", { name: /Ubicación fija/ }).check();
   await page
     .getByRole("region", { name: "Pin del negocio" })
     .click({ position: { x: 160, y: 140 } });
@@ -33,7 +33,7 @@ test("seller publishes a physical pulpería and manages an offer", async ({
   await page.getByRole("link", { name: "Crear oferta" }).click();
   await page.getByLabel("Título").fill(offerTitle);
   await page.getByLabel("Precio publicado (lempiras)").fill("45");
-  await page.getByRole("button", { name: "Crear oferta" }).click();
+  await page.getByRole("button", { name: "Guardar borrador" }).click();
 
   await expect(page.getByRole("heading", { name: "Editar oferta" })).toBeVisible();
   await page.getByRole("button", { name: "Publicar" }).click();
@@ -57,8 +57,100 @@ test("seller publishes a physical pulpería and manages an offer", async ({
   await expect(page.getByText(presenceName)).toBeVisible();
 
   await page.goto("/mapa");
-  const list = page.getByRole("list", { name: "Negocios físicos" });
+  const list = page.getByRole("list", { name: "Ubicaciones fijas" });
   await expect(list.getByText("Pulpería El Pino")).toBeVisible();
   await expect(list.getByText(presenceName)).toBeVisible();
-  await expect(list.getByText("La Canasta Virtual")).toHaveCount(0);
+  await expect(list.getByText("La Canasta Móvil")).toHaveCount(0);
+});
+
+test("seller maintains food, service, and digital offers through the class-aware flow", async ({
+  page,
+}) => {
+  const suffix = crypto.randomUUID().slice(0, 8);
+  const email = `movil.${suffix}@local.test`;
+  const foodTitle = `Pan de tarde ${suffix}`;
+  const serviceTitle = `Reparación local ${suffix}`;
+  const editedServiceTitle = `${serviceTitle} actualizada`;
+  const digitalTitle = `Diseño digital ${suffix}`;
+
+  await page.goto("/ingresar?next=/vender");
+  await page.getByLabel("Nombre visible").fill("Vendedora móvil");
+  await page.getByLabel("Correo para la cuenta nueva").fill(email);
+  await page.getByLabel("Contraseña para la cuenta nueva").fill("pulperia-local");
+  await page.getByRole("button", { name: "Crear cuenta de prueba" }).click();
+
+  await page.getByLabel("Nombre de la pulpería").fill(`Negocio móvil ${suffix}`);
+  await page.getByLabel("WhatsApp", { exact: true }).fill("99994444");
+  await page.getByRole("radio", { name: /Atención móvil/ }).check();
+  await page
+    .getByRole("textbox", { name: "Cobertura declarada" })
+    .fill("Siguatepeque urbano");
+  await page.getByRole("button", { name: "Publicar pulpería" }).click();
+
+  await page.getByRole("link", { name: "Crear oferta" }).click();
+  await expect(page.getByLabel("Nota de existencias (opcional)")).toBeVisible();
+  await expect(page.getByLabel("Inicio de la ventana")).toHaveCount(0);
+  await page.getByRole("radio", { name: /Comida o encargo/ }).check();
+  await expect(page.getByLabel("Nota de existencias (opcional)")).toHaveCount(0);
+  await expect(page.getByRole("checkbox", { name: "Cita" })).toHaveCount(0);
+  await page.getByLabel("Título").fill(foodTitle);
+  await page.getByLabel("Precio publicado (lempiras)").fill("18");
+  await page.getByLabel("Inicio de la ventana").fill("2030-04-12T14:00");
+  await page.getByLabel("Fin de la ventana").fill("2030-04-12T18:00");
+  await page.getByLabel("Fecha de corte (opcional)").fill("2030-04-12T12:00");
+  await page.getByRole("button", { name: "Crear y publicar" }).click();
+
+  await expect(page.getByRole("heading", { name: "Editar oferta" })).toBeVisible();
+  await page.getByRole("button", { name: "Confirmar vigencia" }).click();
+  await expect(page.getByRole("status")).toContainText("Vigencia confirmada");
+  await page.getByRole("button", { name: "Pausar" }).click();
+  await expect(page.getByRole("button", { name: "Volver a publicar" })).toBeVisible();
+  await page.getByRole("button", { name: "Volver a publicar" }).click();
+
+  await page.goto("/mi-pulperia");
+  await page.getByRole("link", { name: "Crear oferta" }).click();
+  await page.getByRole("radio", { name: /Servicio local/ }).check();
+  await expect(page.getByLabel("Nota de existencias (opcional)")).toHaveCount(0);
+  await expect(page.getByRole("checkbox", { name: "Retiro" })).toHaveCount(0);
+  await expect(page.getByRole("checkbox", { name: "Cita" })).toBeVisible();
+  await page.getByLabel("Título").fill(serviceTitle);
+  await page.getByLabel("Modalidad de precio").selectOption("quote");
+  await expect(page.getByLabel("Precio publicado (lempiras)")).toHaveCount(0);
+  await page.getByLabel("Nota de agenda").fill("Disponible por la tarde");
+  await page.getByRole("checkbox", { name: "Cita" }).check();
+  await page.getByRole("button", { name: "Crear y publicar" }).click();
+
+  await expect(page.getByRole("heading", { name: "Editar oferta" })).toBeVisible();
+  await page.getByLabel("Título").fill(editedServiceTitle);
+  await page.getByLabel("Nota de agenda").fill("Disponible de lunes a viernes");
+  await page.getByRole("button", { name: "Guardar cambios" }).click();
+  await expect(page.getByLabel("Título")).toHaveValue(editedServiceTitle);
+
+  await page.goto("/mi-pulperia");
+  await page.getByRole("link", { name: "Crear oferta" }).click();
+  await page.getByRole("radio", { name: /Oferta digital/ }).check();
+  await expect(page.getByRole("checkbox", { name: "Entrega digital" })).toBeVisible();
+  await expect(page.getByRole("checkbox", { name: "Cobertura o visita local" })).toHaveCount(0);
+  await page.getByLabel("Título").fill(digitalTitle);
+  await page.getByLabel("Modalidad de precio").selectOption("quote");
+  await page.getByLabel("Estado actual").selectOption("on_request");
+  await expect(page.getByLabel("Nota de agenda")).toHaveCount(0);
+  await page
+    .getByLabel("Qué necesitás para responder")
+    .fill("Alcance, formato y fecha deseada");
+  await page.getByRole("checkbox", { name: "Entrega digital" }).check();
+  await page.getByRole("button", { name: "Crear y publicar" }).click();
+
+  await expect(page.getByRole("heading", { name: "Editar oferta" })).toBeVisible();
+  await page.goto("/mi-pulperia");
+  await expect(page.getByRole("link", { name: foodTitle })).toBeVisible();
+  await expect(page.getByRole("link", { name: editedServiceTitle })).toBeVisible();
+  await expect(page.getByRole("link", { name: digitalTitle })).toBeVisible();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    )
+    .toBe(true);
 });

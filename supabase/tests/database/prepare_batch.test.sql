@@ -1,5 +1,5 @@
 begin;
-select plan(5);
+select plan(6);
 
 -- Keep the fixture buyer deterministic when this gate follows a local E2E run.
 delete from public.request_batches
@@ -17,8 +17,8 @@ select is(
   (
     select jsonb_array_length(public.prepare_request_batch(
       '[
-        {"offer_id":"10000000-0000-0000-0000-000000000020","quantity":2},
-        {"offer_id":"10000000-0000-0000-0000-000000000022","quantity":1}
+        {"offer_id":"10000000-0000-0000-0000-000000000020","request":{"quantity":2}},
+        {"offer_id":"10000000-0000-0000-0000-000000000022","request":{"quantity":1}}
       ]'::jsonb
     ) -> 'requests')
   ),
@@ -50,6 +50,19 @@ select is(
   ),
   3500,
   'snapshot captures the published price'
+);
+
+select is(
+  (
+    select i.offer_class_snapshot::text
+    from public.request_items i
+    join public.seller_requests r on r.id = i.seller_request_id
+    join public.request_batches b on b.id = r.batch_id
+    where b.buyer_id = '10000000-0000-0000-0000-000000000001'
+      and i.offer_id = '10000000-0000-0000-0000-000000000020'
+  ),
+  'stocked_product',
+  'snapshot captures the offer class'
 );
 
 update public.offers

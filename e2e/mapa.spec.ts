@@ -1,15 +1,15 @@
 import { expect, test } from "@playwright/test";
 
-test("physical map hides virtuals and explains GPS states", async ({
+test("fixed map hides mobile presences and explains GPS states", async ({
   page,
   context,
 }) => {
   await page.goto("/mapa");
-  const list = page.getByRole("list", { name: "Negocios físicos" });
+  const list = page.getByRole("list", { name: "Ubicaciones fijas" });
   await expect(page.locator('[data-map-status="ready"]')).toBeVisible();
   await expect(page.getByText("OpenStreetMap contributors")).toBeVisible();
   await expect(list.getByText("Pulpería El Pino")).toBeVisible();
-  await expect(list.getByText("La Canasta Virtual")).toHaveCount(0);
+  await expect(list.getByText("La Canasta Móvil")).toHaveCount(0);
 
   await page.getByRole("button", { name: "Usar mi ubicación" }).click();
   await expect(page.getByText("No hay permiso de ubicación")).toBeVisible();

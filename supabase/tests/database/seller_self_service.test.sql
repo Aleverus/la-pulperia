@@ -1,5 +1,9 @@
 begin;
-select plan(9);
+select plan(14);
+
+update public.offers
+set confirmed_at = now() - interval '8 days'
+where id = '10000000-0000-0000-0000-000000000020';
 
 select set_config(
   'request.jwt.claims',
@@ -9,6 +13,35 @@ select set_config(
 select set_config('request.jwt.claim.sub', '10000000-0000-0000-0000-000000000002', true);
 set local role authenticated;
 
+select throws_ok(
+  $$
+    update public.seller_presences
+    set description = description
+    where id = '10000000-0000-0000-0000-000000000010'
+  $$,
+  '42501', null,
+  'authenticated sellers cannot bypass the presence RPC with direct writes'
+);
+
+select throws_ok(
+  $$
+    update public.offers
+    set title = title
+    where id = '10000000-0000-0000-0000-000000000020'
+  $$,
+  '42501', null,
+  'authenticated sellers cannot bypass the offer RPC with direct writes'
+);
+
+select throws_ok(
+  $$
+    delete from public.offer_fulfillment_modes
+    where offer_id = '10000000-0000-0000-0000-000000000020'
+  $$,
+  '42501', null,
+  'authenticated sellers cannot bypass fulfillment validation with direct writes'
+);
+
 select lives_ok(
   $$
     select public.confirm_offer_freshness('10000000-0000-0000-0000-000000000020')
@@ -16,13 +49,50 @@ select lives_ok(
   'owner can confirm offer freshness'
 );
 
+select ok(
+  (
+    select confirmed_at >= now() - interval '1 minute'
+    from public.offers
+    where id = '10000000-0000-0000-0000-000000000020'
+  ),
+  'an offer can be reconfirmed after more than one week without operator help'
+);
+
+select lives_ok(
+  $$
+    select public.upsert_offer(
+      '10000000-0000-0000-0000-000000000010',
+      'stocked_product',
+      'Producto RPC de prueba',
+      '',
+      1000,
+      'fixed',
+      null,
+      'stock',
+      'available',
+      '{}'::jsonb,
+      array[
+        'direct_agreement'::public.fulfillment_mode,
+        'direct_agreement'::public.fulfillment_mode
+      ],
+      'draft',
+      null,
+      false
+    );
+    set constraints offers_fulfillment_compatibility_trg immediate
+  $$,
+  'owner can create a valid offer and duplicate fulfillment modes are normalized'
+);
+
 select throws_ok(
   $$
     select public.upsert_seller_presence(
       'Fuera',
       '',
-      'physical',
+      'fixed_location',
       '+50499993333',
+      null,
+      null,
       14.09,
       -87.19,
       true,
@@ -32,7 +102,7 @@ select throws_ok(
   $$,
   '23514',
   null,
-  'owner cannot publish a physical pin outside Siguatepeque'
+  'owner cannot publish a fixed pin outside Siguatepeque'
 );
 
 reset role;
@@ -57,13 +127,16 @@ select throws_ok(
   $$
     select public.upsert_offer(
       '10000000-0000-0000-0000-000000000010',
-      'product',
+      'stocked_product',
       'Intruso',
       '',
       1000,
       'fixed',
       null,
+      'stock',
       'available',
+      '{}'::jsonb,
+      array['direct_agreement'::public.fulfillment_mode],
       'published',
       null,
       false
@@ -88,10 +161,12 @@ select is(
     select location is null and location_public_confirmed = false
     from public.seller_presences
     where id = public.upsert_seller_presence(
-      'La Canasta Virtual',
-      'Sigue virtual.',
-      'virtual',
+      'La Canasta Móvil',
+      'Sigue móvil.',
+      'mobile',
       '+50499992222',
+      'Siguatepeque',
+      null,
       14.5969,
       -87.8310,
       true,
@@ -100,7 +175,7 @@ select is(
     )
   ),
   true,
-  'virtual upsert drops coordinates even if a pin is submitted'
+  'mobile upsert drops coordinates even if a pin is submitted'
 );
 
 reset role;
@@ -144,8 +219,10 @@ select lives_ok(
     select public.upsert_seller_presence(
       'Pulpería La Esquina',
       'Barrio centro.',
-      'physical',
+      'fixed_location',
       '+50499993333',
+      null,
+      null,
       14.5969,
       -87.8310,
       true,
@@ -153,7 +230,7 @@ select lives_ok(
       null
     )
   $$,
-  'new seller can publish a confirmed physical pin in Siguatepeque'
+  'new seller can publish a confirmed fixed pin in Siguatepeque'
 );
 
 reset role;
@@ -163,10 +240,10 @@ select is(
   (
     select count(*)::integer
     from public.catalog_presences
-    where kind = 'physical' and lat is not null
+    where mode = 'fixed_location' and lat is not null
   ) >= 2,
   true,
-  'published physical presence appears in the public catalog with coordinates'
+  'published fixed presence appears in the public catalog with coordinates'
 );
 
 select is(
@@ -176,7 +253,7 @@ select is(
     where slug = 'la-canasta-virtual' and lat is not null
   ),
   0,
-  'virtual catalog row never carries a public pin'
+  'mobile catalog row never carries a public pin'
 );
 
 reset role;
@@ -187,8 +264,10 @@ select throws_ok(
     select public.upsert_seller_presence(
       'Anónima',
       '',
-      'virtual',
+      'mobile',
       '+50499994444',
+      'Siguatepeque',
+      null,
       null,
       null,
       false,

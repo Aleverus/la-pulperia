@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("buyer search, multi-seller cart, login, and two WhatsApp handoffs", async ({
+test("buyer search, multi-seller selection, login, and two WhatsApp handoffs", async ({
   page,
 }) => {
   await page.goto("/");
@@ -8,29 +8,29 @@ test("buyer search, multi-seller cart, login, and two WhatsApp handoffs", async 
   await page.getByRole("button", { name: "Buscar" }).click();
 
   const pino = page.locator("article").filter({ hasText: "Pulpería El Pino" });
-  const canasta = page.locator("article").filter({ hasText: "La Canasta Virtual" });
+  const canasta = page.locator("article").filter({ hasText: "La Canasta Móvil" });
   await expect(pino).toBeVisible();
   await expect(canasta).toBeVisible();
   await expect(page.getByText("Pan de yema")).toHaveCount(0);
 
   await pino.getByRole("link", { name: "Zambos picantes" }).click();
-  const firstAdd = page.getByRole("button", { name: "Agregar al carrito" });
+  const firstAdd = page.getByRole("button", { name: "Agregar a la selección" });
   await firstAdd.click();
-  await expect(page.getByRole("button", { name: "En el carrito" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "En la selección" })).toBeVisible();
 
   await page.goto("/buscar?q=zambos%20picantes");
   await page
     .locator("article")
-    .filter({ hasText: "La Canasta Virtual" })
+    .filter({ hasText: "La Canasta Móvil" })
     .getByRole("link", { name: "Zambos picantes" })
     .click();
-  const secondAdd = page.getByRole("button", { name: "Agregar al carrito" });
+  const secondAdd = page.getByRole("button", { name: "Agregar a la selección" });
   await secondAdd.click();
-  await expect(page.getByRole("button", { name: "En el carrito" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "En la selección" })).toBeVisible();
 
-  await page.getByRole("link", { name: "Carrito" }).click();
+  await page.getByRole("link", { name: "Selección" }).click();
   await expect(page.getByRole("heading", { name: "Pulpería El Pino" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "La Canasta Virtual" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "La Canasta Móvil" })).toBeVisible();
 
   await page.getByRole("link", { name: "Ingresar para preparar solicitudes" }).click();
   await page.getByLabel("Correo", { exact: true }).fill("comprador@local.test");
@@ -39,16 +39,16 @@ test("buyer search, multi-seller cart, login, and two WhatsApp handoffs", async 
     .fill("pulperia-local");
   await page.getByRole("button", { name: "Ingresar" }).click();
 
-  await expect(page.getByRole("heading", { name: "Carrito" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Selección" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Pulpería El Pino" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "La Canasta Virtual" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "La Canasta Móvil" })).toBeVisible();
 
   await page.getByRole("button", { name: "Preparar solicitudes" }).click();
   await expect(page.getByRole("heading", { name: "Solicitudes por vendedor" })).toBeVisible();
 
   const pinoWa = page.getByRole("link", { name: "Abrir WhatsApp de Pulpería El Pino" });
   const canastaWa = page.getByRole("link", {
-    name: "Abrir WhatsApp de La Canasta Virtual",
+    name: "Abrir WhatsApp de La Canasta Móvil",
   });
   await expect(pinoWa).toBeVisible();
   await expect(canastaWa).toBeVisible();

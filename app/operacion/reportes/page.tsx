@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 const EVENT_LABELS = {
   search: "Búsquedas",
   offer_open: "Ofertas abiertas",
-  cart_add: "Agregados al carrito",
+  selection_add: "Agregados a la selección",
   request_prepared: "Solicitudes preparadas",
   handoff_opened: "WhatsApp abierto",
   seller_update: "Actualizaciones de vendedores",
@@ -54,12 +54,16 @@ export default async function OperationReportsPage({
             </div>
           ))}
           <div>
-            <dt>Pulperías físicas publicadas</dt>
-            <dd>{metrics.published_presences.physical}</dd>
+            <dt>Ubicaciones fijas publicadas</dt>
+            <dd>{metrics.published_presences.fixed_location}</dd>
           </div>
           <div>
-            <dt>Pulperías virtuales publicadas</dt>
-            <dd>{metrics.published_presences.virtual}</dd>
+            <dt>Presencias móviles publicadas</dt>
+            <dd>{metrics.published_presences.mobile}</dd>
+          </div>
+          <div>
+            <dt>Presencias remotas publicadas</dt>
+            <dd>{metrics.published_presences.remote}</dd>
           </div>
         </dl>
       </section>

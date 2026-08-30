@@ -20,7 +20,7 @@ export async function searchOffers(input: {
     p_offset: (input.page - 1) * SEARCH_PAGE_SIZE,
     p_lat: input.location?.lat ?? null,
     p_lng: input.location?.lng ?? null,
-    p_presence_kind: input.presence === "all" ? null : input.presence,
+    p_presence_mode: input.presence === "all" ? null : input.presence,
     p_sort: input.sort,
   });
   if (error) throw error;
@@ -38,7 +38,7 @@ export const getCatalogOffer = cache(async function getCatalogOffer(
   const { data, error } = await supabase
     .from("catalog_offers")
     .select(
-      "id, slug, kind, title, description, price_cents, price_mode, unit, availability, confirmed_at, presence_id, presence_slug, presence_name, presence_kind",
+      "id, slug, offer_class, title, description, price_cents, price_mode, unit, availability_model, availability_state, availability_details, confirmed_at, presence_id, presence_slug, presence_name, presence_mode, coverage_label, service_territory, fulfillment_modes",
     )
     .eq("slug", slug)
     .maybeSingle();
@@ -54,7 +54,7 @@ export async function getCatalogOffersByIds(
   const { data, error } = await supabase
     .from("catalog_offers")
     .select(
-      "id, slug, kind, title, description, price_cents, price_mode, unit, availability, confirmed_at, presence_id, presence_slug, presence_name, presence_kind",
+      "id, slug, offer_class, title, description, price_cents, price_mode, unit, availability_model, availability_state, availability_details, confirmed_at, presence_id, presence_slug, presence_name, presence_mode, coverage_label, service_territory, fulfillment_modes",
     )
     .in("id", ids);
   if (error) throw error;
@@ -67,7 +67,9 @@ export const getPresence = cache(async function getPresence(
   const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("catalog_presences")
-    .select("id, name, slug, description, kind, served_city, lat, lng")
+    .select(
+      "id, name, slug, description, mode, coverage_label, service_territory, served_city, lat, lng",
+    )
     .eq("slug", slug)
     .maybeSingle();
   if (error) throw error;
@@ -81,7 +83,7 @@ export async function getPresenceOffers(
   const { data, error } = await supabase
     .from("catalog_offers")
     .select(
-      "id, slug, kind, title, description, price_cents, price_mode, unit, availability, confirmed_at, presence_id, presence_slug, presence_name, presence_kind",
+      "id, slug, offer_class, title, description, price_cents, price_mode, unit, availability_model, availability_state, availability_details, confirmed_at, presence_id, presence_slug, presence_name, presence_mode, coverage_label, service_territory, fulfillment_modes",
     )
     .eq("presence_id", presenceId)
     .order("title");

@@ -17,7 +17,7 @@ describe("parseLocation", () => {
 });
 
 describe("formErrorMessage", () => {
-  it("refuses to invent a consult-price path", () => {
-    expect(formErrorMessage("price")).toMatch(/precio HNL/);
+  it("asks to reconcile price mode and amount", () => {
+    expect(formErrorMessage("price")).toMatch(/modalidad y el precio/);
   });
 });

@@ -21,12 +21,12 @@ export async function Header() {
     <header className="site-header">
       <Link href="/" className="mark">
         <span>La Pulpería</span>
-        <small>Siguatepeque · mostrador abierto</small>
+        <small>Oferta local de Siguatepeque</small>
       </Link>
       <nav aria-label="Navegación principal">
         <Link href="/buscar">Buscar</Link>
         <Link href="/mapa">Mapa</Link>
-        <Link href="/carrito">Carrito</Link>
+        <Link href="/carrito">Selección</Link>
         <Link href="/vender">Vender</Link>
         {email ? (
           <>

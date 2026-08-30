@@ -6,6 +6,7 @@ import { PublicContextNotes } from "@/app/_components/PublicContextNotes";
 import { ReportForm } from "@/app/_components/ReportForm";
 import { ShareButton } from "@/app/_components/ShareButton";
 import { getPresence, getPresenceOffers } from "@/lib/data";
+import { PRESENCE_MODE_LABEL } from "@/lib/catalog";
 import { FRESHNESS_LABEL, freshnessBand } from "@/lib/freshness";
 import { formatPublishedPrice } from "@/lib/money";
 import { getPublicContextNotes } from "@/lib/operations";
@@ -22,7 +23,7 @@ export async function generateMetadata({
     return { title: "Pulpería no encontrada", robots: { index: false } };
   }
   const description = metadataDescription(
-    `${presence.kind === "physical" ? "Negocio físico" : "Pulpería virtual"} en Siguatepeque. ${presence.description}`,
+    `${PRESENCE_MODE_LABEL[presence.mode]} en Siguatepeque. ${presence.description}`,
   );
   const canonical = `/pulperia/${presence.slug}`;
   return {
@@ -51,7 +52,7 @@ export default async function PulperiaPage({
     getPublicContextNotes({ presenceId: presence.id }),
   ]);
   const structuredData =
-    presence.kind === "physical"
+    presence.mode === "fixed_location"
       ? {
           "@context": "https://schema.org",
           "@type": "LocalBusiness",
@@ -79,7 +80,7 @@ export default async function PulperiaPage({
     <main className="detail-page presence-page">
       {structuredData ? <JsonLd data={structuredData} /> : null}
       <section className="presence-sign">
-        <p className="eyebrow">Pulpería {presence.kind === "physical" ? "física" : "virtual"}</p>
+        <p className="eyebrow">{PRESENCE_MODE_LABEL[presence.mode]}</p>
         <h1>{presence.name}</h1>
         <p>{presence.served_city}</p>
       </section>
@@ -89,8 +90,10 @@ export default async function PulperiaPage({
       {query.reporte === "error" ? (
         <p role="alert">No se pudo enviar el reporte.</p>
       ) : null}
-      {presence.kind === "virtual" ? (
-        <p>No aparece en el mapa. Atiende Siguatepeque por WhatsApp, sin pin público.</p>
+      {presence.mode !== "fixed_location" ? (
+        <p>
+          No aparece como punto en el mapa. {presence.coverage_label ?? presence.service_territory}
+        </p>
       ) : (
         <p>
           Negocio físico. El pin es público porque el vendedor lo confirmó.{" "}
@@ -104,7 +107,7 @@ export default async function PulperiaPage({
       <PublicContextNotes notes={notes} />
       <div className="section-heading">
         <div>
-          <p className="eyebrow">En este mostrador</p>
+          <p className="eyebrow">Ofertas de este negocio</p>
           <h2>Ofertas</h2>
         </div>
       </div>
@@ -114,7 +117,7 @@ export default async function PulperiaPage({
             <div>
               <Link href={`/oferta/${offer.slug}`}>{offer.title}</Link>
               <p className="freshness">
-                {offer.availability === "unavailable"
+                {offer.availability_state === "unavailable"
                   ? "No disponible"
                   : FRESHNESS_LABEL[freshnessBand(new Date(offer.confirmed_at))]}
               </p>

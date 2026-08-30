@@ -1,4 +1,4 @@
-export type PriceMode = "fixed" | "from";
+export type PriceMode = "fixed" | "from" | "quote";
 
 export function parseLempirasToCents(raw: string): number | null {
   const trimmed = raw.trim();
@@ -19,7 +19,12 @@ export function formatHnl(cents: number): string {
   return `L ${grouped}.${fraction}`;
 }
 
-export function formatPublishedPrice(cents: number, mode: PriceMode): string {
+export function formatPublishedPrice(
+  cents: number | null,
+  mode: PriceMode,
+): string {
+  if (mode === "quote") return "Cotización";
+  if (cents === null) throw new Error("price_cents_required");
   const amount = formatHnl(cents);
   return mode === "from" ? `desde ${amount}` : amount;
 }

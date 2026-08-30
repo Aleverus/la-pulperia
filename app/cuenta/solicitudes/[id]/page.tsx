@@ -3,7 +3,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { HandoffButton } from "@/app/_components/HandoffButton";
 import { composeHandoffMessage } from "@/lib/handoff";
+import type { FulfillmentMode, OfferClass } from "@/lib/catalog";
 import type { PriceMode } from "@/lib/money";
+import type { SelectionRequest } from "@/lib/selection";
 import { waMeUrl } from "@/lib/phone";
 import { createClient } from "@/lib/supabase/server";
 
@@ -22,9 +24,11 @@ type HandoffPayload = {
   buyer_name: string;
   items: Array<{
     title: string;
-    quantity: number;
-    price_cents: number;
+    offer_class: OfferClass;
+    request: SelectionRequest;
+    price_cents: number | null;
     price_mode: PriceMode;
+    fulfillment_modes: FulfillmentMode[];
   }>;
 };
 
@@ -66,9 +70,11 @@ export default async function SolicitudPage({
       referenceUrl,
       items: payload.items.map((item) => ({
         title: item.title,
-        quantity: item.quantity,
+        offerClass: item.offer_class,
+        request: item.request,
         priceCents: item.price_cents,
         priceMode: item.price_mode,
+        fulfillmentModes: item.fulfillment_modes,
       })),
     });
     cards.push({
@@ -90,7 +96,7 @@ export default async function SolicitudPage({
           <ul>
             {payload.items.map((item) => (
               <li key={item.title}>
-                {item.quantity} × {item.title}
+                {item.title}
               </li>
             ))}
           </ul>

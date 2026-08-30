@@ -29,7 +29,7 @@ export default async function NuevaOfertaPage({
         <Link href="/mi-pulperia">Volver a mi pulpería</Link>
       </p>
       <h1>Nueva oferta</h1>
-      <p>El precio HNL es obligatorio. No existe “consultar precio”.</p>
+      <p>El precio puede ser fijo, desde o por cotización según la clase de oferta.</p>
       <OfferForm offer={null} media={[]} error={error ?? undefined} />
     </main>
   );

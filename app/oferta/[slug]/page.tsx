@@ -1,16 +1,21 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { AddToCartButton } from "@/app/_components/AddToCartButton";
+import { AddToSelection } from "@/app/_components/AddToSelection";
 import { JsonLd } from "@/app/_components/JsonLd";
 import { PublicContextNotes } from "@/app/_components/PublicContextNotes";
 import { ReportForm } from "@/app/_components/ReportForm";
 import { ShareButton } from "@/app/_components/ShareButton";
 import { getCatalogOffer } from "@/lib/data";
+import {
+  OFFER_CLASS_LABEL,
+  PRESENCE_MODE_LABEL,
+} from "@/lib/catalog";
 import { FRESHNESS_LABEL, freshnessBand } from "@/lib/freshness";
 import { formatPublishedPrice } from "@/lib/money";
 import { getPublicContextNotes, recordPublicEvent } from "@/lib/operations";
-import { getOfferMedia, mediaPublicUrl } from "@/lib/seller-data";
+import { mediaPublicUrl } from "@/lib/media-url";
+import { getOfferMedia } from "@/lib/seller-data";
 import {
   absoluteUrl,
   availabilitySchemaUrl,
@@ -58,18 +63,25 @@ export default async function OfferPage({
   ]);
   const canonical = absoluteUrl(`/oferta/${offer.slug}`);
   const sellerType =
-    offer.presence_kind === "physical" ? "LocalBusiness" : "Organization";
+    offer.presence_mode === "fixed_location" ? "LocalBusiness" : "Organization";
+  const schemaAvailability = availabilitySchemaUrl(offer.availability_state);
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": offer.kind === "service" ? "Service" : "Product",
+    "@type":
+      offer.offer_class === "local_service" ||
+      offer.offer_class === "digital_offer"
+        ? "Service"
+        : "Product",
     name: offer.title,
     description: offer.description,
     url: canonical,
     offers: {
       "@type": "Offer",
-      price: (offer.price_cents / 100).toFixed(2),
+      ...(offer.price_cents !== null
+        ? { price: (offer.price_cents / 100).toFixed(2) }
+        : {}),
       priceCurrency: "HNL",
-      availability: availabilitySchemaUrl(offer.availability),
+      ...(schemaAvailability ? { availability: schemaAvailability } : {}),
       url: canonical,
       seller: {
         "@type": sellerType,
@@ -85,9 +97,10 @@ export default async function OfferPage({
       <p className="eyebrow">
         <Link href={`/pulperia/${offer.presence_slug}`}>{offer.presence_name}</Link>
         {" · "}
-        {offer.presence_kind === "physical" ? "física" : "virtual"}
+        {PRESENCE_MODE_LABEL[offer.presence_mode]}
       </p>
       <h1>{offer.title}</h1>
+      <p>{OFFER_CLASS_LABEL[offer.offer_class]}</p>
       {query.reporte === "recibido" ? (
         <p role="status">Reporte recibido. Un operador lo revisará.</p>
       ) : null}
@@ -118,14 +131,16 @@ export default async function OfferPage({
       </div>
       <p className="lede">{offer.description}</p>
       <div className="button-row">
-        {offer.availability === "unavailable" ? (
+        {offer.availability_state === "unavailable" ? (
           <p>No disponible. Sigue visible en la pulpería.</p>
         ) : (
-          <AddToCartButton
+          <AddToSelection
             offerId={offer.id}
+            offerClass={offer.offer_class}
+            availabilityDetails={offer.availability_details}
             listedPriceCents={offer.price_cents}
             listedPriceMode={offer.price_mode}
-            listedAvailability={offer.availability}
+            listedAvailabilityState={offer.availability_state}
             listedConfirmedAt={offer.confirmed_at}
           />
         )}

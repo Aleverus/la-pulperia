@@ -31,5 +31,6 @@ describe("formatPublishedPrice", () => {
   it("keeps the listed figure and the from prefix", () => {
     expect(formatPublishedPrice(8000, "fixed")).toBe("L 80.00");
     expect(formatPublishedPrice(8000, "from")).toBe("desde L 80.00");
+    expect(formatPublishedPrice(null, "quote")).toBe("Cotización");
   });
 });
