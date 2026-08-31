@@ -84,9 +84,10 @@ The v2 migration, discovery RPC and fixtures, views, RLS, snapshots, TypeScript
 consumers, class-specific request payloads, seller maintenance flow, reviewed
 context, handoff snapshots, seller understanding signal, privacy-safe metrics,
 and Corte 5 instruments are implemented and verified locally. The same schema
-and deterministic preview fixtures are also deployed to the isolated
-`la-pulperia-preview` Supabase project; public execution of privileged functions
-is limited to the audited RPC surface. The workbook
+and 23 migrations are deployed to the isolated `la-pulperia-preview` Supabase
+project, but its app data, Auth users, sessions, and Storage objects are now
+deliberately empty for a clean human review; public execution of privileged
+functions is limited to the audited RPC surface. The workbook
 starts every research row as pending and keeps real copies under a Git-ignored
 local directory. Interviews, the 100-business census, the comparative audit
 with 20 real searches and field use still require separate evidence and owner
@@ -99,8 +100,10 @@ recoverable prelaunch checkpoint published primarily at
 `https://la-pulperia-coral.vercel.app` retained as a transition fallback; both
 are explicitly excluded from search indexes. Google OAuth is connected in
 controlled test mode, Supabase Email auth is disabled, and a real Google session
-started on the new domain has returned to the authenticated cart and account.
-Publication does not imply owner acceptance, launch, or field evidence.
+started on the new domain previously returned to the authenticated cart and
+account. That session, identity, profile, and every preview fixture were removed
+after verification, so the current runtime starts empty. Publication does not
+imply owner acceptance, launch, or field evidence.
 
 ## Visual direction and local implementation
 
