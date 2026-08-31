@@ -12,6 +12,12 @@ export function hasPublicSupabaseEnv(): boolean {
   return publicSupabaseConfig() !== null;
 }
 
+export function prelaunchMode(
+  env: Record<string, string | undefined> = process.env,
+): boolean {
+  return env.PULPERIA_PRELAUNCH === "true";
+}
+
 export function localTestAuthEnabled(
   env: Record<string, string | undefined> = process.env,
 ): boolean {

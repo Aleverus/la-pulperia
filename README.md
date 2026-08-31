@@ -93,9 +93,10 @@ with 20 real searches and field use still require separate evidence and owner
 judgment. A mobile visual direction has been accepted in the parent project
 canon and is implemented locally across the active product surfaces. The
 production build and the public search → offer → cart path were inspected at
-390 px; the visual comparison has no open P0–P2 findings. This is a recoverable
-implementation checkpoint, not owner acceptance, deployment, publication, or
-field evidence.
+390 px; the visual comparison has no open P0–P2 findings. This is now a
+recoverable prelaunch checkpoint published at
+`https://la-pulperia-coral.vercel.app`; it is explicitly excluded from search
+indexes. Publication does not imply owner acceptance, launch, or field evidence.
 
 ## Visual direction and local implementation
 
@@ -126,9 +127,9 @@ through search, offer detail, all four request contracts, a multi-seller cart,
 buyer account/history, and seller dashboard/settings/inbox at 320, 390, and
 1440 px. Existing cart requests survive reopening, query-only history keeps the
 search controls and mobile menu synchronized, and no P0–P2 visual finding remains.
-Ale has not yet accepted the executed result. Supabase and the Vercel project are
-configured for prelaunch publication, but the human runtime acceptance remains
-separate.
+Ale has not yet accepted the executed result. Supabase and Vercel serve a public
+prelaunch from the GitHub `prelaunch` branch, but the human runtime acceptance
+and promotion of `main` remain separate.
 
 The parent `../AGENTS.md` requires every product, contract, route, status, or
 evidence change to update all related documentation in the same work. The
@@ -155,14 +156,15 @@ After the bug-repair plans 001–005 on 2026-08-30, the local tree passed:
   passed a visual layout inspection.
 - after the visual implementation and cloud hardening, a clean local database
   passed all 239 pgTAP checks and schema lint; ESLint, generated route types,
-  TypeScript, all 80 unit
+  TypeScript, all 81 unit
   tests, the production build, and production dependency audit passed again;
   all 32 Playwright journeys passed in mobile and desktop, including Axe and
   query-history regressions. Authenticated buyer and seller flows were also
   observed manually at 390 and 1440 px. `git diff --check` remained clean.
 
-This receipt proves the local technical contract and exercised flows. It does
-not prove commercial demand, legal readiness, deployment, field use, or visual
+This local receipt proves the technical contract and exercised flows. The
+separate prelaunch runtime check proves public deployment and remote data reads;
+neither proves commercial demand, legal readiness, field use, or visual
 acceptance.
 
 ## Run locally
@@ -204,9 +206,11 @@ pnpm test:e2e   # Playwright mobile and desktop journeys
 configured public source. The regional runtime artifact is versioned so Git-based
 deployments include the same map that was verified locally.
 
-Google OAuth remains pending provider credentials and a real sign-in exercise.
-A custom domain, automated messages, spending, seller onboarding, and field
-research remain intentionally unconfigured.
+The public prelaunch uses `PULPERIA_PRELAUNCH=true`, which emits `noindex` and
+blocks crawlers until owner launch. Google OAuth remains pending provider
+credentials and a real sign-in exercise. A custom domain, automated messages,
+spending, seller onboarding, and field research remain intentionally
+unconfigured.
 
 ## Source status
 

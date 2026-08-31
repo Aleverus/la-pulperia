@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fira_Sans_Condensed } from "next/font/google";
 import { Header } from "@/app/_components/Header";
+import { prelaunchMode } from "@/lib/env";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_ORIGIN } from "@/lib/site";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./globals.css";
@@ -28,7 +29,9 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     url: "/",
   },
-  robots: { index: true, follow: true },
+  robots: prelaunchMode()
+    ? { index: false, follow: false }
+    : { index: true, follow: true },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
