@@ -10,6 +10,7 @@ import type { PriceMode } from "@/lib/money";
 
 export type PresenceStatus = "draft" | "published" | "archived";
 export type OfferStatus = "draft" | "published" | "paused" | "archived";
+export type WhatsappVerificationStatus = "unverified" | "verified";
 
 export type OwnedPresence = {
   id: string;
@@ -24,6 +25,8 @@ export type OwnedPresence = {
   location_public_confirmed: boolean;
   lat: number | null;
   lng: number | null;
+  whatsapp_verification_status: WhatsappVerificationStatus;
+  whatsapp_verified_at: string | null;
 };
 
 export type OwnedOffer = {
@@ -48,6 +51,7 @@ export type OwnedMedia = {
   storage_path: string;
   alt_text: string;
   sort_order: number;
+  deletion_pending: boolean;
 };
 
 export const PRESENCE_STATUS_LABEL: Record<PresenceStatus, string> = {
@@ -90,15 +94,21 @@ const FORM_ERRORS: Record<string, string> = {
   coverage: "La atención móvil necesita una cobertura declarada.",
   territory: "La atención remota necesita un territorio o alcance.",
   whatsapp: "El WhatsApp tiene que ser un número hondureño usable.",
+  verification:
+    "Guardá el borrador. Ese número debe verificarse antes de publicar la pulpería.",
   pin: "Para publicar una ubicación fija hay que confirmar que el pin será público.",
   bounds: "El pin publicado tiene que quedar dentro de Siguatepeque.",
   status: "Ese estado no es válido.",
   save: "No se pudo guardar. Revisá los datos e intentá de nuevo.",
   title: "La oferta necesita un título.",
   price: "Revisá la modalidad y el precio publicado.",
+  unit: "Los productos y encargos necesitan una unidad comercial.",
   availability: "La disponibilidad no corresponde a esta clase de oferta.",
   fulfillment: "Elegí una forma de cumplimiento compatible.",
-  image: "No se pudo guardar la imagen. Usá un archivo de foto de hasta 5 MB.",
+  image:
+    "No se pudo guardar la imagen. Usá JPEG, PNG o WebP de hasta 3 MB y dimensiones moderadas.",
+  image_cleanup:
+    "La imagen quedó en limpieza pendiente. Reintentá quitarla; no se publicará mientras tanto.",
   confirm: "No se pudo confirmar la vigencia.",
   signup: "No se pudo crear la cuenta de prueba.",
 };

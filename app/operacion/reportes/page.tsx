@@ -14,6 +14,7 @@ const EVENT_LABELS = {
   selection_add: "Agregados a la selección",
   request_prepared: "Solicitudes preparadas",
   handoff_opened: "WhatsApp abierto",
+  request_understood: "Solicitudes entendidas por el vendedor",
   seller_update: "Actualizaciones de vendedores",
 } as const;
 
@@ -38,6 +39,10 @@ export default async function OperationReportsPage({
 
       <section aria-labelledby="metrics-title">
         <h2 id="metrics-title">Señales de uso</h2>
+        <p>
+          Son señales orientativas: las ráfagas públicas se agrupan y se topan
+          por minuto. No prueban venta, pago ni validación de campo.
+        </p>
         <dl className="metrics-grid">
           <div>
             <dt>Búsquedas útiles</dt>

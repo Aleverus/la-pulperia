@@ -25,6 +25,7 @@ const env = [
   `NEXT_PUBLIC_SUPABASE_ANON_KEY=${values.ANON_KEY ?? anon}`,
   `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${anon}`,
   `SUPABASE_SERVICE_ROLE_KEY=${values.SERVICE_ROLE_KEY ?? ""}`,
+  "PULPERIA_LOCAL_TEST_AUTH=true",
   "",
 ].join("\n");
 

@@ -1,6 +1,8 @@
 import type { CatalogOffer, CatalogPresence, SearchOffer } from "@/lib/catalog";
 import {
   SEARCH_PAGE_SIZE,
+  type SearchAvailabilityFilter,
+  type SearchOfferClassFilter,
   type SearchPresenceFilter,
   type SearchSort,
 } from "@/lib/search";
@@ -8,7 +10,9 @@ import { createPublicClient } from "@/lib/supabase/public";
 
 export async function searchOffers(input: {
   query: string;
+  offerClass: SearchOfferClassFilter;
   presence: SearchPresenceFilter;
+  availability: SearchAvailabilityFilter;
   sort: SearchSort;
   page: number;
   location?: { lat: number; lng: number } | null;
@@ -20,7 +24,10 @@ export async function searchOffers(input: {
     p_offset: (input.page - 1) * SEARCH_PAGE_SIZE,
     p_lat: input.location?.lat ?? null,
     p_lng: input.location?.lng ?? null,
+    p_offer_class: input.offerClass === "all" ? null : input.offerClass,
     p_presence_mode: input.presence === "all" ? null : input.presence,
+    p_availability_state:
+      input.availability === "all" ? null : input.availability,
     p_sort: input.sort,
   });
   if (error) throw error;
@@ -38,7 +45,7 @@ export const getCatalogOffer = cache(async function getCatalogOffer(
   const { data, error } = await supabase
     .from("catalog_offers")
     .select(
-      "id, slug, offer_class, title, description, price_cents, price_mode, unit, availability_model, availability_state, availability_details, confirmed_at, presence_id, presence_slug, presence_name, presence_mode, coverage_label, service_territory, fulfillment_modes",
+      "id, slug, offer_class, title, description, price_cents, price_mode, unit, availability_model, availability_state, availability_details, confirmed_at, presence_id, presence_slug, presence_name, presence_mode, coverage_label, service_territory, fulfillment_modes, request_context_token",
     )
     .eq("slug", slug)
     .maybeSingle();
@@ -54,7 +61,7 @@ export async function getCatalogOffersByIds(
   const { data, error } = await supabase
     .from("catalog_offers")
     .select(
-      "id, slug, offer_class, title, description, price_cents, price_mode, unit, availability_model, availability_state, availability_details, confirmed_at, presence_id, presence_slug, presence_name, presence_mode, coverage_label, service_territory, fulfillment_modes",
+      "id, slug, offer_class, title, description, price_cents, price_mode, unit, availability_model, availability_state, availability_details, confirmed_at, presence_id, presence_slug, presence_name, presence_mode, coverage_label, service_territory, fulfillment_modes, request_context_token",
     )
     .in("id", ids);
   if (error) throw error;
@@ -83,7 +90,7 @@ export async function getPresenceOffers(
   const { data, error } = await supabase
     .from("catalog_offers")
     .select(
-      "id, slug, offer_class, title, description, price_cents, price_mode, unit, availability_model, availability_state, availability_details, confirmed_at, presence_id, presence_slug, presence_name, presence_mode, coverage_label, service_territory, fulfillment_modes",
+      "id, slug, offer_class, title, description, price_cents, price_mode, unit, availability_model, availability_state, availability_details, confirmed_at, presence_id, presence_slug, presence_name, presence_mode, coverage_label, service_territory, fulfillment_modes, request_context_token",
     )
     .eq("presence_id", presenceId)
     .order("title");

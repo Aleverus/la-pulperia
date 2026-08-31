@@ -11,3 +11,17 @@ export function publicSupabaseConfig(): { url: string; key: string } | null {
 export function hasPublicSupabaseEnv(): boolean {
   return publicSupabaseConfig() !== null;
 }
+
+export function localTestAuthEnabled(
+  env: Record<string, string | undefined> = process.env,
+): boolean {
+  if (env.PULPERIA_LOCAL_TEST_AUTH !== "true") return false;
+  try {
+    const hostname = new URL(env.NEXT_PUBLIC_SUPABASE_URL ?? "").hostname;
+    return hostname === "127.0.0.1" ||
+      hostname === "localhost" ||
+      hostname === "::1";
+  } catch {
+    return false;
+  }
+}

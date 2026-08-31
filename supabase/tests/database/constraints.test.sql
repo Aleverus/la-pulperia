@@ -39,22 +39,23 @@ select throws_ok(
 );
 
 insert into public.seller_presences (
-  id, owner_id, name, slug, mode, coverage_label, whatsapp_e164, status
+  id, owner_id, name, slug, mode, coverage_label, whatsapp_e164, status,
+  whatsapp_verification_status, whatsapp_verified_at
 ) values (
   '22222222-2222-2222-2222-222222222222',
   '11111111-1111-1111-1111-111111111111',
   'Canasta móvil', 'canasta-movil', 'mobile', 'Siguatepeque',
-  '+50499991111', 'published'
+  '+50499991111', 'published', 'verified', now()
 );
 
 select throws_ok(
   $$
     insert into public.offers (
-      presence_id, slug, offer_class, title, price_cents, price_mode,
+      presence_id, slug, offer_class, title, price_cents, price_mode, unit,
       availability_model, availability_state, status
     ) values (
       '22222222-2222-2222-2222-222222222222', 'cotizacion-con-cifra',
-      'local_service', 'Servicio', 1000, 'quote', 'on_request', 'on_request',
+      'local_service', 'Servicio', 1000, 'quote', null, 'on_request', 'on_request',
       'draft'
     )
   $$,
@@ -65,11 +66,11 @@ select throws_ok(
 select throws_ok(
   $$
     insert into public.offers (
-      presence_id, slug, offer_class, title, price_cents, price_mode,
+      presence_id, slug, offer_class, title, price_cents, price_mode, unit,
       availability_model, availability_state, status
     ) values (
       '22222222-2222-2222-2222-222222222222', 'fijo-sin-cifra',
-      'stocked_product', 'Producto', null, 'fixed', 'stock', 'available',
+      'stocked_product', 'Producto', null, 'fixed', 'unidad', 'stock', 'available',
       'draft'
     )
   $$,
@@ -80,11 +81,11 @@ select throws_ok(
 select throws_ok(
   $$
     insert into public.offers (
-      presence_id, slug, offer_class, title, price_cents, price_mode,
+      presence_id, slug, offer_class, title, price_cents, price_mode, unit,
       availability_model, availability_state, availability_details, status
     ) values (
       '22222222-2222-2222-2222-222222222222', 'producto-con-agenda',
-      'stocked_product', 'Producto', 1000, 'fixed', 'schedule', 'available',
+      'stocked_product', 'Producto', 1000, 'fixed', 'unidad', 'schedule', 'available',
       '{"schedule_note":"Mañana"}'::jsonb, 'draft'
     )
   $$,
@@ -95,11 +96,11 @@ select throws_ok(
 select throws_ok(
   $$
     insert into public.offers (
-      presence_id, slug, offer_class, title, price_cents, price_mode,
+      presence_id, slug, offer_class, title, price_cents, price_mode, unit,
       availability_model, availability_state, status
     ) values (
       '22222222-2222-2222-2222-222222222222', 'publicada-sin-cumplimiento',
-      'stocked_product', 'Producto', 1000, 'fixed', 'stock', 'available',
+      'stocked_product', 'Producto', 1000, 'fixed', 'unidad', 'stock', 'available',
       'published'
     )
   $$,
@@ -108,12 +109,12 @@ select throws_ok(
 );
 
 insert into public.offers (
-  id, presence_id, slug, offer_class, title, price_cents, price_mode,
+  id, presence_id, slug, offer_class, title, price_cents, price_mode, unit,
   availability_model, availability_state, status
 ) values (
   '33333333-3333-3333-3333-333333333333',
   '22222222-2222-2222-2222-222222222222',
-  'zambos-picantes', 'stocked_product', 'Zambos picantes', 3500, 'fixed',
+  'zambos-picantes', 'stocked_product', 'Zambos picantes', 3500, 'fixed', 'bolsa',
   'stock', 'available', 'draft'
 );
 
@@ -169,12 +170,13 @@ select throws_ok(
   $$
     insert into public.seller_presences (
       owner_id, name, slug, mode, whatsapp_e164, location,
-      location_public_confirmed, status
+      location_public_confirmed, status, whatsapp_verification_status,
+      whatsapp_verified_at
     ) values (
       '11111111-1111-1111-1111-111111111111', 'Fuera', 'fuera',
       'fixed_location', '+50499992222',
       extensions.st_point(-87.19, 14.09)::extensions.geography,
-      true, 'published'
+      true, 'published', 'verified', now()
     )
   $$,
   '23514', null,

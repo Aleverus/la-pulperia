@@ -1,7 +1,16 @@
 import type { Metadata } from "next";
+import { Fira_Sans_Condensed } from "next/font/google";
 import { Header } from "@/app/_components/Header";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_ORIGIN } from "@/lib/site";
 import "maplibre-gl/dist/maplibre-gl.css";
+import "./globals.css";
+
+const pulperiaSans = Fira_Sans_Condensed({
+  weight: ["400", "500", "600", "700", "800"],
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-pulperia-sans",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_ORIGIN),
@@ -24,10 +33,21 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es" className="h-full">
-      <body className="min-h-full flex flex-col">
+    <html
+      lang="es"
+      className={pulperiaSans.variable}
+      data-scroll-behavior="smooth"
+    >
+      <body>
         <Header />
         {children}
+        <footer className="site-footer">
+          <p>
+            La Pulpería te ayuda a encontrar y comparar. Existencia, precio
+            final, pago y entrega se confirman con cada negocio.
+          </p>
+          <small>Siguatepeque, comercio local con contexto.</small>
+        </footer>
       </body>
     </html>
   );

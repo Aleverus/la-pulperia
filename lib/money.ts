@@ -22,9 +22,14 @@ export function formatHnl(cents: number): string {
 export function formatPublishedPrice(
   cents: number | null,
   mode: PriceMode,
+  unit?: string | null,
 ): string {
-  if (mode === "quote") return "Cotización";
+  const normalizedUnit = unit?.replace(/\s+/g, " ").trim() || null;
+  if (mode === "quote") {
+    return normalizedUnit ? `Cotización / ${normalizedUnit}` : "Cotización";
+  }
   if (cents === null) throw new Error("price_cents_required");
   const amount = formatHnl(cents);
-  return mode === "from" ? `desde ${amount}` : amount;
+  const published = mode === "from" ? `desde ${amount}` : amount;
+  return normalizedUnit ? `${published} / ${normalizedUnit}` : published;
 }

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { getMyRequestBatches } from "@/lib/account-data";
 
 export const metadata: Metadata = {
-  title: "Solicitudes",
+  title: "Pedidos para WhatsApp",
   robots: { index: false, follow: false },
 };
 
@@ -12,13 +12,13 @@ export default async function RequestHistoryPage() {
   return (
     <main className="detail-page">
       <p className="eyebrow">Tu cuenta</p>
-      <h1>Solicitudes</h1>
+      <h1>Pedidos para WhatsApp</h1>
       <p>
-        Cada registro conserva lo que preparaste durante 180 días. No confirma
-        que el mensaje se envió ni que hubo una venta.
+        Cada registro conserva durante 180 días lo que armaste para cada
+        vendedor. No confirma que el mensaje se envió ni que hubo una venta.
       </p>
       {batches.length === 0 ? (
-        <p className="empty-state">Todavía no preparaste solicitudes.</p>
+        <p className="empty-state">Todavía no armaste pedidos para WhatsApp.</p>
       ) : (
         <ul className="request-history">
           {batches.map((batch) => (

@@ -1,5 +1,5 @@
 begin;
-select plan(16);
+select plan(20);
 
 select ok(
   exists (
@@ -17,6 +17,34 @@ select is(
   (select query_normalized from public.search_events order by id desc limit 1),
   '',
   'metric events discard query text and possible PII'
+);
+
+select is(
+  (
+    select count(*)::integer
+    from public.search_offers(p_query => 'zambos picantes')
+  ),
+  2,
+  'a search with alternatives records a resolved result'
+);
+
+select is(
+  (
+    select count(*)::integer
+    from public.search_offers(p_query => 'consulta privada inexistente')
+  ),
+  0,
+  'a search without alternatives records an empty result'
+);
+
+select is(
+  (
+    select count(*)::integer
+    from public.search_events
+    where event_kind = 'search' and query_normalized <> ''
+  ),
+  0,
+  'resolved and empty searches retain no query text'
 );
 
 select set_config(
@@ -123,6 +151,15 @@ select is(
   'operator metrics expose aggregate event counts'
 );
 
+select is(
+  jsonb_build_array(
+    (public.get_metrics_summary()->>'useful_searches')::integer,
+    (public.get_metrics_summary()->>'empty_searches')::integer
+  ),
+  '[1, 2]'::jsonb,
+  'operator metrics separate resolved and empty searches without PII'
+);
+
 reset role;
 
 insert into public.request_batches (id, buyer_id, expires_at)
@@ -173,7 +210,16 @@ select set_config(
 select set_config('request.jwt.claim.sub', '10000000-0000-0000-0000-000000000090', true);
 set local role authenticated;
 
-select is(public.delete_my_account(), true, 'a user can delete their own account');
+select is(
+  (
+    with prepared as materialized (
+      select public.begin_account_deletion()
+    )
+    select public.delete_my_account() from prepared
+  ),
+  true,
+  'a prepared user can delete their own account'
+);
 
 reset role;
 

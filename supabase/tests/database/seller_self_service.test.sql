@@ -67,7 +67,7 @@ select lives_ok(
       '',
       1000,
       'fixed',
-      null,
+      'unidad',
       'stock',
       'available',
       '{}'::jsonb,
@@ -90,7 +90,7 @@ select throws_ok(
       'Fuera',
       '',
       'fixed_location',
-      '+50499993333',
+      '+50499991111',
       null,
       null,
       14.09,
@@ -226,11 +226,11 @@ select lives_ok(
       14.5969,
       -87.8310,
       true,
-      'published',
+      'draft',
       null
     )
   $$,
-  'new seller can publish a confirmed fixed pin in Siguatepeque'
+  'new seller can save a confirmed fixed pin as an unverified draft'
 );
 
 reset role;
@@ -241,9 +241,9 @@ select is(
     select count(*)::integer
     from public.catalog_presences
     where mode = 'fixed_location' and lat is not null
-  ) >= 2,
+  ) >= 1,
   true,
-  'published fixed presence appears in the public catalog with coordinates'
+  'the verified fixture remains in the public catalog with coordinates'
 );
 
 select is(

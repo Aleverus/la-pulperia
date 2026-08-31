@@ -2,13 +2,17 @@
 
 import { redirect } from "next/navigation";
 import { getCatalogOffersByIds } from "@/lib/data";
+import { localTestAuthEnabled } from "@/lib/env";
 import {
+  parseSelection,
+  selectionNeedsOfferReview,
   selectionToPrepareItems,
   type SelectionLine,
 } from "@/lib/selection";
 import { createClient } from "@/lib/supabase/server";
 
 export async function signInAction(formData: FormData) {
+  if (!localTestAuthEnabled()) redirect("/ingresar?error=auth_disabled");
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
   const next = safeNext(String(formData.get("next") ?? "/carrito"));
@@ -27,6 +31,7 @@ export async function signOutAction() {
 }
 
 export async function signUpAction(formData: FormData) {
+  if (!localTestAuthEnabled()) redirect("/ingresar?error=auth_disabled");
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
   const displayName = String(formData.get("display_name") ?? "").trim();
@@ -53,27 +58,57 @@ export async function signUpAction(formData: FormData) {
 }
 
 export async function refreshSelectionAction(ids: string[]) {
+  if (
+    !Array.isArray(ids) ||
+    ids.length > 30 ||
+    ids.some((id) => !UUID.test(id))
+  ) {
+    return [];
+  }
   return getCatalogOffersByIds(ids);
 }
 
 export async function prepareBatchAction(lines: SelectionLine[]) {
+  if (!Array.isArray(lines) || lines.length < 1 || lines.length > 30) {
+    return { ok: false, reason: "prepare_failed" } as const;
+  }
+  let validated: SelectionLine[];
+  try {
+    validated = parseSelection(JSON.stringify(lines));
+  } catch {
+    return { ok: false, reason: "prepare_failed" } as const;
+  }
+  if (validated.length !== lines.length) {
+    return { ok: false, reason: "prepare_failed" } as const;
+  }
+  if (validated.some(selectionNeedsOfferReview)) {
+    return { ok: false, reason: "context_changed" } as const;
+  }
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) {
-    redirect("/ingresar?next=/carrito");
+    return { ok: false, reason: "auth_required" } as const;
   }
 
   const { data, error } = await supabase.rpc("prepare_request_batch", {
-    p_items: selectionToPrepareItems(lines),
+    p_items: selectionToPrepareItems(validated),
   });
   if (error || !data) {
-    redirect("/carrito?error=prepare");
+    return {
+      ok: false,
+      reason: error?.message.includes("offer_context_changed")
+        ? "context_changed"
+        : error?.message.includes("offer_not_public") ||
+            error?.message.includes("offer_window_closed")
+          ? "offer_not_public"
+        : "prepare_failed",
+    } as const;
   }
 
   const payload = data as { batch_id: string };
-  redirect(`/cuenta/solicitudes/${payload.batch_id}`);
+  return { ok: true, batchId: payload.batch_id } as const;
 }
 
 export async function markHandoffAction(sellerRequestId: string) {
@@ -90,3 +125,5 @@ function safeNext(value: string): string {
   if (value.startsWith("/") && !value.startsWith("//")) return value;
   return "/carrito";
 }
+
+const UUID = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;

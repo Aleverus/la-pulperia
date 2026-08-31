@@ -1,6 +1,11 @@
 import { expect, test } from "@playwright/test";
 
-test("seller publishes a fixed presence and manages a stock offer", async ({
+const TINY_PNG = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAEklEQVQImWO4Y6Nxx0aDAUIBACXeBQEgOSe0AAAAAElFTkSuQmCC",
+  "base64",
+);
+
+test("seller saves an unverified presence and manages a stock offer privately", async ({
   page,
 }) => {
   const suffix = crypto.randomUUID().slice(0, 8);
@@ -26,16 +31,41 @@ test("seller publishes a fixed presence and manages a stock offer", async ({
     "href",
     /https:\/\/wa\.me\/50499993333/,
   );
-  await expect(page.getByText("no verifica")).toBeVisible();
-  await page.getByRole("button", { name: "Publicar pulpería" }).click();
+  await expect(page.getByRole("status")).toContainText("sin verificar");
+  await expect(
+    page.getByRole("button", { name: "Publicar pulpería" }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "Guardar borrador" }).click();
 
   await expect(page.getByRole("heading", { name: "Mi pulpería" })).toBeVisible();
   await page.getByRole("link", { name: "Crear oferta" }).click();
   await page.getByLabel("Título").fill(offerTitle);
   await page.getByLabel("Precio publicado (lempiras)").fill("45");
+  await page.getByLabel("Unidad o periodo").fill("bolsa");
   await page.getByRole("button", { name: "Guardar borrador" }).click();
 
   await expect(page.getByRole("heading", { name: "Editar oferta" })).toBeVisible();
+  for (const [index, name] of ["primera.png", "segunda.png"].entries()) {
+    await page.getByLabel(/Foto \(opcional/).setInputFiles({
+      name,
+      mimeType: "image/png",
+      buffer: TINY_PNG,
+    });
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+    await expect(page.locator('img[alt="Foto de la oferta"]')).toHaveCount(
+      index + 1,
+    );
+  }
+  await page.getByRole("button", { name: "Quitar foto" }).first().click();
+  await expect(page.locator('img[alt="Foto de la oferta"]')).toHaveCount(1);
+  await page.getByLabel(/Foto \(opcional/).setInputFiles({
+    name: "reemplazo.png",
+    mimeType: "image/png",
+    buffer: TINY_PNG,
+  });
+  await page.getByRole("button", { name: "Guardar cambios" }).click();
+  await expect(page.locator('img[alt="Foto de la oferta"]')).toHaveCount(2);
+
   await page.getByRole("button", { name: "Publicar" }).click();
   await page.getByRole("button", { name: "Confirmar vigencia" }).click();
   await expect(page.getByText("Vigencia confirmada")).toBeVisible();
@@ -53,14 +83,75 @@ test("seller publishes a fixed presence and manages a stock offer", async ({
   await expect(page.getByRole("button", { name: "Pausar" })).toBeVisible();
 
   await page.goto("/buscar?q=caf%C3%A9%20molido");
-  await expect(page.getByRole("link", { name: offerTitle })).toBeVisible();
-  await expect(page.getByText(presenceName)).toBeVisible();
+  await expect(page.getByRole("link", { name: offerTitle })).toHaveCount(0);
 
   await page.goto("/mapa");
   const list = page.getByRole("list", { name: "Ubicaciones fijas" });
   await expect(list.getByText("Pulpería El Pino")).toBeVisible();
-  await expect(list.getByText(presenceName)).toBeVisible();
+  await expect(list.getByText(presenceName)).toHaveCount(0);
   await expect(list.getByText("La Canasta Móvil")).toHaveCount(0);
+
+  const secondPresenceName = `Repartos La Esquina ${suffix}`;
+  await page.goto("/vender");
+  await expect(
+    page.getByRole("heading", { name: "Abrir otra pulpería" }),
+  ).toBeVisible();
+  await page.getByLabel("Nombre de la pulpería").fill(secondPresenceName);
+  await page.getByLabel("WhatsApp", { exact: true }).fill("99994445");
+  await page.getByRole("radio", { name: /Atención móvil/ }).check();
+  await page
+    .getByRole("textbox", { name: "Cobertura declarada" })
+    .fill("Siguatepeque urbano");
+  await page.getByRole("button", { name: "Guardar borrador" }).click();
+
+  await expect(page.getByLabel("Nombre de la pulpería")).toHaveValue(
+    secondPresenceName,
+  );
+  await page.getByLabel("Pulpería activa").selectOption({ label: presenceName });
+  await page.getByRole("button", { name: "Cambiar" }).click();
+  await expect(page.getByLabel("Nombre de la pulpería")).toHaveValue(
+    presenceName,
+  );
+});
+
+test("fixture owner switches mobile and remote presences without mixing offers", async ({
+  page,
+}) => {
+  await page.goto("/ingresar?next=/mi-pulperia");
+  await page.getByLabel("Correo", { exact: true }).fill("canasta@local.test");
+  await page
+    .getByLabel("Contraseña", { exact: true })
+    .fill("pulperia-local");
+  await page.getByRole("button", { name: "Ingresar" }).click();
+
+  await expect(page.getByLabel("Nombre de la pulpería")).toHaveValue(
+    "La Canasta Móvil",
+  );
+  await expect(page.getByRole("link", { name: "Pan por encargo" })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Tarjeta digital para evento" }),
+  ).toHaveCount(0);
+
+  await page
+    .getByLabel("Pulpería activa")
+    .selectOption({ label: "Diseño Remoto Siguatepeque" });
+  await page.getByRole("button", { name: "Cambiar" }).click();
+
+  await expect(page.getByLabel("Nombre de la pulpería")).toHaveValue(
+    "Diseño Remoto Siguatepeque",
+  );
+  await expect(
+    page.getByRole("link", { name: "Tarjeta digital para evento" }),
+  ).toBeVisible();
+  await expect(page.getByRole("link", { name: "Pan por encargo" })).toHaveCount(0);
+
+  await page.goto(
+    "/mi-pulperia?presence=10000000-0000-0000-0000-999999999999",
+  );
+  await expect(page.getByLabel("Nombre de la pulpería")).toHaveValue(
+    "La Canasta Móvil",
+  );
+  await expect(page.getByText("Pulpería El Pino")).toHaveCount(0);
 });
 
 test("seller maintains food, service, and digital offers through the class-aware flow", async ({
@@ -85,7 +176,10 @@ test("seller maintains food, service, and digital offers through the class-aware
   await page
     .getByRole("textbox", { name: "Cobertura declarada" })
     .fill("Siguatepeque urbano");
-  await page.getByRole("button", { name: "Publicar pulpería" }).click();
+  await expect(
+    page.getByRole("button", { name: "Publicar pulpería" }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "Guardar borrador" }).click();
 
   await page.getByRole("link", { name: "Crear oferta" }).click();
   await expect(page.getByLabel("Nota de existencias (opcional)")).toBeVisible();
@@ -95,6 +189,7 @@ test("seller maintains food, service, and digital offers through the class-aware
   await expect(page.getByRole("checkbox", { name: "Cita" })).toHaveCount(0);
   await page.getByLabel("Título").fill(foodTitle);
   await page.getByLabel("Precio publicado (lempiras)").fill("18");
+  await page.getByLabel("Unidad o periodo").fill("unidad");
   await page.getByLabel("Inicio de la ventana").fill("2030-04-12T14:00");
   await page.getByLabel("Fin de la ventana").fill("2030-04-12T18:00");
   await page.getByLabel("Fecha de corte (opcional)").fill("2030-04-12T12:00");

@@ -2,12 +2,12 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { JsonLd } from "@/app/_components/JsonLd";
+import { OfferContext } from "@/app/_components/OfferContext";
 import { PublicContextNotes } from "@/app/_components/PublicContextNotes";
 import { ReportForm } from "@/app/_components/ReportForm";
 import { ShareButton } from "@/app/_components/ShareButton";
 import { getPresence, getPresenceOffers } from "@/lib/data";
-import { PRESENCE_MODE_LABEL } from "@/lib/catalog";
-import { FRESHNESS_LABEL, freshnessBand } from "@/lib/freshness";
+import { OFFER_CLASS_LABEL, PRESENCE_MODE_LABEL } from "@/lib/catalog";
 import { formatPublishedPrice } from "@/lib/money";
 import { getPublicContextNotes } from "@/lib/operations";
 import { absoluteUrl, metadataDescription } from "@/lib/site";
@@ -116,14 +116,11 @@ export default async function PulperiaPage({
           <li key={offer.id}>
             <div>
               <Link href={`/oferta/${offer.slug}`}>{offer.title}</Link>
-              <p className="freshness">
-                {offer.availability_state === "unavailable"
-                  ? "No disponible"
-                  : FRESHNESS_LABEL[freshnessBand(new Date(offer.confirmed_at))]}
-              </p>
+              <p>{OFFER_CLASS_LABEL[offer.offer_class]}</p>
+              <OfferContext offer={offer} />
             </div>
             <span className="price-tag">
-              {formatPublishedPrice(offer.price_cents, offer.price_mode)}
+              {formatPublishedPrice(offer.price_cents, offer.price_mode, offer.unit)}
             </span>
           </li>
         ))}

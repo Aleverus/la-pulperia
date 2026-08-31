@@ -63,11 +63,13 @@ const ALLOWED_FULFILLMENTS: Record<OfferClass, FulfillmentMode[]> = {
 };
 
 export function OfferForm({
+  presenceId,
   offer,
   media,
   error,
   notice,
 }: {
+  presenceId: string;
   offer: OwnedOffer | null;
   media: OwnedMedia[];
   error?: string;
@@ -119,6 +121,7 @@ export function OfferForm({
   return (
     <div className="stack">
       <form action={saveOfferAction} className="stack">
+        <input type="hidden" name="presence_id" value={presenceId} />
         <input type="hidden" name="offer_id" value={offer?.id ?? ""} />
         <input
           type="hidden"
@@ -201,11 +204,19 @@ export function OfferForm({
             </>
           )}
 
-          <label htmlFor="offer-unit">Unidad o periodo (opcional)</label>
+          <label htmlFor="offer-unit">
+            Unidad o periodo
+            {offerClass === "stocked_product" || offerClass === "scheduled_food"
+              ? ""
+              : " (opcional)"}
+          </label>
           <input
             id="offer-unit"
             name="unit"
             defaultValue={offer?.unit ?? ""}
+            required={
+              offerClass === "stocked_product" || offerClass === "scheduled_food"
+            }
             maxLength={40}
             placeholder={unitPlaceholder(offerClass)}
           />
@@ -344,7 +355,9 @@ export function OfferForm({
         {offer ? (
           <>
             <input type="hidden" name="status" value={offer.status} />
-            <label htmlFor="offer-image">Foto (opcional, máximo 4)</label>
+            <label htmlFor="offer-image">
+              Foto (opcional, máximo 4; hasta 3 MB cada una)
+            </label>
             <input
               id="offer-image"
               name="image"
@@ -393,27 +406,45 @@ export function OfferForm({
             el contenido.
           </p>
           <form action={confirmOfferAction}>
+            <input type="hidden" name="presence_id" value={presenceId} />
             <input type="hidden" name="offer_id" value={offer.id} />
             <SubmitButton label="Confirmar vigencia" />
           </form>
           <div>
             {offer.status !== "published" ? (
-              <StatusButton offerId={offer.id} status="published" label="Publicar" />
+              <StatusButton
+                presenceId={presenceId}
+                offerId={offer.id}
+                status="published"
+                label="Publicar"
+              />
             ) : null}
             {offer.status === "published" ? (
-              <StatusButton offerId={offer.id} status="paused" label="Pausar" />
+              <StatusButton
+                presenceId={presenceId}
+                offerId={offer.id}
+                status="paused"
+                label="Pausar"
+              />
             ) : null}
             {offer.status === "paused" ? (
               <StatusButton
+                presenceId={presenceId}
                 offerId={offer.id}
                 status="published"
                 label="Volver a publicar"
               />
             ) : null}
             {offer.status !== "archived" ? (
-              <StatusButton offerId={offer.id} status="archived" label="Archivar" />
+              <StatusButton
+                presenceId={presenceId}
+                offerId={offer.id}
+                status="archived"
+                label="Archivar"
+              />
             ) : (
               <StatusButton
+                presenceId={presenceId}
                 offerId={offer.id}
                 status="draft"
                 label="Sacar del archivo"
@@ -431,10 +462,26 @@ export function OfferForm({
                       <img src={src} alt={item.alt_text || "Foto de la oferta"} />
                     ) : null}
                     <form action={removeOfferImageAction}>
+                      <input
+                        type="hidden"
+                        name="presence_id"
+                        value={presenceId}
+                      />
                       <input type="hidden" name="offer_id" value={offer.id} />
                       <input type="hidden" name="media_id" value={item.id} />
-                      <SubmitButton label="Quitar foto" />
+                      <SubmitButton
+                        label={
+                          item.deletion_pending
+                            ? "Reintentar limpieza"
+                            : "Quitar foto"
+                        }
+                      />
                     </form>
+                    {item.deletion_pending ? (
+                      <p role="status">
+                        Esta foto no se publica mientras se completa la limpieza.
+                      </p>
+                    ) : null}
                   </li>
                 );
               })}
@@ -473,16 +520,19 @@ function SubmitButton({
 }
 
 function StatusButton({
+  presenceId,
   offerId,
   status,
   label,
 }: {
+  presenceId: string;
   offerId: string;
   status: "draft" | "published" | "paused" | "archived";
   label: string;
 }) {
   return (
     <form action={setOfferStatusAction} style={{ display: "inline" }}>
+      <input type="hidden" name="presence_id" value={presenceId} />
       <input type="hidden" name="offer_id" value={offerId} />
       <input type="hidden" name="status" value={status} />
       <SubmitButton label={label} />

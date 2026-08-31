@@ -26,6 +26,7 @@ export type MetricsSummary = {
     | "selection_add"
     | "request_prepared"
     | "handoff_opened"
+    | "request_understood"
     | "seller_update",
     number
   >;

@@ -4,16 +4,22 @@ import { useState, useSyncExternalStore } from "react";
 import { classifyGeolocation, GEO_ISSUE_LABEL, type GeoIssue } from "@/lib/geo";
 import {
   searchHref,
+  type SearchAvailabilityFilter,
+  type SearchOfferClassFilter,
   type SearchPresenceFilter,
 } from "@/lib/search";
 
 export function LocationSearchControl({
   query,
+  offerClass,
   presence,
+  availability,
   active,
 }: {
   query: string;
+  offerClass: SearchOfferClassFilter;
   presence: SearchPresenceFilter;
+  availability: SearchAvailabilityFilter;
   active: boolean;
 }) {
   const ready = useSyncExternalStore(subscribe, clientReady, serverNotReady);
@@ -52,7 +58,14 @@ export function LocationSearchControl({
           return;
         }
         window.location.assign(
-          searchHref({ query, presence, sort: "nearby", page: 1 }),
+          searchHref({
+            query,
+            offerClass,
+            presence,
+            availability,
+            sort: "nearby",
+            page: 1,
+          }),
         );
       },
       (error) => {
@@ -69,7 +82,14 @@ export function LocationSearchControl({
     setBusy(false);
     setIssue(null);
     window.location.assign(
-      searchHref({ query, presence, sort: "organic", page: 1 }),
+      searchHref({
+        query,
+        offerClass,
+        presence,
+        availability,
+        sort: "organic",
+        page: 1,
+      }),
     );
   }
 

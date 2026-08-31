@@ -6,9 +6,9 @@ import { formErrorMessage } from "@/lib/seller";
 import {
   getOwnedMedia,
   getOwnedOffer,
-  getOwnedPresence,
+  getOwnedPresences,
 } from "@/lib/seller-data";
-import { requireSession } from "@/lib/session";
+import { selectOwnedPresence, sellerUrl } from "@/lib/seller-routing";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -20,14 +20,19 @@ export default async function EditarOfertaPage({
   params,
   searchParams,
 }: PageProps<"/mi-pulperia/ofertas/[id]">) {
-  await requireSession("/mi-pulperia");
-  const presence = await getOwnedPresence();
-  if (!presence) redirect("/vender");
   const { id } = await params;
+  const query = await searchParams;
+  const requestedId =
+    typeof query.presence === "string" ? query.presence : null;
+  const presences = await getOwnedPresences(`/mi-pulperia/ofertas/${id}`);
+  const presence = selectOwnedPresence(presences, requestedId);
+  if (!presence) redirect("/vender");
+  if (requestedId !== presence.id) {
+    redirect(sellerUrl(`/mi-pulperia/ofertas/${id}`, presence.id));
+  }
   const offer = await getOwnedOffer(presence.id, id);
   if (!offer) notFound();
   const media = await getOwnedMedia(offer.id);
-  const query = await searchParams;
   const error = formErrorMessage(
     typeof query.error === "string" ? query.error : undefined,
   );
@@ -37,10 +42,13 @@ export default async function EditarOfertaPage({
   return (
     <main>
       <p>
-        <Link href="/mi-pulperia">Volver a mi pulpería</Link>
+        <Link href={sellerUrl("/mi-pulperia", presence.id)}>
+          Volver a {presence.name}
+        </Link>
       </p>
       <h1>Editar oferta</h1>
       <OfferForm
+        presenceId={presence.id}
         offer={offer}
         media={media}
         error={error ?? undefined}

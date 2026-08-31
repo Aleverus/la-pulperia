@@ -3,15 +3,23 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { HandoffButton } from "@/app/_components/HandoffButton";
 import { composeHandoffMessage } from "@/lib/handoff";
-import type { FulfillmentMode, OfferClass } from "@/lib/catalog";
-import type { PriceMode } from "@/lib/money";
-import type { SelectionRequest } from "@/lib/selection";
+import {
+  FULFILLMENT_MODE_LABEL,
+  OFFER_CLASS_LABEL,
+  type FulfillmentMode,
+  type OfferClass,
+} from "@/lib/catalog";
+import { formatPublishedPrice, type PriceMode } from "@/lib/money";
+import {
+  formatRequestDetails,
+  type SelectionRequest,
+} from "@/lib/selection";
 import { waMeUrl } from "@/lib/phone";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "Solicitud por vendedor",
+  title: "Pedidos por vendedor",
   robots: { index: false, follow: false },
 };
 
@@ -19,6 +27,8 @@ type HandoffPayload = {
   seller_request_id: string;
   batch_id: string;
   status: "prepared" | "handoff_opened";
+  handoff_opened_at: string | null;
+  seller_understood_at: string | null;
   destination_e164: string;
   presence_name: string;
   buyer_name: string;
@@ -28,7 +38,9 @@ type HandoffPayload = {
     request: SelectionRequest;
     price_cents: number | null;
     price_mode: PriceMode;
+    unit: string | null;
     fulfillment_modes: FulfillmentMode[];
+    confirmed_at: string;
   }>;
 };
 
@@ -74,6 +86,7 @@ export default async function SolicitudPage({
         request: item.request,
         priceCents: item.price_cents,
         priceMode: item.price_mode,
+        unit: item.unit,
         fulfillmentModes: item.fulfillment_modes,
       })),
     });
@@ -85,18 +98,34 @@ export default async function SolicitudPage({
 
   return (
     <main>
-      <h1>Solicitudes por vendedor</h1>
+      <h1>Pedidos por vendedor</h1>
       <p>
-        Abrí un WhatsApp por vendedor. Eso no es un mensaje enviado, un pedido
-        aceptado ni una venta.
+        La Pulpería armó un mensaje por vendedor. Abrí cada WhatsApp para
+        revisarlo y enviarlo. Prepararlo no significa que el pedido fue enviado,
+        aceptado o pagado.
       </p>
       {cards.map(({ payload, href }) => (
-        <section key={payload.seller_request_id}>
+        <section className="handoff-card" key={payload.seller_request_id}>
           <h2>{payload.presence_name}</h2>
-          <ul>
-            {payload.items.map((item) => (
-              <li key={item.title}>
-                {item.title}
+          <p>Referencia {payload.seller_request_id.slice(0, 8)}</p>
+          <ul className="handoff-items">
+            {payload.items.map((item, index) => (
+              <li key={`${item.title}-${index}`}>
+                <strong>{item.title}</strong>
+                <p>{OFFER_CLASS_LABEL[item.offer_class]}</p>
+                <p>
+                  {formatRequestDetails(item.offer_class, item.request, item.unit)}
+                </p>
+                <p>
+                  {formatPublishedPrice(item.price_cents, item.price_mode, item.unit)} ·{" "}
+                  {item.fulfillment_modes
+                    .map((mode) => FULFILLMENT_MODE_LABEL[mode])
+                    .join(", ")}
+                </p>
+                <p>
+                  Contexto confirmado el{" "}
+                  {new Date(item.confirmed_at).toLocaleString("es-HN")}
+                </p>
               </li>
             ))}
           </ul>
@@ -104,7 +133,12 @@ export default async function SolicitudPage({
             Estado:{" "}
             {payload.status === "handoff_opened"
               ? "WhatsApp abierto"
-              : "Solicitud preparada"}
+              : "Pedido preparado"}
+          </p>
+          <p>
+            {payload.seller_understood_at
+              ? "El vendedor confirmó voluntariamente que entendió el pedido."
+              : "El vendedor todavía no confirmó que entendió el pedido."}
           </p>
           <HandoffButton
             sellerRequestId={payload.seller_request_id}

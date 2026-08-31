@@ -16,6 +16,7 @@ export default defineConfig({
   },
   webServer: {
     command: process.env.CI ? "pnpm start" : "pnpm dev",
+    env: { PULPERIA_LOCAL_TEST_AUTH: "true" },
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

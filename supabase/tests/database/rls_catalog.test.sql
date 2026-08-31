@@ -1,5 +1,5 @@
 begin;
-select plan(17);
+select plan(18);
 
 select hasnt_column(
   'public',
@@ -71,12 +71,12 @@ select is(
     select presence_name
     from public.search_offers(
       p_query => 'zambos picantes',
-      p_sort => 'price_asc'
+      p_sort => 'organic'
     )
     limit 1
   ),
   'La Canasta Móvil',
-  'price ascending is explicit and deterministic'
+  'organic ordering is explicit and deterministic'
 );
 
 select is(
@@ -86,7 +86,7 @@ select is(
       p_query => 'zambos picantes',
       p_limit => 1,
       p_offset => 1,
-      p_sort => 'price_asc'
+      p_sort => 'organic'
     )
     limit 1
   ),
@@ -139,6 +139,11 @@ select is(
 );
 
 set local role anon;
+
+select lives_ok(
+  $$ select count(*) from public.catalog_offer_media $$,
+  'anonymous media catalog access can evaluate the pending-deletion gate'
+);
 
 select is(
   (

@@ -9,6 +9,7 @@ export default function robots(): MetadataRoute.Robots {
       disallow: [
         "/auth/",
         "/carrito",
+        "/seleccion",
         "/cuenta/",
         "/ingresar",
         "/mi-pulperia/",

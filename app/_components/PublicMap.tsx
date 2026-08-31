@@ -11,7 +11,13 @@ import {
   type GeoIssue,
 } from "@/lib/geo";
 
-export function PublicMap({ places }: { places: CatalogPresence[] }) {
+export function PublicMap({
+  places,
+  compact = false,
+}: {
+  places: CatalogPresence[];
+  compact?: boolean;
+}) {
   const pins = places.filter(
     (place): place is CatalogPresence & { lat: number; lng: number } =>
       place.mode === "fixed_location" && place.lat !== null && place.lng !== null,
@@ -60,15 +66,19 @@ export function PublicMap({ places }: { places: CatalogPresence[] }) {
   }
 
   return (
-    <div>
-      <p>
-        <button type="button" onClick={useGps}>
-          Usar mi ubicación
-        </button>
-        . Sólo vale para esta sesión; no se guarda.
-      </p>
+    <div className={compact ? "public-map public-map--compact" : "public-map"}>
+      {!compact ? (
+        <p>
+          <button type="button" onClick={useGps}>
+            Usar mi ubicación
+          </button>
+          . Sólo vale para esta sesión; no se guarda.
+        </p>
+      ) : null}
       {issue ? <p>{GEO_ISSUE_LABEL[issue]}</p> : null}
-      <h2 id="public-map-label">Mapa de Siguatepeque</h2>
+      <h2 id="public-map-label" className={compact ? "sr-only" : undefined}>
+        Mapa de Siguatepeque
+      </h2>
       {pins.length === 0 ? (
         <p>Todavía no hay ubicaciones fijas publicadas.</p>
       ) : null}
@@ -84,29 +94,31 @@ export function PublicMap({ places }: { places: CatalogPresence[] }) {
         onSelect={setSelectedId}
         here={here}
       />
-      <ul className="offer-list" aria-label="Ubicaciones fijas">
-        {ordered.map((place) => {
-          const selected = place.id === selectedId;
-          const distance =
-            here != null
-              ? Math.round(haversineMeters(here, { lat: place.lat, lng: place.lng }))
-              : null;
-          return (
-            <li key={place.id}>
-              <button
-                type="button"
-                aria-current={selected ? "true" : undefined}
-                onClick={() => setSelectedId(place.id)}
-              >
-                {place.name}
-              </button>
-              {distance !== null ? <span> · {distance} m</span> : null}
-              {" · "}
-              <Link href={`/pulperia/${place.slug}`}>Ver pulpería</Link>
-            </li>
-          );
-        })}
-      </ul>
+      {!compact ? (
+        <ul className="offer-list" aria-label="Ubicaciones fijas">
+          {ordered.map((place) => {
+            const selected = place.id === selectedId;
+            const distance =
+              here != null
+                ? Math.round(haversineMeters(here, { lat: place.lat, lng: place.lng }))
+                : null;
+            return (
+              <li key={place.id}>
+                <button
+                  type="button"
+                  aria-current={selected ? "true" : undefined}
+                  onClick={() => setSelectedId(place.id)}
+                >
+                  {place.name}
+                </button>
+                {distance !== null ? <span> · {distance} m</span> : null}
+                {" · "}
+                <Link href={`/pulperia/${place.slug}`}>Ver pulpería</Link>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
     </div>
   );
 }

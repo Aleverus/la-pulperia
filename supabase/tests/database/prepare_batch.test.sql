@@ -6,6 +6,21 @@ delete from public.request_batches
 where buyer_id = '10000000-0000-0000-0000-000000000001';
 
 select set_config(
+  'test.offer20_context_token',
+  public.offer_request_context_token(
+    '10000000-0000-0000-0000-000000000020'
+  ),
+  true
+);
+select set_config(
+  'test.offer22_context_token',
+  public.offer_request_context_token(
+    '10000000-0000-0000-0000-000000000022'
+  ),
+  true
+);
+
+select set_config(
   'request.jwt.claims',
   '{"sub":"10000000-0000-0000-0000-000000000001","role":"authenticated"}',
   true
@@ -16,14 +31,28 @@ set local role authenticated;
 select is(
   (
     select jsonb_array_length(public.prepare_request_batch(
-      '[
-        {"offer_id":"10000000-0000-0000-0000-000000000020","request":{"quantity":2}},
-        {"offer_id":"10000000-0000-0000-0000-000000000022","request":{"quantity":1}}
-      ]'::jsonb
+      jsonb_build_array(
+        jsonb_build_object(
+          'offer_id', '10000000-0000-0000-0000-000000000020',
+          'request', jsonb_build_object('quantity', 2),
+          'context', jsonb_build_object(
+            'request_context_token',
+            current_setting('test.offer20_context_token')
+          )
+        ),
+        jsonb_build_object(
+          'offer_id', '10000000-0000-0000-0000-000000000022',
+          'request', jsonb_build_object('quantity', 1),
+          'context', jsonb_build_object(
+            'request_context_token',
+            current_setting('test.offer22_context_token')
+          )
+        )
+      )
     ) -> 'requests')
   ),
   2,
-  'multi-seller cart produces one request per seller'
+  'multi-seller selection produces one request per seller'
 );
 
 reset role;

@@ -40,6 +40,7 @@ type OfferContract = {
   coverage_label: string | null;
   service_territory: string | null;
   fulfillment_modes: FulfillmentMode[];
+  request_context_token: string;
 };
 
 export type SearchOffer = OfferContract & {
@@ -77,4 +78,20 @@ export const PRESENCE_MODE_LABEL: Record<PresenceMode, string> = {
   fixed_location: "Ubicación fija",
   mobile: "Atención móvil",
   remote: "Atención remota",
+};
+
+export const AVAILABILITY_STATE_LABEL: Record<AvailabilityState, string> = {
+  available: "Disponible",
+  limited: "Disponibilidad limitada",
+  unavailable: "No disponible",
+  on_request: "Bajo solicitud",
+};
+
+export const FULFILLMENT_MODE_LABEL: Record<FulfillmentMode, string> = {
+  pickup: "retiro",
+  local_coverage: "cobertura o visita local",
+  seller_shipping: "envío propio",
+  appointment: "cita",
+  digital_delivery: "entrega digital",
+  direct_agreement: "acuerdo directo",
 };

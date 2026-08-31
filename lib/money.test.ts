@@ -32,5 +32,11 @@ describe("formatPublishedPrice", () => {
     expect(formatPublishedPrice(8000, "fixed")).toBe("L 80.00");
     expect(formatPublishedPrice(8000, "from")).toBe("desde L 80.00");
     expect(formatPublishedPrice(null, "quote")).toBe("Cotización");
+    expect(formatPublishedPrice(8000, "fixed", "libra")).toBe(
+      "L 80.00 / libra",
+    );
+    expect(formatPublishedPrice(null, "quote", "hora")).toBe(
+      "Cotización / hora",
+    );
   });
 });

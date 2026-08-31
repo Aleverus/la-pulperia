@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { AddToSelection } from "@/app/_components/AddToSelection";
 import { JsonLd } from "@/app/_components/JsonLd";
+import { OfferFallback } from "@/app/_components/OfferArtwork";
+import { OfferContext } from "@/app/_components/OfferContext";
 import { PublicContextNotes } from "@/app/_components/PublicContextNotes";
 import { ReportForm } from "@/app/_components/ReportForm";
 import { ShareButton } from "@/app/_components/ShareButton";
@@ -11,7 +13,8 @@ import {
   OFFER_CLASS_LABEL,
   PRESENCE_MODE_LABEL,
 } from "@/lib/catalog";
-import { FRESHNESS_LABEL, freshnessBand } from "@/lib/freshness";
+import { freshnessBand } from "@/lib/freshness";
+import { isOfferEffectivelyAvailable } from "@/lib/offer-context";
 import { formatPublishedPrice } from "@/lib/money";
 import { getPublicContextNotes, recordPublicEvent } from "@/lib/operations";
 import { mediaPublicUrl } from "@/lib/media-url";
@@ -32,7 +35,7 @@ export async function generateMetadata({
   if (!offer) return { title: "Oferta no encontrada", robots: { index: false } };
 
   const description = metadataDescription(
-    `${formatPublishedPrice(offer.price_cents, offer.price_mode)} en ${offer.presence_name}. ${offer.description}`,
+    `${formatPublishedPrice(offer.price_cents, offer.price_mode, offer.unit)} en ${offer.presence_name}. ${offer.description}`,
   );
   const canonical = `/oferta/${offer.slug}`;
   return {
@@ -64,7 +67,12 @@ export default async function OfferPage({
   const canonical = absoluteUrl(`/oferta/${offer.slug}`);
   const sellerType =
     offer.presence_mode === "fixed_location" ? "LocalBusiness" : "Organization";
-  const schemaAvailability = availabilitySchemaUrl(offer.availability_state);
+  const freshness = freshnessBand(new Date(offer.confirmed_at));
+  const requestable = isOfferEffectivelyAvailable(offer);
+  const schemaAvailability =
+    freshness === "stale" || !requestable
+      ? null
+      : availabilitySchemaUrl(offer.availability_state);
   const structuredData = {
     "@context": "https://schema.org",
     "@type":
@@ -120,19 +128,26 @@ export default async function OfferPage({
             );
           })}
         </ul>
-      ) : null}
+      ) : (
+        <OfferFallback
+          className="detail-media-fallback"
+          offerClass={offer.offer_class}
+          title={offer.title}
+        />
+      )}
       <div className="detail-summary">
         <p className="price-tag price-tag--large">
-          {formatPublishedPrice(offer.price_cents, offer.price_mode)}
-        </p>
-        <p className="freshness">
-          {FRESHNESS_LABEL[freshnessBand(new Date(offer.confirmed_at))]}
+          {formatPublishedPrice(offer.price_cents, offer.price_mode, offer.unit)}
         </p>
       </div>
       <p className="lede">{offer.description}</p>
+      <OfferContext offer={offer} />
       <div className="button-row">
-        {offer.availability_state === "unavailable" ? (
-          <p>No disponible. Sigue visible en la pulpería.</p>
+        {!requestable ? (
+          <p>
+            Esta oferta ya no admite pedidos con el contexto publicado. Sigue
+            visible para que puedas revisar la ficha.
+          </p>
         ) : (
           <AddToSelection
             offerId={offer.id}
@@ -140,8 +155,10 @@ export default async function OfferPage({
             availabilityDetails={offer.availability_details}
             listedPriceCents={offer.price_cents}
             listedPriceMode={offer.price_mode}
+            listedUnit={offer.unit}
             listedAvailabilityState={offer.availability_state}
             listedConfirmedAt={offer.confirmed_at}
+            requestContextToken={offer.request_context_token}
           />
         )}
         <ShareButton label="Compartir oferta" />

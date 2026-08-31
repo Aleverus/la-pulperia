@@ -25,7 +25,9 @@ export default async function Home() {
 
   const { offers } = await searchOffers({
     query: "",
+    offerClass: "all",
     presence: "all",
+    availability: "all",
     sort: "organic",
     page: 1,
   });
@@ -33,11 +35,12 @@ export default async function Home() {
   return (
     <main className="catalog-page">
       <section className="hero">
-        <p className="eyebrow">Mercado local de Siguatepeque</p>
-        <h1>Encontrá lo que hay cerca, sin dar vueltas.</h1>
+        <p className="eyebrow">Índice vivo de comercio local</p>
+        <h1>Encontrá quién ofrece lo que necesitás en Siguatepeque.</h1>
         <p>
-          Compará precios publicados y armá tu canasto. La disponibilidad,
-          pago y entrega se confirman con cada vendedor por WhatsApp.
+          Compará precio o modalidad, vigencia, disponibilidad y forma de
+          cumplimiento antes de hablar con cada vendedor. La confirmación,
+          pago y entrega ocurren fuera de La Pulpería.
         </p>
       </section>
       <SearchForm />

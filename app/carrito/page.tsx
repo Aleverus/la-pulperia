@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "Selección",
+  title: "Carrito",
   robots: { index: false, follow: false },
 };
 
@@ -19,9 +19,12 @@ export default async function CartPage() {
 
   return (
     <main className="cart-page">
-      <p className="eyebrow">Intención por vendedor</p>
-      <h1>Selección</h1>
-      <p>La selección se agrupa por vendedor. No es un pedido único de la plataforma.</p>
+      <p className="eyebrow">Tu compra local</p>
+      <h1>Carrito</h1>
+      <p>
+        Revisá lo que querés pedir. La Pulpería lo agrupa por vendedor y
+        prepara un pedido de WhatsApp para cada uno.
+      </p>
       <SelectionClient signedIn={signedIn} />
     </main>
   );

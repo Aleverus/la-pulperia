@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { savePresenceAction } from "@/app/seller-actions";
 import { CityMap } from "@/app/_components/CityMap";
 import {
@@ -30,10 +30,12 @@ export function PresenceForm({
   const [issue, setIssue] = useState<GeoIssue | null>(null);
 
   const e164 = normalizeWhatsapp(whatsapp);
-  const probeHref = useMemo(() => {
-    if (!e164) return null;
-    return waMeUrl(e164, whatsappProbeMessage(name || "esta pulpería"));
-  }, [e164, name]);
+  const whatsappVerified =
+    presence?.whatsapp_verification_status === "verified" &&
+    e164 === presence.whatsapp_e164;
+  const probeHref = e164
+    ? waMeUrl(e164, whatsappProbeMessage(name || "esta pulpería"))
+    : null;
 
   function placePin(nextLat: number, nextLng: number, accuracyM?: number) {
     const classified = classifyGeolocation({
@@ -74,6 +76,7 @@ export function PresenceForm({
 
   return (
     <form action={savePresenceAction} className="stack">
+      <input type="hidden" name="presence_id" value={presence?.id ?? ""} />
       <label htmlFor="presence-name">Nombre de la pulpería</label>
       <input
         id="presence-name"
@@ -188,6 +191,11 @@ export function PresenceForm({
       ) : (
         <p>Escribí un número hondureño para ver la prueba.</p>
       )}
+      <p role="status">
+        {whatsappVerified
+          ? "WhatsApp verificado para esta pulpería."
+          : "WhatsApp sin verificar. Podés guardar el borrador, pero no publicarlo hasta comprobar el control del número."}
+      </p>
 
       {mode === "fixed_location" ? (
         <div>
@@ -238,7 +246,12 @@ export function PresenceForm({
         <button type="submit" name="status" value="draft">
           Guardar borrador
         </button>{" "}
-        <button type="submit" name="status" value="published">
+        <button
+          type="submit"
+          name="status"
+          value="published"
+          disabled={!whatsappVerified}
+        >
           Publicar pulpería
         </button>
       </p>

@@ -4,6 +4,14 @@ test("public offer and fixed-location seller expose safe indexable metadata", as
   page,
   request,
 }) => {
+  const home = await request.get("/");
+  expect(home.headers()["x-powered-by"]).toBeUndefined();
+  expect(home.headers()["x-content-type-options"]).toBe("nosniff");
+  expect(home.headers()["x-frame-options"]).toBe("DENY");
+  expect(home.headers()["content-security-policy"]).toContain(
+    "frame-ancestors 'none'",
+  );
+
   await page.goto("/oferta/zambos-picantes-el-pino");
   await expect(page).toHaveTitle(/Zambos picantes \| La Pulpería/);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
@@ -18,6 +26,16 @@ test("public offer and fixed-location seller expose safe indexable metadata", as
   expect(offerJson["@type"]).toBe("Product");
   expect(offerJson.offers.priceCurrency).toBe("HNL");
   expect(JSON.stringify(offerJson)).not.toContain("+504");
+
+  await page.goto("/oferta/zambos-picantes-canasta");
+  const staleOfferJson = JSON.parse(
+    (await page.locator('script[type="application/ld+json"]').textContent()) ??
+      "{}",
+  );
+  expect(staleOfferJson.offers.availability).toBeUndefined();
+  await expect(
+    page.getByText(/no confirma esta información desde hace más de 30 días/),
+  ).toBeVisible();
 
   await page.goto("/pulperia/el-pino");
   const sellerJson = JSON.parse(

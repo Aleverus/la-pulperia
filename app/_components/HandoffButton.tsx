@@ -9,6 +9,7 @@ export function HandoffButton(props: {
 }) {
   return (
     <a
+      className="handoff-link"
       href={props.href}
       target="_blank"
       rel="noopener noreferrer"

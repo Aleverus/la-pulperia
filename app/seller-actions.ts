@@ -9,20 +9,29 @@ import type {
   OfferClass,
   PresenceMode,
 } from "@/lib/catalog";
-import { OFFER_IMAGE_MAX_COUNT, processOfferImage } from "@/lib/image";
+import {
+  isOfferImageFileSizeAllowed,
+  processOfferImage,
+} from "@/lib/image";
+import { deleteMediaRecoverably } from "@/lib/deletion";
 import { parseLempirasToCents, type PriceMode } from "@/lib/money";
 import { normalizeWhatsapp } from "@/lib/phone";
 import { requireSession } from "@/lib/session";
 import {
-  getOwnedMedia,
   getOwnedOffer,
-  getOwnedPresence,
+  getOwnedPresenceById,
+  getSellerRequests,
 } from "@/lib/seller-data";
+import { sellerUrl } from "@/lib/seller-routing";
 import type { OfferStatus, PresenceStatus } from "@/lib/seller";
 
 export async function savePresenceAction(formData: FormData) {
   const { supabase } = await requireSession("/vender");
-  const existing = await getOwnedPresence();
+  const presenceId = emptyToNull(String(formData.get("presence_id") ?? ""));
+  const existing = presenceId
+    ? await getOwnedPresenceById(presenceId)
+    : null;
+  if (presenceId && !existing) redirect("/mi-pulperia");
   const name = String(formData.get("name") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
   const mode = String(formData.get("mode") ?? "") as PresenceMode;
@@ -52,7 +61,7 @@ export async function savePresenceAction(formData: FormData) {
     redirect(presenceError("pin", existing?.id));
   }
 
-  const { error } = await supabase.rpc("upsert_seller_presence", {
+  const { data, error } = await supabase.rpc("upsert_seller_presence", {
     p_name: name,
     p_description: description,
     p_mode: mode,
@@ -69,13 +78,13 @@ export async function savePresenceAction(formData: FormData) {
   if (error) {
     redirect(presenceError(classifyPresenceError(error.message), existing?.id));
   }
-  redirect("/mi-pulperia");
+  if (!data) redirect(presenceError("save", existing?.id));
+  redirect(sellerUrl("/mi-pulperia", String(data)));
 }
 
 export async function saveOfferAction(formData: FormData) {
-  const presence = await getOwnedPresence();
-  if (!presence) redirect("/vender");
-  const { supabase, user } = await requireSession("/mi-pulperia");
+  const presence = await requireOwnedPresenceFromForm(formData);
+  const { supabase } = await requireSession("/mi-pulperia");
 
   const offerId = emptyToNull(String(formData.get("offer_id") ?? ""));
   const title = String(formData.get("title") ?? "").trim();
@@ -96,21 +105,31 @@ export async function saveOfferAction(formData: FormData) {
     .map(String)
     .filter(isFulfillmentMode);
 
-  if (!title) redirect(offerError("title", offerId));
-  if (!isOfferClass(offerClass)) redirect(offerError("availability", offerId));
+  if (!title) redirect(offerError("title", presence.id, offerId));
+  if (!isOfferClass(offerClass)) {
+    redirect(offerError("availability", presence.id, offerId));
+  }
+  if (
+    (offerClass === "stocked_product" || offerClass === "scheduled_food") &&
+    !unit
+  ) {
+    redirect(offerError("unit", presence.id, offerId));
+  }
   if (!isPriceMode(priceMode) || (priceMode !== "quote" && price === null)) {
-    redirect(offerError("price", offerId));
+    redirect(offerError("price", presence.id, offerId));
   }
   if (!isAvailabilityState(availabilityState)) {
-    redirect(offerError("availability", offerId));
+    redirect(offerError("availability", presence.id, offerId));
   }
-  if (!isOfferStatus(status)) redirect(offerError("status", offerId));
+  if (!isOfferStatus(status)) {
+    redirect(offerError("status", presence.id, offerId));
+  }
   if (fulfillmentModes.length < 1) {
-    redirect(offerError("fulfillment", offerId));
+    redirect(offerError("fulfillment", presence.id, offerId));
   }
 
   const contract = availabilityContract(offerClass, availabilityState, formData);
-  if (!contract) redirect(offerError("availability", offerId));
+  if (!contract) redirect(offerError("availability", presence.id, offerId));
 
   const { data, error } = await supabase.rpc("upsert_offer_maintained", {
     p_presence_id: presence.id,
@@ -131,40 +150,63 @@ export async function saveOfferAction(formData: FormData) {
       formData.get("maintenance_started_at_ms"),
     ),
   });
-  if (error || !data) redirect(offerError(classifyOfferError(error?.message), offerId));
+  if (error || !data) {
+    redirect(
+      offerError(classifyOfferError(error?.message), presence.id, offerId),
+    );
+  }
 
   const savedId = String(data);
   const image = formData.get("image");
   if (image instanceof File && image.size > 0) {
     const uploaded = await storeOfferImage({
       supabase,
-      userId: user.id,
       offerId: savedId,
       file: image,
     });
-    if (!uploaded) redirect(`/mi-pulperia/ofertas/${savedId}?error=image`);
+    if (uploaded !== "ok") {
+      redirect(
+        sellerUrl(`/mi-pulperia/ofertas/${savedId}`, presence.id, {
+          error: uploaded,
+        }),
+      );
+    }
   }
-  redirect(`/mi-pulperia/ofertas/${savedId}`);
+  redirect(sellerUrl(`/mi-pulperia/ofertas/${savedId}`, presence.id));
 }
 
 export async function confirmOfferAction(formData: FormData) {
+  const presence = await requireOwnedPresenceFromForm(formData);
   const offerId = String(formData.get("offer_id") ?? "");
+  const current = await getOwnedOffer(presence.id, offerId);
+  if (!current) redirect(sellerUrl("/mi-pulperia", presence.id));
   const { supabase } = await requireSession("/mi-pulperia");
   const { error } = await supabase.rpc("confirm_offer_freshness", {
     p_offer_id: offerId,
   });
-  if (error) redirect(`/mi-pulperia/ofertas/${offerId}?error=confirm`);
-  redirect(`/mi-pulperia/ofertas/${offerId}?ok=fresh`);
+  if (error) {
+    redirect(
+      sellerUrl(`/mi-pulperia/ofertas/${offerId}`, presence.id, {
+        error: "confirm",
+      }),
+    );
+  }
+  redirect(
+    sellerUrl(`/mi-pulperia/ofertas/${offerId}`, presence.id, { ok: "fresh" }),
+  );
 }
 
 export async function setOfferStatusAction(formData: FormData) {
+  const presence = await requireOwnedPresenceFromForm(formData);
   const offerId = String(formData.get("offer_id") ?? "");
   const status = String(formData.get("status") ?? "") as OfferStatus;
-  const presence = await getOwnedPresence();
-  if (!presence) redirect("/vender");
   const current = await getOwnedOffer(presence.id, offerId);
   if (!current || !isOfferStatus(status)) {
-    redirect(`/mi-pulperia/ofertas/${offerId}?error=save`);
+    redirect(
+      sellerUrl(`/mi-pulperia/ofertas/${offerId}`, presence.id, {
+        error: "save",
+      }),
+    );
   }
   const { supabase } = await requireSession("/mi-pulperia");
   const { error } = await supabase.rpc("upsert_offer", {
@@ -183,24 +225,84 @@ export async function setOfferStatusAction(formData: FormData) {
     p_id: offerId,
     p_confirm: false,
   });
-  if (error) redirect(`/mi-pulperia/ofertas/${offerId}?error=save`);
-  redirect(`/mi-pulperia/ofertas/${offerId}`);
+  if (error) {
+    redirect(
+      sellerUrl(`/mi-pulperia/ofertas/${offerId}`, presence.id, {
+        error: "save",
+      }),
+    );
+  }
+  redirect(sellerUrl(`/mi-pulperia/ofertas/${offerId}`, presence.id));
+}
+
+export async function confirmRequestUnderstoodAction(formData: FormData) {
+  const presence = await requireOwnedPresenceFromForm(formData);
+  const sellerRequestId = String(formData.get("seller_request_id") ?? "");
+  const requests = await getSellerRequests(presence.id);
+  if (!requests.some((request) => request.seller_request_id === sellerRequestId)) {
+    redirect(sellerUrl("/mi-pulperia/solicitudes", presence.id));
+  }
+  const { supabase } = await requireSession("/mi-pulperia/solicitudes");
+  const { error } = await supabase.rpc("confirm_request_understood", {
+    p_seller_request_id: sellerRequestId,
+  });
+  if (error) {
+    redirect(
+      sellerUrl("/mi-pulperia/solicitudes", presence.id, {
+        error: "confirm",
+      }),
+    );
+  }
+  redirect(
+    sellerUrl("/mi-pulperia/solicitudes", presence.id, {
+      ok: "understood",
+    }),
+  );
 }
 
 export async function removeOfferImageAction(formData: FormData) {
+  const presence = await requireOwnedPresenceFromForm(formData);
   const offerId = String(formData.get("offer_id") ?? "");
   const mediaId = String(formData.get("media_id") ?? "");
+  const offer = await getOwnedOffer(presence.id, offerId);
+  if (!offer) redirect(sellerUrl("/mi-pulperia", presence.id));
   const { supabase } = await requireSession("/mi-pulperia");
-  const { data: media } = await supabase
-    .from("offer_media")
-    .select("id, storage_path")
-    .eq("id", mediaId)
-    .eq("offer_id", offerId)
-    .maybeSingle();
-  if (!media) redirect(`/mi-pulperia/ofertas/${offerId}?error=image`);
-  await supabase.storage.from("offer-media").remove([media.storage_path]);
-  await supabase.from("offer_media").delete().eq("id", mediaId);
-  redirect(`/mi-pulperia/ofertas/${offerId}`);
+  const result = await deleteMediaRecoverably({
+    begin: async () => {
+      const { data, error } = await supabase.rpc(
+        "begin_offer_media_deletion",
+        { p_offer_id: offerId, p_media_id: mediaId },
+      );
+      if (error || typeof data !== "string") throw error ?? new Error("media");
+      return data;
+    },
+    removeStorage: async (path) => {
+      const { error } = await supabase.storage.from("offer-media").remove([path]);
+      if (error) throw error;
+    },
+    restore: async () => {
+      const { data, error } = await supabase.rpc(
+        "restore_offer_media_deletion",
+        { p_offer_id: offerId, p_media_id: mediaId },
+      );
+      if (error || data !== true) throw error ?? new Error("restore");
+    },
+    finalize: async () => {
+      const { data, error } = await supabase.rpc(
+        "finalize_offer_media_deletion",
+        { p_offer_id: offerId, p_media_id: mediaId },
+      );
+      if (error || data !== true) throw error ?? new Error("finalize");
+    },
+  });
+  if (!result.ok) {
+    redirect(
+      sellerUrl(`/mi-pulperia/ofertas/${offerId}`, presence.id, {
+        error: result.pending ? "image_cleanup" : "image",
+      }),
+    );
+  }
+  redirect(sellerUrl(`/mi-pulperia/ofertas/${offerId}`, presence.id));
 }
 
 function availabilityContract(
@@ -257,19 +359,33 @@ function availabilityContract(
 }
 
 function presenceError(code: string, presenceId?: string) {
-  const path = presenceId ? "/mi-pulperia" : "/vender";
-  return `${path}?error=${encodeURIComponent(code)}`;
+  return presenceId
+    ? sellerUrl("/mi-pulperia", presenceId, { error: code })
+    : `/vender?error=${encodeURIComponent(code)}`;
 }
 
-function offerError(code: string, offerId: string | null) {
+function offerError(
+  code: string,
+  presenceId: string,
+  offerId: string | null,
+) {
   const path = offerId
     ? `/mi-pulperia/ofertas/${offerId}`
     : "/mi-pulperia/ofertas/nueva";
-  return `${path}?error=${encodeURIComponent(code)}`;
+  return sellerUrl(path, presenceId, { error: code });
+}
+
+async function requireOwnedPresenceFromForm(formData: FormData) {
+  const presenceId = String(formData.get("presence_id") ?? "");
+  if (!presenceId) redirect("/mi-pulperia");
+  const presence = await getOwnedPresenceById(presenceId);
+  if (!presence) redirect("/mi-pulperia");
+  return presence;
 }
 
 function classifyPresenceError(message: string): string {
   const text = message.toLowerCase();
+  if (text.includes("whatsapp_not_verified")) return "verification";
   if (text.includes("published_fixed_location_is_located")) return "bounds";
   if (text.includes("mobile_presence_has_coverage")) return "coverage";
   if (text.includes("remote_presence_has_territory")) return "territory";
@@ -359,37 +475,55 @@ function maintenanceDurationSeconds(
 
 async function storeOfferImage({
   supabase,
-  userId,
   offerId,
   file,
 }: {
   supabase: Awaited<ReturnType<typeof requireSession>>["supabase"];
-  userId: string;
   offerId: string;
   file: File;
-}): Promise<boolean> {
-  const existing = await getOwnedMedia(offerId);
-  if (existing.length >= OFFER_IMAGE_MAX_COUNT) return false;
+}): Promise<"ok" | "image" | "image_cleanup"> {
+  if (!isOfferImageFileSizeAllowed(file.size)) return "image";
 
   let processed: Buffer;
   try {
     processed = await processOfferImage(Buffer.from(await file.arrayBuffer()));
   } catch {
-    return false;
+    return "image";
   }
 
-  const sort = existing.length;
-  const path = `${userId}/${offerId}/${sort}.webp`;
+  const reservation = await supabase.rpc("reserve_offer_media_upload", {
+    p_offer_id: offerId,
+  });
+  const reserved = parseMediaReservation(reservation.data);
+  if (reservation.error || !reserved) return "image";
+
   const upload = await supabase.storage
     .from("offer-media")
-    .upload(path, processed, { contentType: "image/webp", upsert: true });
-  if (upload.error) return false;
+    .upload(reserved.storagePath, processed, {
+      contentType: "image/webp",
+      upsert: false,
+    });
+  if (upload.error) {
+    const abort = await supabase.rpc("abort_offer_media_upload", {
+      p_media_id: reserved.mediaId,
+    });
+    return abort.error || abort.data !== true ? "image_cleanup" : "image";
+  }
 
-  const { error } = await supabase.from("offer_media").insert({
-    offer_id: offerId,
-    storage_path: path,
-    alt_text: "",
-    sort_order: sort,
+  const completed = await supabase.rpc("complete_offer_media_upload", {
+    p_media_id: reserved.mediaId,
   });
-  return !error;
+  return completed.error || completed.data !== true ? "image_cleanup" : "ok";
+}
+
+function parseMediaReservation(value: unknown): {
+  mediaId: string;
+  storagePath: string;
+} | null {
+  if (!value || typeof value !== "object") return null;
+  const mediaId = (value as { media_id?: unknown }).media_id;
+  const storagePath = (value as { storage_path?: unknown }).storage_path;
+  return typeof mediaId === "string" && typeof storagePath === "string"
+    ? { mediaId, storagePath }
+    : null;
 }

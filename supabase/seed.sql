@@ -155,7 +155,8 @@ values ('10000000-0000-0000-0000-000000000004');
 insert into public.seller_presences (
   id, owner_id, name, slug, description, mode, whatsapp_e164,
   served_city, coverage_label, service_territory, location,
-  location_public_confirmed, status
+  location_public_confirmed, status, whatsapp_verification_status,
+  whatsapp_verified_at
 ) values
   (
     '10000000-0000-0000-0000-000000000010',
@@ -170,7 +171,9 @@ insert into public.seller_presences (
     null,
     extensions.st_point(-87.8310, 14.5969)::extensions.geography,
     true,
-    'published'
+    'published',
+    'verified',
+    now()
   ),
   (
     '10000000-0000-0000-0000-000000000011',
@@ -185,7 +188,26 @@ insert into public.seller_presences (
     null,
     null,
     false,
-    'published'
+    'published',
+    'verified',
+    now()
+  ),
+  (
+    '10000000-0000-0000-0000-000000000012',
+    '10000000-0000-0000-0000-000000000003',
+    'Diseño Remoto Siguatepeque',
+    'diseno-remoto-siguatepeque',
+    'Fixture local de atención remota. Sin ubicación ni cobertura física inventada.',
+    'remote',
+    '+50499993333',
+    'Siguatepeque',
+    null,
+    'Siguatepeque y atención digital en Honduras',
+    null,
+    false,
+    'published',
+    'verified',
+    now()
   );
 
 insert into public.offers (
@@ -238,7 +260,7 @@ insert into public.offers (
     'stock',
     'available',
     '{}'::jsonb,
-    now() - interval '12 days',
+    now() - interval '40 days',
     'draft'
   ),
   (
@@ -307,11 +329,11 @@ insert into public.offers (
   ),
   (
     '10000000-0000-0000-0000-000000000027',
-    '10000000-0000-0000-0000-000000000011',
+    '10000000-0000-0000-0000-000000000012',
     'tarjeta-digital-fixture',
     'digital_offer',
     'Tarjeta digital para evento',
-    'Fixture digital bajo solicitud con entrega fuera de la plataforma.',
+    'Fixture remoto bajo solicitud con entrega fuera de la plataforma.',
     null,
     'quote',
     null,
