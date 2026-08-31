@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { IconArrowLeft, IconInbox } from "@tabler/icons-react";
 import { redirect } from "next/navigation";
 import { PresenceSelector } from "@/app/_components/PresenceSelector";
 import { confirmRequestUnderstoodAction } from "@/app/seller-actions";
@@ -33,10 +34,12 @@ export default async function SellerRequestsPage({
   const requests = await getSellerRequests(presence.id);
 
   return (
-    <main>
+    <main className="detail-page seller-inbox">
+      <p className="eyebrow">Panel de dueña</p>
       <h1>Solicitudes recibidas</h1>
-      <p>
+      <p className="back-link">
         <Link href={sellerUrl("/mi-pulperia", presence.id)}>
+          <IconArrowLeft aria-hidden="true" size={17} stroke={1.8} />
           Volver a {presence.name}
         </Link>
       </p>
@@ -56,7 +59,16 @@ export default async function SellerRequestsPage({
         <p role="alert">No se pudo registrar la confirmación.</p>
       ) : null}
       {requests.length === 0 ? (
-        <p>Todavía no hay solicitudes para {presence.name}.</p>
+        <div className="empty-state seller-empty-state">
+          <IconInbox aria-hidden="true" size={30} stroke={1.7} />
+          <div>
+            <strong>No hay solicitudes nuevas</strong>
+            <p>
+              Cuando un cliente prepare un pedido para {presence.name}, aparecerá
+              acá con el detalle antes de cualquier conversación en WhatsApp.
+            </p>
+          </div>
+        </div>
       ) : (
         requests.map((request) => (
           <article className="seller-request-card" key={request.seller_request_id}>

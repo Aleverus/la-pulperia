@@ -185,7 +185,13 @@ export function formatRequestDetails(
 
 function formatRequestDate(value: string): string {
   const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? value : date.toLocaleString("es-HN");
+  return Number.isNaN(date.getTime())
+    ? value
+    : new Intl.DateTimeFormat("es-HN", {
+        dateStyle: "medium",
+        timeStyle: "short",
+        timeZone: "America/Tegucigalpa",
+      }).format(date);
 }
 
 export function isValidSelectionQuantity(value: unknown): value is number {

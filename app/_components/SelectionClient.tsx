@@ -227,20 +227,21 @@ export function SelectionClient({ signedIn }: { signedIn: boolean }) {
                     oferta y configurá el pedido otra vez; no vamos a inventar
                     unidad ni destino.
                   </p>
+                ) : selection.offerClass !== offer.offer_class ? (
+                  <p role="alert">
+                    La clase de la oferta cambió. Volvé a la oferta para
+                    configurar un pedido compatible.
+                  </p>
                 ) : contextChanged(selection, offer) ? (
                   <p role="alert">
                     Cambió: {contextChangeSummary(selection, offer)}. Revisá el
                     contexto actual antes de continuar.
                   </p>
                 ) : null}
-                {selection.offerClass !== offer.offer_class ? (
-                  <p>
-                    La clase de la oferta cambió. Volvé a la oferta para configurar
-                    un pedido compatible.
-                  </p>
-                ) : null}
                 {!isOfferEffectivelyAvailable(offer) ? (
-                  <p>Esta oferta o su ventana ya no se puede incluir en el pedido.</p>
+                  <p role="alert">
+                    Esta oferta o su ventana ya no se puede incluir en el pedido.
+                  </p>
                 ) : null}
                 <div className="selection-line__actions">
                   {contextChanged(selection, offer) &&

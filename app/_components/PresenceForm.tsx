@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useFormStatus } from "react-dom";
 import { savePresenceAction } from "@/app/seller-actions";
 import { CityMap } from "@/app/_components/CityMap";
 import {
@@ -28,6 +29,7 @@ export function PresenceForm({
   const [lat, setLat] = useState<number | null>(presence?.lat ?? null);
   const [lng, setLng] = useState<number | null>(presence?.lng ?? null);
   const [issue, setIssue] = useState<GeoIssue | null>(null);
+  const [locating, setLocating] = useState(false);
 
   const e164 = normalizeWhatsapp(whatsapp);
   const whatsappVerified =
@@ -54,8 +56,10 @@ export function PresenceForm({
       setIssue("unavailable");
       return;
     }
+    setLocating(true);
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        setLocating(false);
         placePin(
           position.coords.latitude,
           position.coords.longitude,
@@ -63,6 +67,7 @@ export function PresenceForm({
         );
       },
       (err) => {
+        setLocating(false);
         setIssue(classifyGeolocation({ errorCode: err.code }));
       },
       { enableHighAccuracy: true, timeout: 10_000, maximumAge: 0 },
@@ -75,7 +80,7 @@ export function PresenceForm({
       : [];
 
   return (
-    <form action={savePresenceAction} className="stack">
+    <form action={savePresenceAction} className="stack presence-form">
       <input type="hidden" name="presence_id" value={presence?.id ?? ""} />
       <label htmlFor="presence-name">Nombre de la pulpería</label>
       <input
@@ -205,11 +210,18 @@ export function PresenceForm({
             coordenada exacta será pública.
           </p>
           <p>
-            <button type="button" onClick={useGps}>
-              Usar GPS
+            <button type="button" onClick={useGps} disabled={locating}>
+              {locating ? "Buscando ubicación…" : "Usar GPS"}
             </button>
           </p>
-          {issue ? <p>{GEO_ISSUE_LABEL[issue]}</p> : null}
+          {issue ? (
+            <p
+              className={issue === "imprecise" ? "field-hint" : "field-hint is-error"}
+              role={issue === "imprecise" ? "status" : "alert"}
+            >
+              {GEO_ISSUE_LABEL[issue]}
+            </p>
+          ) : null}
           <CityMap
             labelledBy="pin-map-label"
             pins={pin}
@@ -230,7 +242,9 @@ export function PresenceForm({
             Confirmo que esta coordenada exacta será pública
           </label>
           {lat !== null && lng !== null && !withinSiguatepeque(lat, lng) ? (
-            <p>Ese pin queda fuera de Siguatepeque y no se puede publicar.</p>
+            <p className="field-hint is-error" role="alert">
+              Ese pin queda fuera de Siguatepeque y no se puede publicar.
+            </p>
           ) : null}
         </div>
       ) : (
@@ -240,21 +254,42 @@ export function PresenceForm({
       <input type="hidden" name="lat" value={lat ?? ""} />
       <input type="hidden" name="lng" value={lng ?? ""} />
 
-      {error ? <p>{error}</p> : null}
+      {error ? (
+        <p className="field-hint is-error" role="alert">
+          {error}
+        </p>
+      ) : null}
 
-      <p>
-        <button type="submit" name="status" value="draft">
-          Guardar borrador
-        </button>{" "}
-        <button
-          type="submit"
-          name="status"
-          value="published"
-          disabled={!whatsappVerified}
-        >
-          Publicar pulpería
-        </button>
-      </p>
+      <PresenceSubmitButtons canPublish={whatsappVerified} />
     </form>
+  );
+}
+
+function PresenceSubmitButtons({ canPublish }: { canPublish: boolean }) {
+  const { pending, data } = useFormStatus();
+  const pendingStatus = data?.get("status");
+
+  return (
+    <div className="button-row">
+      <button type="submit" name="status" value="draft" disabled={pending}>
+        {pending && pendingStatus === "draft" ? "Guardando…" : "Guardar borrador"}
+      </button>
+      <button
+        type="submit"
+        name="status"
+        value="published"
+        disabled={pending || !canPublish}
+        aria-describedby={!canPublish ? "presence-publish-help" : undefined}
+      >
+        {pending && pendingStatus === "published"
+          ? "Publicando…"
+          : "Publicar pulpería"}
+      </button>
+      {!canPublish ? (
+        <span id="presence-publish-help" className="field-hint">
+          Verificá el WhatsApp antes de publicar.
+        </span>
+      ) : null}
+    </div>
   );
 }

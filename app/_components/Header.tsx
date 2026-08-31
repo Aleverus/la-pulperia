@@ -1,21 +1,28 @@
 import Link from "next/link";
-import { IconChristmasTreeFilled, IconMenu2 } from "@tabler/icons-react";
+import { IconChristmasTreeFilled } from "@tabler/icons-react";
 import { signOutAction } from "@/app/actions";
 import { CartLink } from "@/app/_components/CartLink";
+import { MobileMenu } from "@/app/_components/MobileMenu";
 import { hasPublicSupabaseEnv } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
 
 export async function Header() {
   let email: string | null = null;
   let isOperator = false;
+  let hasSellerPresence = false;
   if (hasPublicSupabaseEnv()) {
     const supabase = await createClient();
     const { data } = await supabase.auth.getClaims();
     email =
       typeof data?.claims?.email === "string" ? data.claims.email : null;
     if (email) {
-      const operatorResult = await supabase.rpc("is_operator");
+      const [operatorResult, presenceResult] = await Promise.all([
+        supabase.rpc("is_operator"),
+        supabase.rpc("get_my_presences"),
+      ]);
       isOperator = operatorResult.data === true;
+      hasSellerPresence =
+        Array.isArray(presenceResult.data) && presenceResult.data.length > 0;
     }
   }
 
@@ -33,16 +40,19 @@ export async function Header() {
         <div className="site-header__actions">
           <CartLink />
           <nav className="desktop-nav" aria-label="Navegación principal">
-            <PrimaryNavigation email={email} isOperator={isOperator} />
+            <PrimaryNavigation
+              email={email}
+              hasSellerPresence={hasSellerPresence}
+              isOperator={isOperator}
+            />
           </nav>
-          <details className="nav-menu">
-            <summary aria-label="Abrir menú principal">
-              <IconMenu2 aria-hidden="true" size={28} stroke={1.8} />
-            </summary>
-            <nav aria-label="Menú principal">
-              <PrimaryNavigation email={email} isOperator={isOperator} />
-            </nav>
-          </details>
+          <MobileMenu>
+            <PrimaryNavigation
+              email={email}
+              hasSellerPresence={hasSellerPresence}
+              isOperator={isOperator}
+            />
+          </MobileMenu>
         </div>
       </div>
     </header>
@@ -51,18 +61,22 @@ export async function Header() {
 
 function PrimaryNavigation({
   email,
+  hasSellerPresence,
   isOperator,
 }: {
   email: string | null;
+  hasSellerPresence: boolean;
   isOperator: boolean;
 }) {
   return (
     <>
       <Link href="/buscar">Buscar</Link>
       <Link href="/mapa">Mapa</Link>
-      <Link href="/vender">Vender</Link>
       {email ? (
         <>
+          <Link href={hasSellerPresence ? "/mi-pulperia" : "/vender"}>
+            {hasSellerPresence ? "Mi pulpería" : "Vender"}
+          </Link>
           <Link href="/cuenta">Cuenta</Link>
           {isOperator ? <Link href="/operacion/reportes">Operación</Link> : null}
           <form action={signOutAction}>
@@ -70,7 +84,10 @@ function PrimaryNavigation({
           </form>
         </>
       ) : (
-        <Link href="/ingresar">Ingresar</Link>
+        <>
+          <Link href="/vender">Vender</Link>
+          <Link href="/ingresar">Ingresar</Link>
+        </>
       )}
     </>
   );

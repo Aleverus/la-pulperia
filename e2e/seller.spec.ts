@@ -31,7 +31,7 @@ test("seller saves an unverified presence and manages a stock offer privately", 
     "href",
     /https:\/\/wa\.me\/50499993333/,
   );
-  await expect(page.getByRole("status")).toContainText("sin verificar");
+  await expect(page.getByText(/WhatsApp sin verificar/)).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Publicar pulpería" }),
   ).toBeDisabled();

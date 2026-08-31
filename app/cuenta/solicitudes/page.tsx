@@ -31,7 +31,12 @@ export default async function RequestHistoryPage() {
                   {batch.handoff_opened_count} WhatsApp abiertos
                 </span>
               </div>
-              <Link href={`/cuenta/solicitudes/${batch.batch_id}`}>Ver detalle</Link>
+              <Link
+                className="secondary-action"
+                href={`/cuenta/solicitudes/${batch.batch_id}`}
+              >
+                Ver detalle
+              </Link>
             </li>
           ))}
         </ul>

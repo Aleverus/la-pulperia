@@ -104,13 +104,19 @@ A later Corte 6 produced an accepted mobile direction after the v2 contract and
 repairs stabilized. Corte 7 now implements that direction on the real states:
 global tokens and typography, responsive navigation and forms, public search,
 real map, comparable offer cards, detail, cart, buyer surfaces and seller
-maintenance. Missing seller media uses an explicit class fallback rather than
-inventing a product photo.
+maintenance. Buyer account/history and seller operation have distinct navigation,
+hierarchy, empty/error states, progressive disclosure, and action feedback.
+Missing seller media uses an explicit class fallback rather than inventing a
+product photo.
 
 `design-qa.md` records the selected source, side-by-side comparisons, iteration
 history and the final `passed` result. The local production build was exercised
-through search, offer detail and cart with no mobile horizontal overflow. Ale
-has not yet accepted the executed result, and nothing was deployed or published.
+through search, offer detail, all four request contracts, a multi-seller cart,
+buyer account/history, and seller dashboard/settings/inbox at 320, 390, and
+1440 px. Existing cart requests survive reopening, query-only history keeps the
+search controls and mobile menu synchronized, and no P0–P2 visual finding remains.
+Ale has not yet accepted the executed result, and nothing was deployed or
+published.
 
 The parent `../AGENTS.md` requires every product, contract, route, status, or
 evidence change to update all related documentation in the same work. The
@@ -122,24 +128,25 @@ After the bug-repair plans 001–005 on 2026-08-30, the local tree passed:
 
 - ESLint;
 - generated Next route types and TypeScript;
-- 72 deterministic unit tests;
+- 76 deterministic unit tests;
 - production build;
 - a clean Supabase database reset and deterministic seed;
 - 231 pgTAP database, constraint, RPC, and RLS tests;
 - Supabase lint on the owned `public` schema with no errors;
 - the production dependency audit with no known high-severity vulnerabilities;
 - production runtime header checks on home, search, map, auth, and robots;
-- 26 Playwright journeys at 390 px and 1440 px, including no serious or
+- 32 Playwright journeys in mobile and desktop, including 320 px reflow and no serious or
   critical Axe violations;
 - public runtime HTML checks across search, offer, seller, sitemap, and robots
   with no email, phone, or secret markers;
 - the evidence workbook reopened with no formula errors and all eleven sheets
   passed a visual layout inspection.
 - after the visual implementation, a clean local database passed all 231 pgTAP
-  checks; ESLint, generated route types, TypeScript, all 72 unit tests and the
-  production build passed again; all 26 Playwright journeys passed in mobile
-  and desktop, including Axe, and the local production search → offer → cart
-  path was observed at 390 px. `git diff --check` remained clean.
+  checks and schema lint; ESLint, generated route types, TypeScript, all 76 unit
+  tests, the production build, and production dependency audit passed again;
+  all 32 Playwright journeys passed in mobile and desktop, including Axe and
+  query-history regressions. Authenticated buyer and seller flows were also
+  observed manually at 390 and 1440 px. `git diff --check` remained clean.
 
 This receipt proves the local technical contract and exercised flows. It does
 not prove commercial demand, legal readiness, deployment, field use, or visual

@@ -9,7 +9,9 @@ test("a disposable user can delete their account", async ({ page }) => {
   await page.getByLabel("Contraseña para la cuenta nueva").fill("pulperia-local");
   await page.getByRole("button", { name: "Crear cuenta de prueba" }).click();
 
-  await expect(page.getByRole("heading", { name: "Cuenta" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Cuenta", exact: true }),
+  ).toBeVisible();
   await page.getByRole("link", { name: /Pedidos para WhatsApp/ }).click();
   await expect(
     page.getByRole("heading", { name: "Pedidos para WhatsApp" }),
@@ -32,6 +34,7 @@ test("a disposable user can delete their account", async ({ page }) => {
   await expect(page.getByText("No hay localidad guardada")).toBeVisible();
 
   await page.goto("/cuenta");
+  await page.getByText("Eliminar cuenta", { exact: true }).click();
   await page.getByLabel("Escribí BORRAR para confirmar").fill("borrar");
   await page.getByRole("button", { name: /Eliminar mi cuenta/ }).click();
   await expect(page.locator("main [role=alert]")).toContainText(

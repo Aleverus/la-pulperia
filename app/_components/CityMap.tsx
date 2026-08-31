@@ -132,10 +132,16 @@ export function CityMap({
         className="city-map"
         role="region"
         aria-labelledby={labelledBy}
+        aria-busy={!ready && !failed}
         style={{ minHeight: "20rem", width: "100%" }}
         data-map-status={failed ? "failed" : ready ? "ready" : "loading"}
         data-map-error={mapError ?? undefined}
       />
+      {!ready && !failed ? (
+        <p className="map-status is-loading" role="status">
+          Cargando mapa local…
+        </p>
+      ) : null}
       {failed ? (
         <p className="map-status" role="status">
           El mapa base no está disponible. La lista de negocios sigue activa.

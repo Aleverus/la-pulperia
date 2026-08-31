@@ -18,7 +18,8 @@ export default async function IngresarPage({
   const testAuthEnabled = localTestAuthEnabled();
 
   return (
-    <main>
+    <main className="detail-page auth-page">
+      <p className="eyebrow">Acceso seguro</p>
       <h1>Ingresar</h1>
       {testAuthEnabled ? (
         <>
@@ -26,56 +27,79 @@ export default async function IngresarPage({
             Auth de prueba local. Esta superficie sólo existe contra Supabase
             en loopback y con el gate explícito habilitado.
           </p>
-          {errored ? <p>No se pudo ingresar con esos datos.</p> : null}
-          {signupFailed ? <p>No se pudo crear la cuenta de prueba.</p> : null}
-          <form action={signInAction} className="stack">
-            <input type="hidden" name="next" value={next} />
-            <label htmlFor="email">Correo</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="username"
-              required
-            />
-            <label htmlFor="password">Contraseña</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-            />
-            <button type="submit">Ingresar</button>
-          </form>
-          <h2>Crear cuenta de prueba</h2>
-          <form action={signUpAction} className="stack">
-            <input type="hidden" name="next" value={next} />
-            <label htmlFor="display_name">Nombre visible</label>
-            <input id="display_name" name="display_name" required maxLength={80} />
-            <label htmlFor="signup-email">Correo para la cuenta nueva</label>
-            <input
-              id="signup-email"
-              name="email"
-              type="email"
-              autoComplete="off"
-              required
-            />
-            <label htmlFor="signup-password">
-              Contraseña para la cuenta nueva
-            </label>
-            <input
-              id="signup-password"
-              name="password"
-              type="password"
-              autoComplete="new-password"
-              required
-              minLength={6}
-            />
-            <button type="submit">Crear cuenta de prueba</button>
-          </form>
-          <p>Comprador: comprador@local.test / pulperia-local</p>
-          <p>Vendedora física: elpino@local.test / pulperia-local</p>
+          {errored ? (
+            <p className="field-hint is-error" role="alert">
+              No se pudo ingresar con esos datos.
+            </p>
+          ) : null}
+          {signupFailed ? (
+            <p className="field-hint is-error" role="alert">
+              No se pudo crear la cuenta de prueba.
+            </p>
+          ) : null}
+          <div className="auth-grid">
+            <section>
+              <h2>Ya tengo cuenta</h2>
+              <form action={signInAction} className="stack">
+                <input type="hidden" name="next" value={next} />
+                <label htmlFor="email">Correo</label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="username"
+                  required
+                />
+                <label htmlFor="password">Contraseña</label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                />
+                <button type="submit">Ingresar</button>
+              </form>
+            </section>
+            <section>
+              <h2>Crear cuenta de prueba</h2>
+              <form action={signUpAction} className="stack">
+                <input type="hidden" name="next" value={next} />
+                <label htmlFor="display_name">Nombre visible</label>
+                <input
+                  id="display_name"
+                  name="display_name"
+                  required
+                  maxLength={80}
+                />
+                <label htmlFor="signup-email">Correo para la cuenta nueva</label>
+                <input
+                  id="signup-email"
+                  name="email"
+                  type="email"
+                  autoComplete="off"
+                  required
+                />
+                <label htmlFor="signup-password">
+                  Contraseña para la cuenta nueva
+                </label>
+                <input
+                  id="signup-password"
+                  name="password"
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  minLength={6}
+                />
+                <button type="submit">Crear cuenta de prueba</button>
+              </form>
+            </section>
+          </div>
+          <details className="test-fixtures">
+            <summary>Credenciales locales de prueba</summary>
+            <p>Comprador: comprador@local.test / pulperia-local</p>
+            <p>Vendedora física: elpino@local.test / pulperia-local</p>
+          </details>
         </>
       ) : (
         <p role="status">

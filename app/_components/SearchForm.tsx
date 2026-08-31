@@ -22,10 +22,24 @@ export function SearchForm({
   defaultSort?: SearchSort;
   locationActive?: boolean;
 }) {
+  const formKey = [
+    defaultQuery,
+    defaultOfferClass,
+    defaultPresence,
+    defaultAvailability,
+    defaultSort,
+    locationActive ? "located" : "unlocated",
+  ].join("|");
+
   return (
-    <Form action="/buscar" role="search" className="search-form">
+    <Form
+      key={formKey}
+      action="/buscar"
+      role="search"
+      className="search-form"
+    >
       <label className="form-field form-field--query" htmlFor="q">
-        <span>Qué buscás</span>
+        <span>¿Qué necesitás encontrar?</span>
         <input
           id="q"
           name="q"

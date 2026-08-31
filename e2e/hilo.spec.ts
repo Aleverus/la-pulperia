@@ -5,7 +5,9 @@ test("buyer search, multi-seller cart, login, and two WhatsApp handoffs", async 
   page,
 }) => {
   await page.goto("/");
-  await page.getByLabel("Qué buscás").fill("zambos picantes");
+  await page
+    .getByLabel("¿Qué necesitás encontrar?")
+    .fill("zambos picantes");
   await page.getByRole("button", { name: "Buscar" }).click();
   await expect(page).toHaveURL(/\/buscar\?q=zambos(?:\+|%20)picantes/);
 

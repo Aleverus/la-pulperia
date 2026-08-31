@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
+  IconBrandWhatsapp,
+  IconMapPin,
+  IconUserCircle,
+} from "@tabler/icons-react";
+import {
   deleteAccountAction,
   retryAccountDeletionAction,
 } from "@/app/account-actions";
@@ -22,21 +27,34 @@ export default async function AccountPage({
     await supabase.rpc("account_deletion_pending");
   const cleanupPending = deletionStatusError ? true : deletionPending === true;
   return (
-    <main>
+    <main className="detail-page account-page">
+      <p className="eyebrow">Tu espacio</p>
       <h1>Cuenta</h1>
-      <p>{user.email}</p>
+      <p className="account-identity">
+        <IconUserCircle aria-hidden="true" size={22} stroke={1.8} />
+        {user.email}
+      </p>
       <nav className="account-nav" aria-label="Opciones de cuenta">
         <Link href="/cuenta/solicitudes">
-          <strong>Pedidos para WhatsApp</strong>
-          <span>Revisá los pedidos que armaste para cada vendedor.</span>
+          <IconBrandWhatsapp aria-hidden="true" size={25} stroke={1.8} />
+          <span>
+            <strong>Pedidos para WhatsApp</strong>
+            <small>Revisá los pedidos que armaste para cada vendedor.</small>
+          </span>
         </Link>
         <Link href="/cuenta/ubicacion">
-          <strong>Localidad</strong>
-          <span>Elegí si querés recordar Siguatepeque sin guardar tu GPS.</span>
+          <IconMapPin aria-hidden="true" size={25} stroke={1.8} />
+          <span>
+            <strong>Localidad</strong>
+            <small>Elegí si querés recordar Siguatepeque sin guardar tu GPS.</small>
+          </span>
         </Link>
       </nav>
-      <section className="danger-zone" aria-labelledby="delete-account-title">
-        <h2 id="delete-account-title">Eliminar cuenta</h2>
+      <details
+        className="danger-zone"
+        open={Boolean(query.error) || cleanupPending}
+      >
+        <summary id="delete-account-title">Eliminar cuenta</summary>
         <p>
           Esta acción elimina tu identidad, tus solicitudes y, si vendés, tu
           pulpería, ofertas e imágenes. No se puede deshacer.
@@ -67,7 +85,7 @@ export default async function AccountPage({
             <button type="submit">Eliminar mi cuenta definitivamente</button>
           </form>
         )}
-      </section>
+      </details>
     </main>
   );
 }

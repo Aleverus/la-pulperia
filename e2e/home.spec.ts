@@ -5,7 +5,7 @@ test("home is the public catalog", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: /Encontrá quién ofrece lo que necesitás/ }),
   ).toBeVisible();
-  await expect(page.getByLabel("Qué buscás")).toBeVisible();
+  await expect(page.getByLabel("¿Qué necesitás encontrar?")).toBeVisible();
   await expect(page.getByRole("link", { name: "Carrito" })).toHaveAttribute(
     "href",
     "/carrito",

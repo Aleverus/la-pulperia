@@ -1,6 +1,8 @@
 import { headers } from "next/headers";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { IconArrowLeft } from "@tabler/icons-react";
 import { HandoffButton } from "@/app/_components/HandoffButton";
 import { composeHandoffMessage } from "@/lib/handoff";
 import {
@@ -97,8 +99,15 @@ export default async function SolicitudPage({
   }
 
   return (
-    <main>
+    <main className="detail-page request-detail-page">
+      <p className="eyebrow">Tu cuenta</p>
       <h1>Pedidos por vendedor</h1>
+      <p className="back-link">
+        <Link href="/cuenta/solicitudes">
+          <IconArrowLeft aria-hidden="true" size={17} stroke={1.8} />
+          Volver al historial
+        </Link>
+      </p>
       <p>
         La Pulpería armó un mensaje por vendedor. Abrí cada WhatsApp para
         revisarlo y enviarlo. Prepararlo no significa que el pedido fue enviado,
@@ -124,16 +133,21 @@ export default async function SolicitudPage({
                 </p>
                 <p>
                   Contexto confirmado el{" "}
-                  {new Date(item.confirmed_at).toLocaleString("es-HN")}
+                  {formatDate(item.confirmed_at)}
                 </p>
               </li>
             ))}
           </ul>
-          <p>
-            Estado:{" "}
-            {payload.status === "handoff_opened"
-              ? "WhatsApp abierto"
-              : "Pedido preparado"}
+          <p className="request-status-line">
+            <span
+              className={`status-badge is-${
+                payload.status === "handoff_opened" ? "published" : "draft"
+              }`}
+            >
+              {payload.status === "handoff_opened"
+                ? "WhatsApp abierto"
+                : "Pedido preparado"}
+            </span>
           </p>
           <p>
             {payload.seller_understood_at
@@ -153,4 +167,12 @@ export default async function SolicitudPage({
       </p>
     </main>
   );
+}
+
+function formatDate(value: string): string {
+  return new Intl.DateTimeFormat("es-HN", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "America/Tegucigalpa",
+  }).format(new Date(value));
 }
