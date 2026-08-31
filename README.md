@@ -94,12 +94,13 @@ judgment. A mobile visual direction has been accepted in the parent project
 canon and is implemented locally across the active product surfaces. The
 production build and the public search → offer → cart path were inspected at
 390 px; the visual comparison has no open P0–P2 findings. This is now a
-recoverable prelaunch checkpoint published at
-`https://la-pulperia-coral.vercel.app`; it is explicitly excluded from search
-indexes. Google OAuth is connected in controlled test mode, Supabase Email auth
-is disabled, and a real Google session has returned to the authenticated cart
-and account. Publication does not imply owner acceptance, launch, or field
-evidence.
+recoverable prelaunch checkpoint published primarily at
+`https://la-pulperia-hn.vercel.app`, with
+`https://la-pulperia-coral.vercel.app` retained as a transition fallback; both
+are explicitly excluded from search indexes. Google OAuth is connected in
+controlled test mode, Supabase Email auth is disabled, and a real Google session
+started on the new domain has returned to the authenticated cart and account.
+Publication does not imply owner acceptance, launch, or field evidence.
 
 ## Visual direction and local implementation
 
