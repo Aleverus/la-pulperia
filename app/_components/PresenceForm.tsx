@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
+import { IconCircleCheck, IconCircleDashed } from "@tabler/icons-react";
 import { savePresenceAction } from "@/app/seller-actions";
 import { CityMap } from "@/app/_components/CityMap";
 import {
@@ -21,13 +22,16 @@ export function PresenceForm({
   presence: OwnedPresence | null;
   error?: string;
 }) {
-  const [mode, setMode] = useState<PresenceMode>(
-    presence?.mode ?? "fixed_location",
+  const [mode, setMode] = useState<PresenceMode | null>(
+    presence?.mode ?? null,
   );
   const [name, setName] = useState(presence?.name ?? "");
   const [whatsapp, setWhatsapp] = useState(presence?.whatsapp_e164 ?? "");
   const [lat, setLat] = useState<number | null>(presence?.lat ?? null);
   const [lng, setLng] = useState<number | null>(presence?.lng ?? null);
+  const [locationPublicConfirmed, setLocationPublicConfirmed] = useState(
+    presence?.location_public_confirmed ?? false,
+  );
   const [issue, setIssue] = useState<GeoIssue | null>(null);
   const [locating, setLocating] = useState(false);
 
@@ -78,6 +82,16 @@ export function PresenceForm({
     mode === "fixed_location" && lat !== null && lng !== null
       ? [{ id: "draft", name: name || "Tu pulpería", lat, lng }]
       : [];
+  const hasPublishablePin =
+    mode === "fixed_location" &&
+    lat !== null &&
+    lng !== null &&
+    locationPublicConfirmed &&
+    withinSiguatepeque(lat, lng);
+  const canPublish =
+    mode !== null &&
+    whatsappVerified &&
+    (mode !== "fixed_location" || hasPublishablePin);
 
   return (
     <form action={savePresenceAction} className="stack presence-form">
@@ -102,8 +116,12 @@ export function PresenceForm({
       />
 
       <fieldset>
-        <legend>Tipo</legend>
-        <label>
+        <legend>¿Cómo atendés?</legend>
+        <p>
+          Elegí la opción que la persona verá al buscar. No cambia cómo cerrás
+          la venta por WhatsApp.
+        </p>
+        <label className="presence-mode-choice">
           <input
             type="radio"
             name="mode"
@@ -111,9 +129,15 @@ export function PresenceForm({
             checked={mode === "fixed_location"}
             onChange={() => setMode("fixed_location")}
           />
-          Ubicación fija: aparece en el mapa con un pin público confirmado
+          <span>
+            <strong>Ubicación fija</strong>
+            <small>
+              Tengo un local. Aparece en el mapa sólo con un pin público
+              confirmado.
+            </small>
+          </span>
         </label>
-        <label>
+        <label className="presence-mode-choice">
           <input
             type="radio"
             name="mode"
@@ -126,9 +150,15 @@ export function PresenceForm({
               setIssue(null);
             }}
           />
-          Atención móvil: cobertura declarada, sin marcador puntual
+          <span>
+            <strong>Atención móvil</strong>
+            <small>
+              Me muevo o cubro zonas. Se explica la cobertura sin un marcador
+              puntual.
+            </small>
+          </span>
         </label>
-        <label>
+        <label className="presence-mode-choice">
           <input
             type="radio"
             name="mode"
@@ -141,9 +171,21 @@ export function PresenceForm({
               setIssue(null);
             }}
           />
-          Atención remota: alcance o entrega digital, sin marcador físico
+          <span>
+            <strong>Atención remota</strong>
+            <small>
+              Atiendo a distancia o entrego digitalmente. No se inventa una
+              ubicación física.
+            </small>
+          </span>
         </label>
       </fieldset>
+
+      {mode === null ? (
+        <p className="field-hint" role="status">
+          Elegí cómo atendés para completar sólo los datos que corresponden.
+        </p>
+      ) : null}
 
       {mode === "mobile" ? (
         <>
@@ -237,7 +279,10 @@ export function PresenceForm({
             <input
               type="checkbox"
               name="location_public_confirmed"
-              defaultChecked={presence?.location_public_confirmed ?? false}
+              checked={locationPublicConfirmed}
+              onChange={(event) =>
+                setLocationPublicConfirmed(event.target.checked)
+              }
             />
             Confirmo que esta coordenada exacta será pública
           </label>
@@ -260,7 +305,51 @@ export function PresenceForm({
         </p>
       ) : null}
 
-      <PresenceSubmitButtons canPublish={whatsappVerified} />
+      <aside
+        className="seller-publish-checklist"
+        aria-labelledby="seller-publish-checklist-title"
+      >
+        <p className="eyebrow">Antes de publicar</p>
+        <h2 id="seller-publish-checklist-title">Lo que falta revisar</h2>
+        <ul>
+          <li className={mode ? "is-ready" : ""}>
+            {mode ? (
+              <IconCircleCheck aria-hidden="true" size={20} stroke={1.9} />
+            ) : (
+              <IconCircleDashed aria-hidden="true" size={20} stroke={1.9} />
+            )}
+            <span>{mode ? "Forma de atención elegida" : "Elegí cómo atendés"}</span>
+          </li>
+          <li className={whatsappVerified ? "is-ready" : ""}>
+            {whatsappVerified ? (
+              <IconCircleCheck aria-hidden="true" size={20} stroke={1.9} />
+            ) : (
+              <IconCircleDashed aria-hidden="true" size={20} stroke={1.9} />
+            )}
+            <span>
+              {whatsappVerified
+                ? "WhatsApp verificado"
+                : "Verificá que controlás el WhatsApp"}
+            </span>
+          </li>
+          {mode === "fixed_location" ? (
+            <li className={hasPublishablePin ? "is-ready" : ""}>
+              {hasPublishablePin ? (
+                <IconCircleCheck aria-hidden="true" size={20} stroke={1.9} />
+              ) : (
+                <IconCircleDashed aria-hidden="true" size={20} stroke={1.9} />
+              )}
+              <span>
+                {hasPublishablePin
+                  ? "Pin público confirmado en Siguatepeque"
+                  : "Agregá y confirmá el pin público"}
+              </span>
+            </li>
+          ) : null}
+        </ul>
+      </aside>
+
+      <PresenceSubmitButtons canPublish={canPublish} />
     </form>
   );
 }
@@ -287,7 +376,7 @@ function PresenceSubmitButtons({ canPublish }: { canPublish: boolean }) {
       </button>
       {!canPublish ? (
         <span id="presence-publish-help" className="field-hint">
-          Verificá el WhatsApp antes de publicar.
+          Completá los puntos de revisión antes de publicar.
         </span>
       ) : null}
     </div>

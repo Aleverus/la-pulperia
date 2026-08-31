@@ -1521,6 +1521,12 @@
     color: var(--forest-deep);
   }
 
+  .status-badge.is-handoff_opened {
+    border-color: #9dbc90;
+    background: var(--forest-soft);
+    color: var(--forest-deep);
+  }
+
   .status-badge.is-archived {
     background: #ece8df;
     color: var(--ink-soft);
@@ -1545,6 +1551,22 @@
 
   .seller-dashboard {
     max-width: 70rem;
+  }
+
+  .seller-mode-return,
+  .seller-nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .seller-mode-return {
+    min-height: 2.8rem;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    padding: 0.55rem 0.7rem;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
   }
 
   .seller-dashboard__header {
@@ -1604,6 +1626,76 @@
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
+  }
+
+  .seller-attention {
+    display: grid;
+    gap: 0.9rem;
+    border: 1px solid #b8ccb4;
+    background: var(--pine-mist);
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .seller-attention__count {
+    min-width: 2.35rem;
+    min-height: 2.35rem;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--forest);
+    background: var(--forest);
+    color: #fffdf7;
+    border-radius: 999px;
+    font-size: 1.05rem;
+    font-weight: 800;
+  }
+
+  .seller-attention__list {
+    display: grid;
+    gap: 0.65rem;
+    list-style: none;
+  }
+
+  .seller-attention__item,
+  .seller-attention__ready {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.7rem;
+    align-items: start;
+    border: 1px solid rgba(171, 159, 143, 0.65);
+    background: rgba(255, 253, 248, 0.84);
+    padding: 0.85rem;
+    border-radius: var(--radius-md);
+  }
+
+  .seller-attention__item > svg,
+  .seller-attention__ready > svg {
+    color: var(--forest);
+    margin-top: 0.1rem;
+  }
+
+  .seller-attention__item > div,
+  .seller-attention__ready > div {
+    min-width: 0;
+    display: grid;
+    gap: 0.12rem;
+  }
+
+  .seller-attention__item p,
+  .seller-attention__ready p {
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+  }
+
+  .seller-attention__item > a {
+    grid-column: 2;
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.9rem;
   }
 
   .seller-quick-actions {
@@ -1673,6 +1765,15 @@
     border-radius: var(--radius-md);
   }
 
+  .seller-offer-list > li.is-stale {
+    border-color: #d8b76d;
+    background: #fff8e8;
+  }
+
+  .seller-offer-list > li.is-confirm {
+    border-color: #dbc68f;
+  }
+
   .seller-offer-list > li > div {
     min-width: 0;
     display: grid;
@@ -1685,6 +1786,12 @@
     text-decoration: none;
   }
 
+  .seller-offer-list__identity {
+    color: var(--ink-soft);
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
   .seller-offer-list > li > div:first-child > span,
   .seller-offer-list__meta > span:not(.status-badge) {
     color: var(--ink-soft);
@@ -1693,6 +1800,19 @@
 
   .seller-offer-list__meta {
     align-content: start;
+  }
+
+  .seller-offer-list__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    padding-top: 0.25rem;
+  }
+
+  .seller-offer-list__actions button,
+  .seller-offer-list__actions .secondary-action {
+    min-height: 2.45rem;
+    font-size: 0.9rem;
   }
 
   .seller-settings {
@@ -1767,6 +1887,238 @@
   .seller-empty-state p {
     color: var(--ink-soft);
     font-size: 0.92rem;
+  }
+
+  .seller-inbox-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+
+  .seller-inbox-summary > div {
+    min-width: 0;
+    display: grid;
+    gap: 0.35rem;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+  }
+
+  .seller-inbox-summary svg {
+    color: var(--forest);
+  }
+
+  .seller-inbox-summary span {
+    display: grid;
+    gap: 0.05rem;
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+    line-height: 1.2;
+  }
+
+  .seller-inbox-summary strong {
+    color: var(--forest);
+    font-size: 1.45rem;
+    line-height: 1;
+  }
+
+  .seller-request-card__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: start;
+    justify-content: space-between;
+    gap: 0.8rem;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.85rem;
+  }
+
+  .seller-request-card__header > div {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .seller-request-card__header h2 {
+    font-size: 1.5rem;
+  }
+
+  .offer-class-choice,
+  .presence-mode-choice {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.7rem;
+    align-items: start;
+    border: 1px solid transparent;
+    padding: 0.6rem !important;
+    border-radius: var(--radius-sm);
+  }
+
+  .offer-class-choice:has(input:checked),
+  .presence-mode-choice:has(input:checked) {
+    border-color: #9dbc90;
+    background: var(--pine-mist);
+  }
+
+  .offer-class-choice > span,
+  .presence-mode-choice > span {
+    display: grid;
+    gap: 0.12rem;
+  }
+
+  .offer-class-choice small,
+  .presence-mode-choice small {
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    line-height: 1.35;
+  }
+
+  .offer-public-preview,
+  .offer-maintenance,
+  .offer-media,
+  .seller-publish-checklist {
+    display: grid;
+    gap: 0.75rem;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+  }
+
+  .offer-public-preview {
+    border-color: #b8ccb4;
+    background: var(--pine-mist);
+  }
+
+  .offer-public-preview__class {
+    color: var(--clay);
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .offer-public-preview > strong {
+    color: var(--forest);
+    font-size: 1.35rem;
+    line-height: 1.15;
+  }
+
+  .offer-public-preview > p:not(.eyebrow):not(.offer-public-preview__class) {
+    color: var(--ink-soft);
+  }
+
+  .offer-public-preview dl {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .offer-public-preview dl > div {
+    display: grid;
+    grid-template-columns: minmax(7rem, 0.5fr) minmax(0, 1fr);
+    gap: 0.5rem;
+    border-top: 1px solid rgba(171, 159, 143, 0.55);
+    padding-top: 0.45rem;
+  }
+
+  .offer-public-preview dt {
+    color: var(--ink-soft);
+    font-size: 0.88rem;
+    font-weight: 700;
+  }
+
+  .offer-public-preview dd {
+    font-weight: 700;
+  }
+
+  .offer-submit-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .offer-submit-actions > p {
+    flex-basis: 100%;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+  }
+
+  .offer-maintenance {
+    border-color: #b8ccb4;
+    background: var(--pine-mist);
+  }
+
+  .offer-maintenance > div:first-child {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .offer-maintenance__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+  }
+
+  .quiet-action {
+    border-color: var(--line-strong) !important;
+    background: transparent !important;
+    color: var(--ink-soft) !important;
+    box-shadow: none !important;
+  }
+
+  .quiet-action:hover {
+    border-color: var(--danger) !important;
+    color: var(--danger) !important;
+  }
+
+  .offer-media > div:first-child {
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .seller-publish-checklist ul,
+  .seller-setup-steps {
+    display: grid;
+    gap: 0.5rem;
+    list-style: none;
+  }
+
+  .seller-publish-checklist li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--ink-soft);
+  }
+
+  .seller-publish-checklist li svg {
+    flex: none;
+    color: var(--warning);
+  }
+
+  .seller-publish-checklist li.is-ready {
+    color: var(--forest);
+  }
+
+  .seller-publish-checklist li.is-ready svg {
+    color: var(--success);
+  }
+
+  .seller-setup-steps {
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    margin-block: 1.25rem;
+  }
+
+  .seller-setup-steps > li {
+    display: grid;
+    gap: 0.2rem;
+    border-top: 3px solid var(--maize);
+    background: rgba(255, 250, 240, 0.75);
+    padding: 0.8rem;
+  }
+
+  .seller-setup-steps span {
+    color: var(--ink-soft);
+    font-size: 0.9rem;
   }
 
   .back-link a {

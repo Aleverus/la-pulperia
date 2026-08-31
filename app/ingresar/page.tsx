@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { signInAction, signUpAction } from "@/app/actions";
 import { localTestAuthEnabled } from "@/lib/env";
 
@@ -15,6 +16,7 @@ export default async function IngresarPage({
   const next = typeof params.next === "string" ? params.next : "/carrito";
   const errored = params.error === "1";
   const signupFailed = params.error === "signup";
+  const oauthFailed = params.error === "oauth";
   const testAuthEnabled = localTestAuthEnabled();
 
   return (
@@ -102,10 +104,30 @@ export default async function IngresarPage({
           </details>
         </>
       ) : (
-        <p role="status">
-          El acceso público todavía no tiene un proveedor autorizado. La alta y
-          las credenciales locales están deshabilitadas en este entorno.
-        </p>
+        <div className="auth-grid">
+          <section>
+            <h2>Continuar con Google</h2>
+            <p>
+              Usá tu cuenta de Google para guardar el carrito, revisar pedidos
+              o abrir y mantener tu pulpería.
+            </p>
+            {oauthFailed ? (
+              <p className="field-hint is-error" role="alert">
+                No pudimos completar el ingreso con Google. Intentá de nuevo.
+              </p>
+            ) : null}
+            <Link
+              className="primary-action"
+              href={`/auth/google?next=${encodeURIComponent(next)}`}
+            >
+              Continuar con Google
+            </Link>
+            <p className="field-hint">
+              Google comparte sólo tu identidad básica. La contraseña nunca
+              pasa por La Pulpería.
+            </p>
+          </section>
+        </div>
       )}
     </main>
   );

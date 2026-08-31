@@ -26,7 +26,7 @@ as $$
 $$;
 
 create or replace function public.allocate_presence_slug(p_name text, p_id uuid)
-returns citext
+returns extensions.citext
 language plpgsql
 as $$
 declare
@@ -52,7 +52,7 @@ create or replace function public.allocate_offer_slug(
   p_presence_id uuid,
   p_offer_id uuid
 )
-returns citext
+returns extensions.citext
 language plpgsql
 as $$
 declare
@@ -387,7 +387,7 @@ create or replace function public.get_my_presences()
 returns table (
   id uuid,
   name text,
-  slug citext,
+  slug extensions.citext,
   description text,
   kind public.presence_kind,
   whatsapp_e164 text,

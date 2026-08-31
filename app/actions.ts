@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { getCatalogOffersByIds } from "@/lib/data";
+import { safeAuthNext } from "@/lib/auth";
 import { localTestAuthEnabled } from "@/lib/env";
 import {
   parseSelection,
@@ -15,7 +16,7 @@ export async function signInAction(formData: FormData) {
   if (!localTestAuthEnabled()) redirect("/ingresar?error=auth_disabled");
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
-  const next = safeNext(String(formData.get("next") ?? "/carrito"));
+  const next = safeAuthNext(String(formData.get("next") ?? "/carrito"));
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) {
@@ -35,7 +36,7 @@ export async function signUpAction(formData: FormData) {
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
   const displayName = String(formData.get("display_name") ?? "").trim();
-  const next = safeNext(String(formData.get("next") ?? "/vender"));
+  const next = safeAuthNext(String(formData.get("next") ?? "/vender"));
   const supabase = await createClient();
   const { error } = await supabase.auth.signUp({
     email,
@@ -121,9 +122,5 @@ export async function markHandoffAction(sellerRequestId: string) {
   }
 }
 
-function safeNext(value: string): string {
-  if (value.startsWith("/") && !value.startsWith("//")) return value;
-  return "/carrito";
-}
 
 const UUID = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;

@@ -27,7 +27,7 @@ create table public.seller_presences (
   id uuid primary key default gen_random_uuid(),
   owner_id uuid not null references public.profiles (id) on delete restrict,
   name text not null check (char_length(name) between 1 and 80),
-  slug citext not null unique,
+  slug extensions.citext not null unique,
   description text not null default '' check (char_length(description) <= 2000),
   kind public.presence_kind not null,
   whatsapp_e164 text not null check (whatsapp_e164 ~ '^\+[1-9][0-9]{7,14}$'),
@@ -59,7 +59,7 @@ create index seller_presences_location_gist
 create table public.offers (
   id uuid primary key default gen_random_uuid(),
   presence_id uuid not null references public.seller_presences (id) on delete cascade,
-  slug citext not null unique,
+  slug extensions.citext not null unique,
   kind public.offer_kind not null,
   title text not null check (char_length(title) between 1 and 120),
   description text not null default '' check (char_length(description) <= 4000),
@@ -80,7 +80,7 @@ create table public.offers (
 create index offers_search_vector_idx on public.offers using gin (search_vector);
 create index offers_title_trgm_idx
   on public.offers
-  using gin (public.immutable_unaccent(title) gin_trgm_ops);
+  using gin (public.immutable_unaccent(title) extensions.gin_trgm_ops);
 create index offers_presence_idx on public.offers (presence_id);
 
 create table public.offer_media (

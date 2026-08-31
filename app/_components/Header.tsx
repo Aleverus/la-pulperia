@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { IconChristmasTreeFilled } from "@tabler/icons-react";
-import { signOutAction } from "@/app/actions";
-import { CartLink } from "@/app/_components/CartLink";
-import { MobileMenu } from "@/app/_components/MobileMenu";
+import { HeaderNavigation } from "@/app/_components/HeaderNavigation";
 import { hasPublicSupabaseEnv } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
 
@@ -37,58 +35,12 @@ export async function Header() {
           </span>
         </Link>
 
-        <div className="site-header__actions">
-          <CartLink />
-          <nav className="desktop-nav" aria-label="Navegación principal">
-            <PrimaryNavigation
-              email={email}
-              hasSellerPresence={hasSellerPresence}
-              isOperator={isOperator}
-            />
-          </nav>
-          <MobileMenu>
-            <PrimaryNavigation
-              email={email}
-              hasSellerPresence={hasSellerPresence}
-              isOperator={isOperator}
-            />
-          </MobileMenu>
-        </div>
+        <HeaderNavigation
+          email={email}
+          hasSellerPresence={hasSellerPresence}
+          isOperator={isOperator}
+        />
       </div>
     </header>
-  );
-}
-
-function PrimaryNavigation({
-  email,
-  hasSellerPresence,
-  isOperator,
-}: {
-  email: string | null;
-  hasSellerPresence: boolean;
-  isOperator: boolean;
-}) {
-  return (
-    <>
-      <Link href="/buscar">Buscar</Link>
-      <Link href="/mapa">Mapa</Link>
-      {email ? (
-        <>
-          <Link href={hasSellerPresence ? "/mi-pulperia" : "/vender"}>
-            {hasSellerPresence ? "Mi pulpería" : "Vender"}
-          </Link>
-          <Link href="/cuenta">Cuenta</Link>
-          {isOperator ? <Link href="/operacion/reportes">Operación</Link> : null}
-          <form action={signOutAction}>
-            <button type="submit">Salir</button>
-          </form>
-        </>
-      ) : (
-        <>
-          <Link href="/vender">Vender</Link>
-          <Link href="/ingresar">Ingresar</Link>
-        </>
-      )}
-    </>
   );
 }

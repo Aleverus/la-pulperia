@@ -1,6 +1,12 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { IconArrowLeft, IconInbox } from "@tabler/icons-react";
+import {
+  IconArrowLeft,
+  IconCircleCheck,
+  IconInbox,
+  IconMessage,
+  IconReceipt,
+} from "@tabler/icons-react";
 import { redirect } from "next/navigation";
 import { PresenceSelector } from "@/app/_components/PresenceSelector";
 import { confirmRequestUnderstoodAction } from "@/app/seller-actions";
@@ -32,6 +38,12 @@ export default async function SellerRequestsPage({
     redirect(sellerUrl("/mi-pulperia/solicitudes", presence.id));
   }
   const requests = await getSellerRequests(presence.id);
+  const openedRequests = requests.filter(
+    (request) => request.status === "handoff_opened",
+  ).length;
+  const understoodRequests = requests.filter(
+    (request) => request.seller_understood_at,
+  ).length;
 
   return (
     <main className="detail-page seller-inbox">
@@ -52,6 +64,29 @@ export default async function SellerRequestsPage({
         Esta vista muestra la intención estructurada. Confirmar que la entendiste
         no significa aceptarla, cobrarla, vender ni prometer cumplimiento.
       </p>
+      <section className="seller-inbox-summary" aria-label="Resumen de solicitudes">
+        <div>
+          <IconReceipt aria-hidden="true" size={22} stroke={1.8} />
+          <span>
+            <strong>{requests.length}</strong>
+            preparadas
+          </span>
+        </div>
+        <div>
+          <IconMessage aria-hidden="true" size={22} stroke={1.8} />
+          <span>
+            <strong>{openedRequests}</strong>
+            WhatsApp abierto
+          </span>
+        </div>
+        <div>
+          <IconCircleCheck aria-hidden="true" size={22} stroke={1.8} />
+          <span>
+            <strong>{understoodRequests}</strong>
+            comprensión registrada
+          </span>
+        </div>
+      </section>
       {query.ok === "understood" ? (
         <p role="status">Confirmación de comprensión registrada.</p>
       ) : null}
@@ -62,21 +97,39 @@ export default async function SellerRequestsPage({
         <div className="empty-state seller-empty-state">
           <IconInbox aria-hidden="true" size={30} stroke={1.7} />
           <div>
-            <strong>No hay solicitudes nuevas</strong>
+            <strong>No hay solicitudes preparadas</strong>
             <p>
               Cuando un cliente prepare un pedido para {presence.name}, aparecerá
               acá con el detalle antes de cualquier conversación en WhatsApp.
             </p>
+            <Link href={sellerUrl("/mi-pulperia", presence.id)}>
+              Volver al panel
+            </Link>
           </div>
         </div>
       ) : (
         requests.map((request) => (
           <article className="seller-request-card" key={request.seller_request_id}>
-            <h2>{request.presence_name}</h2>
-            <p>
-              Referencia {request.seller_request_id.slice(0, 8)} · preparada el{" "}
-              {new Date(request.prepared_at).toLocaleString("es-HN")}
-            </p>
+            <header className="seller-request-card__header">
+              <div>
+                <p className="eyebrow">
+                  {request.status === "handoff_opened"
+                    ? "WhatsApp abierto"
+                    : "Pedido preparado"}
+                </p>
+                <h2>Solicitud preparada</h2>
+                <p>
+                  Referencia {request.seller_request_id.slice(0, 8)} · preparada el{" "}
+                  {new Date(request.prepared_at).toLocaleString("es-HN")}
+                </p>
+              </div>
+              <span className={`status-badge is-${request.status}`}>
+                {request.status === "handoff_opened"
+                  ? "WhatsApp abierto"
+                  : "Preparada"}
+              </span>
+            </header>
+            <h3>Qué necesita la persona</h3>
             <ul className="handoff-items">
               {request.items.map((item, index) => (
                 <li key={`${request.seller_request_id}-${index}`}>
@@ -100,7 +153,7 @@ export default async function SellerRequestsPage({
             </ul>
             {request.seller_understood_at ? (
               <p>
-                Comprensión confirmada el{" "}
+                Registraste que entendiste esta solicitud el{" "}
                 {new Date(request.seller_understood_at).toLocaleString("es-HN")}.
               </p>
             ) : request.handoff_opened_at ? (

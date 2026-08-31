@@ -83,7 +83,10 @@ The local implementation through the Corte 5 preparation now provides:
 The v2 migration, discovery RPC and fixtures, views, RLS, snapshots, TypeScript
 consumers, class-specific request payloads, seller maintenance flow, reviewed
 context, handoff snapshots, seller understanding signal, privacy-safe metrics,
-and Corte 5 instruments are implemented and verified locally. The workbook
+and Corte 5 instruments are implemented and verified locally. The same schema
+and deterministic preview fixtures are also deployed to the isolated
+`la-pulperia-preview` Supabase project; public execution of privileged functions
+is limited to the audited RPC surface. The workbook
 starts every research row as pending and keeps real copies under a Git-ignored
 local directory. Interviews, the 100-business census, the comparative audit
 with 20 real searches and field use still require separate evidence and owner
@@ -109,14 +112,23 @@ hierarchy, empty/error states, progressive disclosure, and action feedback.
 Missing seller media uses an explicit class fallback rather than inventing a
 product photo.
 
+The seller operation now prioritizes requests, freshness, and inactive offers;
+offers can be reconfirmed from the dashboard without altering their published
+facts. Seller navigation keeps the buying cart out of the operating context,
+offer creation previews the public reading before publishing, presence setup
+requires an explicit serving mode, and the inbox preserves each structured
+request reference. These controls still lead to seller-owned WhatsApp; they do
+not represent payment, acceptance, a sale, delivery, or a chat inside the app.
+
 `design-qa.md` records the selected source, side-by-side comparisons, iteration
 history and the final `passed` result. The local production build was exercised
 through search, offer detail, all four request contracts, a multi-seller cart,
 buyer account/history, and seller dashboard/settings/inbox at 320, 390, and
 1440 px. Existing cart requests survive reopening, query-only history keeps the
 search controls and mobile menu synchronized, and no P0–P2 visual finding remains.
-Ale has not yet accepted the executed result, and nothing was deployed or
-published.
+Ale has not yet accepted the executed result. Supabase and the Vercel project are
+configured for prelaunch publication, but the human runtime acceptance remains
+separate.
 
 The parent `../AGENTS.md` requires every product, contract, route, status, or
 evidence change to update all related documentation in the same work. The
@@ -141,8 +153,9 @@ After the bug-repair plans 001–005 on 2026-08-30, the local tree passed:
   with no email, phone, or secret markers;
 - the evidence workbook reopened with no formula errors and all eleven sheets
   passed a visual layout inspection.
-- after the visual implementation, a clean local database passed all 231 pgTAP
-  checks and schema lint; ESLint, generated route types, TypeScript, all 76 unit
+- after the visual implementation and cloud hardening, a clean local database
+  passed all 239 pgTAP checks and schema lint; ESLint, generated route types,
+  TypeScript, all 80 unit
   tests, the production build, and production dependency audit passed again;
   all 32 Playwright journeys passed in mobile and desktop, including Axe and
   query-history regressions. Authenticated buyer and seller flows were also
@@ -188,10 +201,12 @@ pnpm test:e2e   # Playwright mobile and desktop journeys
 ```
 
 `pnpm map:refresh` extracts the reproducible regional PMTiles package from the
-configured public source. The generated binary remains outside Git.
+configured public source. The regional runtime artifact is versioned so Git-based
+deployments include the same map that was verified locally.
 
-Real Google OAuth, hosting, domain, provider credentials, messages, spending,
-seller onboarding, and field research remain intentionally unconfigured.
+Google OAuth remains pending provider credentials and a real sign-in exercise.
+A custom domain, automated messages, spending, seller onboarding, and field
+research remain intentionally unconfigured.
 
 ## Source status
 

@@ -1,6 +1,6 @@
 # Mapa regional de Siguatepeque
 
-`pnpm map:refresh` extrae de forma reproducible el recorte `public/maps/siguatepeque.pmtiles` con zoom 0–15. El binario es generado y queda fuera de Git; la aplicación lo sirve por HTTP con solicitudes de rango.
+`pnpm map:refresh` extrae de forma reproducible el recorte `public/maps/siguatepeque.pmtiles` con zoom 0–15. El binario generado se versiona porque es un activo necesario del runtime desplegado desde Git; la aplicación lo sirve por HTTP con solicitudes de rango.
 
 Fuente predeterminada: build diario v4 de Protomaps/OpenStreetMap en Source Cooperative. Puede reemplazarse sólo de forma explícita con `PULPERIA_PMTILES_SOURCE_URL`.
 

@@ -17,7 +17,7 @@ import { OFFER_CLASS_LABEL } from "@/lib/catalog";
 import { FRESHNESS_LABEL, freshnessBand } from "@/lib/freshness";
 import type { PriceMode } from "@/lib/money";
 import { mediaPublicUrl } from "@/lib/media-url";
-import type { OwnedMedia, OwnedOffer } from "@/lib/seller";
+import { OFFER_STATUS_LABEL, type OwnedMedia, type OwnedOffer } from "@/lib/seller";
 
 const CLASS_HELP: Record<OfferClass, string> = {
   stocked_product: "Algo que vendés por cantidad y cuya existencia podés confirmar.",
@@ -89,6 +89,15 @@ export function OfferForm({
       ? offer.fulfillment_modes
       : ["direct_agreement"],
   );
+  const [preview, setPreview] = useState({
+    title: offer?.title ?? "Tu oferta",
+    description: offer?.description ?? "Explicá lo esencial para quien busca.",
+    price:
+      offer?.price_cents === null || offer?.price_cents === undefined
+        ? ""
+        : (offer.price_cents / 100).toFixed(2),
+    unit: offer?.unit ?? "",
+  });
   const maintenanceStartedAtRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -120,6 +129,13 @@ export function OfferForm({
 
   return (
     <div className="stack">
+      {offer ? (
+        <OfferMaintenancePanel
+          presenceId={presenceId}
+          offer={offer}
+          notice={notice}
+        />
+      ) : null}
       <form action={saveOfferAction} className="stack">
         <input type="hidden" name="presence_id" value={presenceId} />
         <input type="hidden" name="offer_id" value={offer?.id ?? ""} />
@@ -139,7 +155,7 @@ export function OfferForm({
               "digital_offer",
             ] as OfferClass[]
           ).map((value) => (
-            <label key={value}>
+            <label key={value} className="offer-class-choice">
               <input
                 type="radio"
                 name="offer_class"
@@ -147,7 +163,10 @@ export function OfferForm({
                 checked={offerClass === value}
                 onChange={() => changeClass(value)}
               />
-              {OFFER_CLASS_LABEL[value]}. {CLASS_HELP[value]}
+              <span>
+                <strong>{OFFER_CLASS_LABEL[value]}</strong>
+                <small>{CLASS_HELP[value]}</small>
+              </span>
             </label>
           ))}
         </fieldset>
@@ -159,6 +178,12 @@ export function OfferForm({
             id="offer-title"
             name="title"
             defaultValue={offer?.title ?? ""}
+            onChange={(event) =>
+              setPreview((current) => ({
+                ...current,
+                title: event.target.value || "Tu oferta",
+              }))
+            }
             required
             maxLength={120}
           />
@@ -168,6 +193,13 @@ export function OfferForm({
             id="offer-description"
             name="description"
             defaultValue={offer?.description ?? ""}
+            onChange={(event) =>
+              setPreview((current) => ({
+                ...current,
+                description:
+                  event.target.value || "Explicá lo esencial para quien busca.",
+              }))
+            }
             maxLength={4000}
             rows={4}
           />
@@ -199,6 +231,12 @@ export function OfferForm({
                     ? ""
                     : (offer.price_cents / 100).toFixed(2)
                 }
+                onChange={(event) =>
+                  setPreview((current) => ({
+                    ...current,
+                    price: event.target.value,
+                  }))
+                }
                 required
               />
             </>
@@ -214,6 +252,12 @@ export function OfferForm({
             id="offer-unit"
             name="unit"
             defaultValue={offer?.unit ?? ""}
+            onChange={(event) =>
+              setPreview((current) => ({
+                ...current,
+                unit: event.target.value,
+              }))
+            }
             required={
               offerClass === "stocked_product" || offerClass === "scheduled_food"
             }
@@ -368,16 +412,23 @@ export function OfferForm({
           </>
         ) : null}
 
-        {error ? <p role="alert">{error}</p> : null}
-        {notice ? <p role="status">{notice}</p> : null}
+        <OfferPublicPreview
+          offerClass={offerClass}
+          availabilityState={availabilityState}
+          fulfillments={fulfillments}
+          priceMode={priceMode}
+          preview={preview}
+        />
 
+        {error ? <p role="alert">{error}</p> : null}
         {offer ? (
           <SubmitButton
             label="Guardar cambios"
             disabled={fulfillments.length === 0}
           />
         ) : (
-          <p>
+          <div className="offer-submit-actions">
+            <p>Podés guardar como borrador y revisar después, o publicar si ya representa cómo atendés hoy.</p>
             <SubmitButton
               label="Guardar borrador"
               name="status"
@@ -390,66 +441,16 @@ export function OfferForm({
               value="published"
               disabled={fulfillments.length === 0}
             />
-          </p>
+          </div>
         )}
       </form>
 
       {offer ? (
-        <section aria-labelledby="offer-maintenance-heading">
-          <h2 id="offer-maintenance-heading">Mantenimiento</h2>
-          <p>
-            {FRESHNESS_LABEL[freshnessBand(new Date(offer.confirmed_at))]} ·{" "}
-            {offer.status}
-          </p>
-          <p>
-            Confirmar vigencia actualiza la fecha sin afirmar una venta ni cambiar
-            el contenido.
-          </p>
-          <form action={confirmOfferAction}>
-            <input type="hidden" name="presence_id" value={presenceId} />
-            <input type="hidden" name="offer_id" value={offer.id} />
-            <SubmitButton label="Confirmar vigencia" />
-          </form>
+        <section className="offer-media" aria-labelledby="offer-media-heading">
           <div>
-            {offer.status !== "published" ? (
-              <StatusButton
-                presenceId={presenceId}
-                offerId={offer.id}
-                status="published"
-                label="Publicar"
-              />
-            ) : null}
-            {offer.status === "published" ? (
-              <StatusButton
-                presenceId={presenceId}
-                offerId={offer.id}
-                status="paused"
-                label="Pausar"
-              />
-            ) : null}
-            {offer.status === "paused" ? (
-              <StatusButton
-                presenceId={presenceId}
-                offerId={offer.id}
-                status="published"
-                label="Volver a publicar"
-              />
-            ) : null}
-            {offer.status !== "archived" ? (
-              <StatusButton
-                presenceId={presenceId}
-                offerId={offer.id}
-                status="archived"
-                label="Archivar"
-              />
-            ) : (
-              <StatusButton
-                presenceId={presenceId}
-                offerId={offer.id}
-                status="draft"
-                label="Sacar del archivo"
-              />
-            )}
+            <p className="eyebrow">Material visual</p>
+            <h2 id="offer-media-heading">Fotos de la oferta</h2>
+            <p>Son opcionales. Si no agregás una, La Pulpería usa la señal visual de la clase de oferta.</p>
           </div>
           {media.length > 0 ? (
             <ul className="offer-list">
@@ -489,9 +490,143 @@ export function OfferForm({
           ) : null}
         </section>
       ) : (
-        <p>Las fotos se agregan después de crear la oferta.</p>
+        <p className="field-hint">Las fotos se agregan después de crear la oferta; no son un requisito para publicar información honesta.</p>
       )}
     </div>
+  );
+}
+
+function OfferMaintenancePanel({
+  presenceId,
+  offer,
+  notice,
+}: {
+  presenceId: string;
+  offer: OwnedOffer;
+  notice?: string;
+}) {
+  const freshness = freshnessBand(new Date(offer.confirmed_at));
+  return (
+    <section className="offer-maintenance" aria-labelledby="offer-maintenance-heading">
+      <div>
+        <p className="eyebrow">Estado de la oferta</p>
+        <h2 id="offer-maintenance-heading">Mantenimiento</h2>
+        <p>
+          <span className={`status-badge is-${offer.status}`}>
+            {OFFER_STATUS_LABEL[offer.status]}
+          </span>{" "}
+          {FRESHNESS_LABEL[freshness]}
+        </p>
+        <p>
+          Reconfirmar actualiza vigencia sin cambiar precio, contenido ni afirmar una venta.
+        </p>
+      </div>
+      <div className="offer-maintenance__actions">
+        <form action={confirmOfferAction}>
+          <input type="hidden" name="presence_id" value={presenceId} />
+          <input type="hidden" name="offer_id" value={offer.id} />
+          <SubmitButton label="Confirmar vigencia" />
+        </form>
+        {offer.status !== "published" ? (
+          <StatusButton
+            presenceId={presenceId}
+            offerId={offer.id}
+            status="published"
+            label="Publicar"
+          />
+        ) : null}
+        {offer.status === "published" ? (
+          <StatusButton
+            presenceId={presenceId}
+            offerId={offer.id}
+            status="paused"
+            label="Pausar"
+            className="secondary-action"
+          />
+        ) : null}
+        {offer.status === "paused" ? (
+          <StatusButton
+            presenceId={presenceId}
+            offerId={offer.id}
+            status="published"
+            label="Volver a publicar"
+          />
+        ) : null}
+        {offer.status !== "archived" ? (
+          <StatusButton
+            presenceId={presenceId}
+            offerId={offer.id}
+            status="archived"
+            label="Archivar"
+            className="quiet-action"
+          />
+        ) : (
+          <StatusButton
+            presenceId={presenceId}
+            offerId={offer.id}
+            status="draft"
+            label="Sacar del archivo"
+            className="secondary-action"
+          />
+        )}
+      </div>
+      {notice ? <p role="status">{notice}</p> : null}
+    </section>
+  );
+}
+
+function OfferPublicPreview({
+  offerClass,
+  availabilityState,
+  fulfillments,
+  priceMode,
+  preview,
+}: {
+  offerClass: OfferClass;
+  availabilityState: AvailabilityState;
+  fulfillments: FulfillmentMode[];
+  priceMode: PriceMode;
+  preview: { title: string; description: string; price: string; unit: string };
+}) {
+  const price =
+    priceMode === "quote"
+      ? "Cotización"
+      : `${priceMode === "from" ? "desde " : ""}${preview.price ? `L ${preview.price}` : "Precio por indicar"}${preview.unit ? ` / ${preview.unit}` : ""}`;
+  return (
+    <aside className="offer-public-preview" aria-live="polite">
+      <div>
+        <p className="eyebrow">Antes de publicar</p>
+        <h2>Así se entenderá al buscar</h2>
+      </div>
+      <p className="offer-public-preview__class">{OFFER_CLASS_LABEL[offerClass]}</p>
+      <strong>{preview.title}</strong>
+      <p>{preview.description}</p>
+      <dl>
+        <div>
+          <dt>Precio</dt>
+          <dd>{price}</dd>
+        </div>
+        <div>
+          <dt>Disponibilidad</dt>
+          <dd>{AVAILABILITY_LABEL[availabilityState]}</dd>
+        </div>
+        <div>
+          <dt>Cómo atenderás</dt>
+          <dd>
+            {fulfillments.length
+              ? fulfillments
+                  .map(
+                    (mode) =>
+                      FULFILLMENT_OPTIONS.find((option) => option.value === mode)
+                        ?.label,
+                  )
+                  .filter(Boolean)
+                  .join(", ")
+              : "Elegí una forma de cumplimiento"}
+          </dd>
+        </div>
+      </dl>
+    </aside>
   );
 }
 
@@ -500,11 +635,13 @@ function SubmitButton({
   name,
   value,
   disabled = false,
+  className,
 }: {
   label: string;
   name?: string;
   value?: string;
   disabled?: boolean;
+  className?: string;
 }) {
   const { pending } = useFormStatus();
   return (
@@ -513,6 +650,7 @@ function SubmitButton({
       name={name}
       value={value}
       disabled={disabled || pending}
+      className={className}
     >
       {pending ? "Guardando…" : label}
     </button>
@@ -524,18 +662,20 @@ function StatusButton({
   offerId,
   status,
   label,
+  className,
 }: {
   presenceId: string;
   offerId: string;
   status: "draft" | "published" | "paused" | "archived";
   label: string;
+  className?: string;
 }) {
   return (
     <form action={setOfferStatusAction} style={{ display: "inline" }}>
       <input type="hidden" name="presence_id" value={presenceId} />
       <input type="hidden" name="offer_id" value={offerId} />
       <input type="hidden" name="status" value={status} />
-      <SubmitButton label={label} />
+      <SubmitButton label={label} className={className} />
     </form>
   );
 }

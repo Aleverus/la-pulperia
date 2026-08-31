@@ -66,7 +66,7 @@ create function public.get_my_presences()
 returns table (
   id uuid,
   name text,
-  slug citext,
+  slug extensions.citext,
   description text,
   mode public.presence_mode,
   whatsapp_e164 text,

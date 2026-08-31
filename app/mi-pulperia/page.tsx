@@ -1,24 +1,41 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import {
+  IconArrowUpRight,
   IconBuildingStore,
+  IconCircleCheck,
   IconExternalLink,
   IconInbox,
   IconPlus,
+  IconRefresh,
   IconSettings,
 } from "@tabler/icons-react";
 import { redirect } from "next/navigation";
 import { PresenceForm } from "@/app/_components/PresenceForm";
 import { PresenceSelector } from "@/app/_components/PresenceSelector";
-import { PRESENCE_MODE_LABEL } from "@/lib/catalog";
-import { FRESHNESS_LABEL, freshnessBand } from "@/lib/freshness";
+import { confirmOfferAction } from "@/app/seller-actions";
+import {
+  AVAILABILITY_STATE_LABEL,
+  OFFER_CLASS_LABEL,
+  PRESENCE_MODE_LABEL,
+} from "@/lib/catalog";
+import { FRESHNESS_LABEL } from "@/lib/freshness";
 import { formatPublishedPrice } from "@/lib/money";
+import {
+  countInactiveOffers,
+  countOffersNeedingFreshness,
+  getSellerOfferTasks,
+} from "@/lib/seller-dashboard";
 import {
   formErrorMessage,
   OFFER_STATUS_LABEL,
   PRESENCE_STATUS_LABEL,
 } from "@/lib/seller";
-import { getOwnedOffers, getOwnedPresences } from "@/lib/seller-data";
+import {
+  getOwnedOffers,
+  getOwnedPresences,
+  getSellerRequests,
+} from "@/lib/seller-data";
 import { selectOwnedPresence, sellerUrl } from "@/lib/seller-routing";
 
 export const dynamic = "force-dynamic";
@@ -39,7 +56,16 @@ export default async function MiPulperiaPage({
   if (requestedId !== presence.id) {
     redirect(sellerUrl("/mi-pulperia", presence.id));
   }
-  const offers = await getOwnedOffers(presence.id);
+  const [offers, requests] = await Promise.all([
+    getOwnedOffers(presence.id),
+    getSellerRequests(presence.id),
+  ]);
+  const offerTasks = getSellerOfferTasks(offers);
+  const freshnessDue = countOffersNeedingFreshness(offerTasks);
+  const inactiveOffers = countInactiveOffers(offerTasks);
+  const openedRequests = requests.filter(
+    (request) => request.status === "handoff_opened",
+  ).length;
   const error = formErrorMessage(
     typeof params.error === "string" ? params.error : undefined,
   );
@@ -86,6 +112,104 @@ export default async function MiPulperiaPage({
         </p>
       ) : null}
 
+      {params.ok === "fresh" ? (
+        <p role="status">Vigencia confirmada. La oferta vuelve a aparecer como reciente.</p>
+      ) : null}
+
+      <section className="seller-attention" aria-labelledby="seller-attention-title">
+        <div className="section-heading-row">
+          <div>
+            <p className="eyebrow">Trabajo del día</p>
+            <h2 id="seller-attention-title">Atención hoy</h2>
+          </div>
+          <span className="seller-attention__count" aria-label="tareas pendientes">
+            {requests.length + freshnessDue + inactiveOffers}
+          </span>
+        </div>
+        {requests.length || freshnessDue || inactiveOffers || presence.status !== "published" ? (
+          <ul className="seller-attention__list">
+            {requests.length ? (
+              <li className="seller-attention__item is-request">
+                <IconInbox aria-hidden="true" size={23} stroke={1.9} />
+                <div>
+                  <strong>
+                    {requests.length === 1
+                      ? "Hay una solicitud preparada"
+                      : `Hay ${requests.length} solicitudes preparadas`}
+                  </strong>
+                  <p>
+                    {openedRequests
+                      ? `${openedRequests} ya pasó a WhatsApp; revisá sólo lo que la plataforma puede mostrar.`
+                      : "Revisá la intención antes de cualquier conversación en WhatsApp."}
+                  </p>
+                </div>
+                <Link href={sellerUrl("/mi-pulperia/solicitudes", presence.id)}>
+                  Ver solicitudes
+                  <IconArrowUpRight aria-hidden="true" size={17} stroke={1.9} />
+                </Link>
+              </li>
+            ) : null}
+            {freshnessDue ? (
+              <li className="seller-attention__item is-freshness">
+                <IconRefresh aria-hidden="true" size={23} stroke={1.9} />
+                <div>
+                  <strong>
+                    {freshnessDue === 1
+                      ? "Una oferta necesita reconfirmación"
+                      : `${freshnessDue} ofertas necesitan reconfirmación`}
+                  </strong>
+                  <p>
+                    Actualizá sólo lo que sigue vigente; no cambia precio ni registra una venta.
+                  </p>
+                </div>
+                <a href="#seller-offers-title">
+                  Revisar catálogo
+                  <IconArrowUpRight aria-hidden="true" size={17} stroke={1.9} />
+                </a>
+              </li>
+            ) : null}
+            {inactiveOffers ? (
+              <li className="seller-attention__item is-inactive">
+                <IconBuildingStore aria-hidden="true" size={23} stroke={1.9} />
+                <div>
+                  <strong>
+                    {inactiveOffers === 1
+                      ? "Hay una oferta fuera del catálogo público"
+                      : `Hay ${inactiveOffers} ofertas fuera del catálogo público`}
+                  </strong>
+                  <p>Revisá borradores y pausadas cuando estés lista para mostrarlas otra vez.</p>
+                </div>
+                <a href="#seller-offers-title">
+                  Ver ofertas
+                  <IconArrowUpRight aria-hidden="true" size={17} stroke={1.9} />
+                </a>
+              </li>
+            ) : null}
+            {presence.status !== "published" ? (
+              <li className="seller-attention__item is-setup">
+                <IconSettings aria-hidden="true" size={23} stroke={1.9} />
+                <div>
+                  <strong>Falta terminar la publicación de la pulpería</strong>
+                  <p>Revisá WhatsApp, atención y ubicación pública antes de mostrar ofertas.</p>
+                </div>
+                <a href="#seller-settings">
+                  Completar datos
+                  <IconArrowUpRight aria-hidden="true" size={17} stroke={1.9} />
+                </a>
+              </li>
+            ) : null}
+          </ul>
+        ) : (
+          <div className="seller-attention__ready" role="status">
+            <IconCircleCheck aria-hidden="true" size={26} stroke={1.9} />
+            <div>
+              <strong>Todo está al día</strong>
+              <p>Las ofertas publicadas están recientes y no hay solicitudes preparadas.</p>
+            </div>
+          </div>
+        )}
+      </section>
+
       <nav className="seller-quick-actions" aria-label="Acciones de la pulpería">
         <Link href={sellerUrl("/mi-pulperia/solicitudes", presence.id)}>
           <IconInbox aria-hidden="true" size={26} stroke={1.8} />
@@ -130,9 +254,12 @@ export default async function MiPulperiaPage({
           </div>
         ) : (
           <ul className="seller-offer-list">
-            {offers.map((offer) => (
-              <li key={offer.id}>
+            {offerTasks.map(({ offer, freshness }) => (
+              <li key={offer.id} className={`is-${freshness}`}>
                 <div>
+                  <p className="seller-offer-list__identity">
+                    {OFFER_CLASS_LABEL[offer.offer_class]} · {AVAILABILITY_STATE_LABEL[offer.availability_state]}
+                  </p>
                   <Link
                     href={sellerUrl(
                       `/mi-pulperia/ofertas/${offer.id}`,
@@ -154,12 +281,27 @@ export default async function MiPulperiaPage({
                     {OFFER_STATUS_LABEL[offer.status]}
                   </span>
                   <span>
-                    {
-                      FRESHNESS_LABEL[
-                        freshnessBand(new Date(offer.confirmed_at))
-                      ]
-                    }
+                    {FRESHNESS_LABEL[freshness]}
                   </span>
+                  <div className="seller-offer-list__actions">
+                    {offer.status === "published" && freshness !== "recent" ? (
+                      <form action={confirmOfferAction}>
+                        <input type="hidden" name="presence_id" value={presence.id} />
+                        <input type="hidden" name="offer_id" value={offer.id} />
+                        <input type="hidden" name="return_to" value="dashboard" />
+                        <button type="submit">Reconfirmar</button>
+                      </form>
+                    ) : null}
+                    <Link
+                      className="secondary-action"
+                      href={sellerUrl(
+                        `/mi-pulperia/ofertas/${offer.id}`,
+                        presence.id,
+                      )}
+                    >
+                      Editar
+                    </Link>
+                  </div>
                 </div>
               </li>
             ))}
@@ -168,6 +310,7 @@ export default async function MiPulperiaPage({
       </section>
 
       <details
+        id="seller-settings"
         className="seller-settings"
         open={presence.status !== "published" || Boolean(error)}
       >

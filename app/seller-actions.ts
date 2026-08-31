@@ -178,6 +178,7 @@ export async function saveOfferAction(formData: FormData) {
 export async function confirmOfferAction(formData: FormData) {
   const presence = await requireOwnedPresenceFromForm(formData);
   const offerId = String(formData.get("offer_id") ?? "");
+  const returnToDashboard = formData.get("return_to") === "dashboard";
   const current = await getOwnedOffer(presence.id, offerId);
   if (!current) redirect(sellerUrl("/mi-pulperia", presence.id));
   const { supabase } = await requireSession("/mi-pulperia");
@@ -192,7 +193,11 @@ export async function confirmOfferAction(formData: FormData) {
     );
   }
   redirect(
-    sellerUrl(`/mi-pulperia/ofertas/${offerId}`, presence.id, { ok: "fresh" }),
+    returnToDashboard
+      ? sellerUrl("/mi-pulperia", presence.id, { ok: "fresh" })
+      : sellerUrl(`/mi-pulperia/ofertas/${offerId}`, presence.id, {
+          ok: "fresh",
+        }),
   );
 }
 

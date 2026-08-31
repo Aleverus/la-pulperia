@@ -27,6 +27,20 @@ export default async function VenderPage({
         Una cuenta sirve para comprar y, si querés, vender. No hay cola de
         aprobación. El WhatsApp no se publica en el catálogo.
       </p>
+      <ol className="seller-setup-steps" aria-label="Pasos para abrir una pulpería">
+        <li>
+          <strong>1. Contá quién sos</strong>
+          <span>Nombre y una descripción breve.</span>
+        </li>
+        <li>
+          <strong>2. Explicá cómo atendés</strong>
+          <span>Local, cobertura móvil o atención remota.</span>
+        </li>
+        <li>
+          <strong>3. Prepará el canal</strong>
+          <span>Guardá un borrador o publicá cuando el WhatsApp esté verificado.</span>
+        </li>
+      </ol>
       {presences.length ? (
         <section aria-labelledby="owned-presences-heading">
           <h2 id="owned-presences-heading">Tus pulperías actuales</h2>

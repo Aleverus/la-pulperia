@@ -41,8 +41,32 @@
 - Carrito: `Agregar al carrito` cambia a `En el carrito`, actualiza `Carrito (1)` y conserva oferta, vendedor y handoff de ingreso.
 - Capturas auxiliares: `.codex-work/design-qa/implementation-mobile-detail-final.jpg` y `.codex-work/design-qa/implementation-mobile-cart.jpg`.
 - Recorrido autenticado de cierre: cuenta, historial y detalle de comprador; panel, configuración e inbox de dueña; cuatro clases de intención, carrito multi-vendedor y 404. Las capturas viven en `.codex-work/audit-corte7-2026-08-30/`.
-- Gates posteriores al último cambio: base local reconstruida, 231 pruebas pgTAP, lint de esquema, ESLint, tipos, 18 archivos / 76 pruebas Vitest, build, auditoría de producción y 32 recorridos Playwright en móvil/escritorio, incluidos Axe y reflow a 320 px, pasaron. `git diff --check` pasó.
+- Gates posteriores al último cambio: base local reconstruida, 231 pruebas pgTAP, lint de esquema, ESLint, tipos, 19 archivos / 77 pruebas Vitest, build, auditoría de producción y 32 recorridos Playwright en móvil/escritorio, incluidos Axe y reflow a 320 px, pasaron. `git diff --check` pasó.
 
 No quedan hallazgos P0, P1 o P2 abiertos. Las diferencias P3 son conscientes, reversibles y no impiden evaluar esta dirección sobre el producto real.
+
+## Extensión operativa de dueña — 30 de agosto de 2026
+
+- Fuente visual: `../Obra/Referencias visuales/direccion-visual-base-movil-aprobada-2026-08-30.png`.
+- Implementación: `test-results/seller-ux-2026-08-30/seller-dashboard-390.png` (375 × 1829 px) y `test-results/seller-ux-2026-08-30/seller-offer-form-390.png` (375 × 2701 px), ambas capturadas desde el runtime local autenticado.
+- Viewport y densidad: 390 × 844 CSS px, factor 1; el navegador entrega 375 px útiles en las capturas por la barra de desplazamiento.
+- Comparación de una sola entrada: `test-results/seller-ux-2026-08-30/comparison-base-dashboard-390.png` (750 × 844 px) coloca la fuente normalizada a 375 × 844 a la izquierda y el primer viewport del panel a la derecha. La fuente sólo define el sistema visual público; no existe un mockup aprobado del mismo estado vendedor, por lo que no se reclama paridad de contenido.
+- Regiones revisadas: cabecera, jerarquía tipográfica, chips de estado, tarjetas de atención, CTA y borde/radio/sombra en la comparación conjunta; el formulario completo verifica la lectura de opciones de clase, campos, controles, vista previa y acciones de publicación. No hizo falta un recorte adicional porque esos controles quedan legibles a escala 1:1 en las capturas.
+
+**Hallazgos y resolución**
+
+- [P1 resuelto] El panel de dueña se comportaba como un listado pasivo y mantenía el carrito de compra como acción de cabecera. Ahora abre con prioridades operativas, ordena la oferta desactualizada primero, permite reconfirmarla sin editar y muestra `Comprar` como salida explícita del modo de dueña.
+- [P2 resuelto] Crear una oferta no anticipaba la lectura pública y el alta de presencia preseleccionaba una ubicación fija. La creación incluye una vista previa de los hechos que verá quien busca; la presencia comienza sin modo seleccionado y sólo habilita publicar al completar los requisitos reales de su modalidad.
+- [P2 resuelto] La bandeja no resumía su estado ni mantenía visible la referencia de solicitud tras la nueva cabecera. Muestra preparación, apertura de WhatsApp y comprensión como señales distintas, y conserva `Referencia` en cada tarjeta.
+- No hay P0, P1 o P2 accionables en el runtime revisado. La ausencia de un mockup vendedor equivalente es una limitación conocida de la fuente, no una afirmación de fidelidad píxel a píxel.
+
+**Superficies de fidelidad**
+
+- Tipografía: conserva el contraste entre la voz condensada del título y el texto operativo legible; no hay truncación ni wrapping que esconda acciones a 390 px.
+- Ritmo y layout: márgenes, bordes finos, radios contenidos y superficies cálidas siguen la base; las tarjetas de prioridad jerarquizan una sola tarea sin convertirse en un dashboard genérico.
+- Color e iconos: marfil, pino, maíz y estados semánticos reutilizan tokens existentes; los iconos son Tabler reales y no arte CSS ni SVG artesanal.
+- Activos y contenido: no se inventan fotos ni pins; el preview y la bandeja describen información que la plataforma sí conoce, y mantienen la frontera de WhatsApp.
+- Accesibilidad y respuesta: los controles conservan etiquetas semánticas; `pnpm test:e2e` pasa Axe y el reflow móvil, y la inspección local no observó desborde horizontal.
+- Interacción nueva: desde el panel a 390 px, `Reconfirmar` volvió a `/mi-pulperia?ok=fresh`, mostró el estado de éxito y movió la oferta a vigencia reciente; la captura posterior está en `test-results/seller-ux-2026-08-30/seller-dashboard-confirmed-390.png`.
 
 Final result: passed

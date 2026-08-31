@@ -41,9 +41,6 @@ yarn-error.log*
 .env*
 !.env.example
 
-# Reproducible regional map artifact; generate with `pnpm map:refresh`.
-/public/maps/*.pmtiles
-
 # vercel
 .vercel
 
