@@ -96,7 +96,10 @@ production build and the public search → offer → cart path were inspected at
 390 px; the visual comparison has no open P0–P2 findings. This is now a
 recoverable prelaunch checkpoint published at
 `https://la-pulperia-coral.vercel.app`; it is explicitly excluded from search
-indexes. Publication does not imply owner acceptance, launch, or field evidence.
+indexes. Google OAuth is connected in controlled test mode, Supabase Email auth
+is disabled, and a real Google session has returned to the authenticated cart
+and account. Publication does not imply owner acceptance, launch, or field
+evidence.
 
 ## Visual direction and local implementation
 
@@ -161,6 +164,11 @@ After the bug-repair plans 001–005 on 2026-08-30, the local tree passed:
   all 32 Playwright journeys passed in mobile and desktop, including Axe and
   query-history regressions. Authenticated buyer and seller flows were also
   observed manually at 390 and 1440 px. `git diff --check` remained clean.
+- the public OAuth exercise selected the authorized Google test account,
+  consented only to basic identity and email, returned to `/carrito`, exposed
+  the authenticated navigation, and opened `/cuenta`; the remote database
+  contains one Google identity with its application profile. Google is enabled
+  and Email is disabled in Supabase.
 
 This local receipt proves the technical contract and exercised flows. The
 separate prelaunch runtime check proves public deployment and remote data reads;
@@ -207,10 +215,10 @@ configured public source. The regional runtime artifact is versioned so Git-base
 deployments include the same map that was verified locally.
 
 The public prelaunch uses `PULPERIA_PRELAUNCH=true`, which emits `noindex` and
-blocks crawlers until owner launch. Google OAuth remains pending provider
-credentials and a real sign-in exercise. A custom domain, automated messages,
-spending, seller onboarding, and field research remain intentionally
-unconfigured.
+blocks crawlers until owner launch. Google OAuth is restricted to test mode and
+the authorized test account; a production consent posture, custom domain,
+automated messages, spending, seller onboarding, and field research remain
+intentionally unconfigured.
 
 ## Source status
 
