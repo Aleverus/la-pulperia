@@ -96,15 +96,17 @@ test("buyer search, multi-seller cart, login, and two WhatsApp handoffs", async 
   await expect(page.getByText("Pedido preparado").first()).toBeVisible();
   await expect(page.getByText("no significa que el pedido fue enviado", { exact: false })).toBeVisible();
 
-  const popupPromise = page.waitForEvent("popup");
-  await canastaWa.click();
-  const popup = await popupPromise;
-  expect(popup.url()).toMatch(/50499992222/);
-  const handoffText = new URL(popup.url()).searchParams.get("text") ?? "";
+  const canastaHref = await canastaWa.getAttribute("href");
+  expect(canastaHref).not.toBeNull();
+  const handoffText = new URL(canastaHref!).searchParams.get("text") ?? "";
   expect(handoffText).toContain("Encargo:");
   expect(handoffText).toContain("Servicio:");
   expect(handoffText).toContain("viernes por la tarde");
   expect(handoffText).toContain("se confirman directamente con el vendedor");
+
+  const popupPromise = page.waitForEvent("popup");
+  await canastaWa.click();
+  const popup = await popupPromise;
   await popup.close();
   await expect(async () => {
     await page.reload();

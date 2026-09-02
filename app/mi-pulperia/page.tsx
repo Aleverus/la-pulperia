@@ -40,7 +40,7 @@ import { selectOwnedPresence, sellerUrl } from "@/lib/seller-routing";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "Mi pulpería",
+  title: "Mi negocio",
   robots: { index: false, follow: false },
 };
 
@@ -61,6 +61,13 @@ export default async function MiPulperiaPage({
     getSellerRequests(presence.id),
   ]);
   const offerTasks = getSellerOfferTasks(offers);
+  const freshnessTasks = offerTasks.filter(
+    ({ offer, freshness }) =>
+      offer.status === "published" && freshness !== "recent",
+  );
+  const inactiveTasks = offerTasks.filter(
+    ({ offer }) => offer.status === "draft" || offer.status === "paused",
+  );
   const freshnessDue = countOffersNeedingFreshness(offerTasks);
   const inactiveOffers = countInactiveOffers(offerTasks);
   const openedRequests = requests.filter(
@@ -69,13 +76,17 @@ export default async function MiPulperiaPage({
   const error = formErrorMessage(
     typeof params.error === "string" ? params.error : undefined,
   );
+  const confirmedOffer =
+    params.ok === "fresh" && typeof params.offer === "string"
+      ? offers.find((offer) => offer.id === params.offer)
+      : null;
 
   return (
     <main className="detail-page seller-dashboard">
       <header className="seller-dashboard__header">
         <div>
-          <p className="eyebrow">Panel de dueña</p>
-          <h1>Mi pulpería</h1>
+          <p className="eyebrow">Trabajo del vendedor</p>
+          <h1>Mi negocio</h1>
           <p className="seller-dashboard__name">
             <IconBuildingStore aria-hidden="true" size={24} stroke={1.8} />
             {presence.name}
@@ -88,7 +99,7 @@ export default async function MiPulperiaPage({
         />
       </header>
 
-      <div className="seller-status-line" aria-label="Estado de la pulpería">
+      <div className="seller-status-line" aria-label="Estado del negocio">
         <span className={`status-badge is-${presence.status}`}>
           {PRESENCE_STATUS_LABEL[presence.status]}
         </span>
@@ -108,12 +119,15 @@ export default async function MiPulperiaPage({
 
       {presence.status !== "published" ? (
         <p className="notice-card" role="status">
-          Tus ofertas se guardan en privado hasta que publiques la pulpería.
+          Tus ofertas se guardan en privado hasta que publiques el negocio.
         </p>
       ) : null}
 
-      {params.ok === "fresh" ? (
-        <p role="status">Vigencia confirmada. La oferta vuelve a aparecer como reciente.</p>
+      {confirmedOffer ? (
+        <p role="status">
+          Vigencia de <strong>{confirmedOffer.title}</strong> confirmada. No se
+          modificaron precio, contenido ni una venta.
+        </p>
       ) : null}
 
       <section className="seller-attention" aria-labelledby="seller-attention-title">
@@ -123,73 +137,82 @@ export default async function MiPulperiaPage({
             <h2 id="seller-attention-title">Atención hoy</h2>
           </div>
           <span className="seller-attention__count" aria-label="tareas pendientes">
-            {requests.length + freshnessDue + inactiveOffers}
+            {requests.length +
+              freshnessDue +
+              inactiveOffers +
+              (presence.status === "published" ? 0 : 1)}
           </span>
         </div>
         {requests.length || freshnessDue || inactiveOffers || presence.status !== "published" ? (
           <ul className="seller-attention__list">
-            {requests.length ? (
-              <li className="seller-attention__item is-request">
+            {requests.map((request) => (
+              <li
+                key={request.seller_request_id}
+                className="seller-attention__item is-request"
+              >
                 <IconInbox aria-hidden="true" size={23} stroke={1.9} />
                 <div>
                   <strong>
-                    {requests.length === 1
-                      ? "Hay una solicitud preparada"
-                      : `Hay ${requests.length} solicitudes preparadas`}
+                    Solicitud sobre {request.items[0]?.title ?? "una oferta"}
                   </strong>
                   <p>
-                    {openedRequests
-                      ? `${openedRequests} ya pasó a WhatsApp; revisá sólo lo que la plataforma puede mostrar.`
-                      : "Revisá la intención antes de cualquier conversación en WhatsApp."}
+                    {request.status === "handoff_opened"
+                      ? "La persona abrió WhatsApp; eso no confirma mensaje, pedido ni venta."
+                      : "Revisá la intención preparada antes de cualquier conversación."}
                   </p>
                 </div>
-                <Link href={sellerUrl("/mi-pulperia/solicitudes", presence.id)}>
-                  Ver solicitudes
+                <Link
+                  href={`${sellerUrl("/mi-pulperia/solicitudes", presence.id)}#solicitud-${request.seller_request_id}`}
+                >
+                  Abrir esta solicitud
                   <IconArrowUpRight aria-hidden="true" size={17} stroke={1.9} />
                 </Link>
               </li>
-            ) : null}
-            {freshnessDue ? (
-              <li className="seller-attention__item is-freshness">
+            ))}
+            {freshnessTasks.map(({ offer, freshness }) => (
+              <li key={offer.id} className="seller-attention__item is-freshness">
                 <IconRefresh aria-hidden="true" size={23} stroke={1.9} />
                 <div>
-                  <strong>
-                    {freshnessDue === 1
-                      ? "Una oferta necesita reconfirmación"
-                      : `${freshnessDue} ofertas necesitan reconfirmación`}
-                  </strong>
+                  <strong>Reconfirmá {offer.title}</strong>
                   <p>
-                    Actualizá sólo lo que sigue vigente; no cambia precio ni registra una venta.
+                    Está {FRESHNESS_LABEL[freshness].toLowerCase()}. Confirmar
+                    sólo actualiza vigencia; no cambia precio ni registra una venta.
                   </p>
                 </div>
-                <a href="#seller-offers-title">
-                  Revisar catálogo
-                  <IconArrowUpRight aria-hidden="true" size={17} stroke={1.9} />
-                </a>
+                <form action={confirmOfferAction} className="seller-attention__action">
+                  <input type="hidden" name="presence_id" value={presence.id} />
+                  <input type="hidden" name="offer_id" value={offer.id} />
+                  <input type="hidden" name="return_to" value="dashboard" />
+                  <button type="submit">Reconfirmar esta oferta</button>
+                </form>
               </li>
-            ) : null}
-            {inactiveOffers ? (
-              <li className="seller-attention__item is-inactive">
+            ))}
+            {inactiveTasks.map(({ offer }) => (
+              <li key={offer.id} className="seller-attention__item is-inactive">
                 <IconBuildingStore aria-hidden="true" size={23} stroke={1.9} />
                 <div>
-                  <strong>
-                    {inactiveOffers === 1
-                      ? "Hay una oferta fuera del catálogo público"
-                      : `Hay ${inactiveOffers} ofertas fuera del catálogo público`}
-                  </strong>
-                  <p>Revisá borradores y pausadas cuando estés lista para mostrarlas otra vez.</p>
+                  <strong>Retomá {offer.title}</strong>
+                  <p>
+                    Está {OFFER_STATUS_LABEL[offer.status].toLowerCase()} y no
+                    aparece en la vitrina pública.
+                  </p>
                 </div>
-                <a href="#seller-offers-title">
-                  Ver ofertas
+                <Link
+                  href={sellerUrl(
+                    `/mi-pulperia/ofertas/${offer.id}`,
+                    presence.id,
+                  )}
+                >
+                  Abrir esta oferta
                   <IconArrowUpRight aria-hidden="true" size={17} stroke={1.9} />
-                </a>
+                </Link>
               </li>
-            ) : null}
+            ))}
             {presence.status !== "published" ? (
               <li className="seller-attention__item is-setup">
                 <IconSettings aria-hidden="true" size={23} stroke={1.9} />
                 <div>
-                  <strong>Falta terminar la publicación de la pulpería</strong>
+                  <strong>Falta terminar la publicación del negocio</strong>
                   <p>Revisá WhatsApp, atención y ubicación pública antes de mostrar ofertas.</p>
                 </div>
                 <a href="#seller-settings">
@@ -210,12 +233,16 @@ export default async function MiPulperiaPage({
         )}
       </section>
 
-      <nav className="seller-quick-actions" aria-label="Acciones de la pulpería">
+      <nav className="seller-quick-actions" aria-label="Acciones del negocio">
         <Link href={sellerUrl("/mi-pulperia/solicitudes", presence.id)}>
           <IconInbox aria-hidden="true" size={26} stroke={1.8} />
           <span>
-            <strong>Solicitudes recibidas</strong>
-            <small>Revisá intenciones preparadas por clientes.</small>
+            <strong>Solicitudes</strong>
+            <small>
+              {openedRequests
+                ? `${openedRequests} con apertura de WhatsApp, sin afirmar venta.`
+                : "Revisá intenciones preparadas por clientes."}
+            </small>
           </span>
         </Link>
         <Link href={sellerUrl("/mi-pulperia/ofertas/nueva", presence.id)}>
@@ -232,15 +259,9 @@ export default async function MiPulperiaPage({
       <section className="seller-offers" aria-labelledby="seller-offers-title">
         <div className="section-heading-row">
           <div>
-            <p className="eyebrow">Catálogo propio</p>
+            <p className="eyebrow">Oferta del negocio</p>
             <h2 id="seller-offers-title">Tus ofertas</h2>
           </div>
-          <Link
-            className="secondary-action"
-            href={sellerUrl("/mi-pulperia/ofertas/nueva", presence.id)}
-          >
-            Nueva oferta
-          </Link>
         </div>
         {offers.length === 0 ? (
           <div className="empty-state seller-empty-state">
@@ -317,14 +338,14 @@ export default async function MiPulperiaPage({
         <summary>
           <IconSettings aria-hidden="true" size={24} stroke={1.8} />
           <span>
-            <strong>Configuración de {presence.name}</strong>
+            <strong>Datos de {presence.name}</strong>
             <small>Identidad, atención, WhatsApp y ubicación pública.</small>
           </span>
         </summary>
         <div className="seller-settings__body">
           <PresenceForm presence={presence} error={error ?? undefined} />
           <p>
-            <Link href="/vender">Abrir otra pulpería</Link>
+            <Link href="/vender">Agregar otro negocio</Link>
           </p>
         </div>
       </details>

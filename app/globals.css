@@ -1698,6 +1698,19 @@
     font-size: 0.9rem;
   }
 
+  .seller-attention__action {
+    grid-column: 2;
+    width: fit-content;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .seller-attention__action button {
+    min-height: 2.55rem;
+    font-size: 0.9rem;
+  }
+
   .seller-quick-actions {
     display: grid;
     gap: 0.75rem;
@@ -2119,6 +2132,37 @@
   .seller-setup-steps span {
     color: var(--ink-soft);
     font-size: 0.9rem;
+  }
+
+  .seller-entry {
+    max-width: 64rem;
+  }
+
+  .seller-entry__promise,
+  .starter-offer,
+  .starter-business {
+    display: grid;
+    gap: 0.8rem;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .starter-offer {
+    border-color: #b8ccb4;
+    background: var(--pine-mist);
+  }
+
+  .starter-offer > form,
+  .starter-business > .presence-form {
+    margin-top: 0.25rem;
+  }
+
+  .starter-business:focus {
+    outline: 3px solid var(--maize);
+    outline-offset: 0.25rem;
   }
 
   .back-link a {

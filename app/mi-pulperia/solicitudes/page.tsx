@@ -47,7 +47,7 @@ export default async function SellerRequestsPage({
 
   return (
     <main className="detail-page seller-inbox">
-      <p className="eyebrow">Panel de dueña</p>
+      <p className="eyebrow">Trabajo del vendedor</p>
       <h1>Solicitudes recibidas</h1>
       <p className="back-link">
         <Link href={sellerUrl("/mi-pulperia", presence.id)}>
@@ -109,7 +109,12 @@ export default async function SellerRequestsPage({
         </div>
       ) : (
         requests.map((request) => (
-          <article className="seller-request-card" key={request.seller_request_id}>
+          <article
+            className="seller-request-card"
+            id={`solicitud-${request.seller_request_id}`}
+            key={request.seller_request_id}
+            tabIndex={-1}
+          >
             <header className="seller-request-card__header">
               <div>
                 <p className="eyebrow">

@@ -79,12 +79,21 @@ export async function savePresenceAction(formData: FormData) {
     redirect(presenceError(classifyPresenceError(error.message), existing?.id));
   }
   if (!data) redirect(presenceError("save", existing?.id));
-  redirect(sellerUrl("/mi-pulperia", String(data)));
+  const savedPresenceId = String(data);
+  if (!existing && formData.get("continue_to_offer") === "1") {
+    redirect(
+      sellerUrl("/mi-pulperia/ofertas/nueva", savedPresenceId, {
+        retomar: "1",
+      }),
+    );
+  }
+  redirect(sellerUrl("/mi-pulperia", savedPresenceId));
 }
 
 export async function saveOfferAction(formData: FormData) {
   const presence = await requireOwnedPresenceFromForm(formData);
   const { supabase } = await requireSession("/mi-pulperia");
+  const starterDraft = formData.get("starter_draft") === "1";
 
   const offerId = emptyToNull(String(formData.get("offer_id") ?? ""));
   const title = String(formData.get("title") ?? "").trim();
@@ -105,31 +114,33 @@ export async function saveOfferAction(formData: FormData) {
     .map(String)
     .filter(isFulfillmentMode);
 
-  if (!title) redirect(offerError("title", presence.id, offerId));
+  if (!title) redirect(offerError("title", presence.id, offerId, starterDraft));
   if (!isOfferClass(offerClass)) {
-    redirect(offerError("availability", presence.id, offerId));
+    redirect(offerError("availability", presence.id, offerId, starterDraft));
   }
   if (
     (offerClass === "stocked_product" || offerClass === "scheduled_food") &&
     !unit
   ) {
-    redirect(offerError("unit", presence.id, offerId));
+    redirect(offerError("unit", presence.id, offerId, starterDraft));
   }
   if (!isPriceMode(priceMode) || (priceMode !== "quote" && price === null)) {
-    redirect(offerError("price", presence.id, offerId));
+    redirect(offerError("price", presence.id, offerId, starterDraft));
   }
   if (!isAvailabilityState(availabilityState)) {
-    redirect(offerError("availability", presence.id, offerId));
+    redirect(offerError("availability", presence.id, offerId, starterDraft));
   }
   if (!isOfferStatus(status)) {
-    redirect(offerError("status", presence.id, offerId));
+    redirect(offerError("status", presence.id, offerId, starterDraft));
   }
   if (fulfillmentModes.length < 1) {
-    redirect(offerError("fulfillment", presence.id, offerId));
+    redirect(offerError("fulfillment", presence.id, offerId, starterDraft));
   }
 
   const contract = availabilityContract(offerClass, availabilityState, formData);
-  if (!contract) redirect(offerError("availability", presence.id, offerId));
+  if (!contract) {
+    redirect(offerError("availability", presence.id, offerId, starterDraft));
+  }
 
   const { data, error } = await supabase.rpc("upsert_offer_maintained", {
     p_presence_id: presence.id,
@@ -152,7 +163,12 @@ export async function saveOfferAction(formData: FormData) {
   });
   if (error || !data) {
     redirect(
-      offerError(classifyOfferError(error?.message), presence.id, offerId),
+      offerError(
+        classifyOfferError(error?.message),
+        presence.id,
+        offerId,
+        starterDraft,
+      ),
     );
   }
 
@@ -172,7 +188,12 @@ export async function saveOfferAction(formData: FormData) {
       );
     }
   }
-  redirect(sellerUrl(`/mi-pulperia/ofertas/${savedId}`, presence.id));
+  redirect(
+    sellerUrl(`/mi-pulperia/ofertas/${savedId}`, presence.id, {
+      starter:
+        starterDraft ? "cleared" : undefined,
+    }),
+  );
 }
 
 export async function confirmOfferAction(formData: FormData) {
@@ -194,7 +215,10 @@ export async function confirmOfferAction(formData: FormData) {
   }
   redirect(
     returnToDashboard
-      ? sellerUrl("/mi-pulperia", presence.id, { ok: "fresh" })
+      ? sellerUrl("/mi-pulperia", presence.id, {
+          ok: "fresh",
+          offer: offerId,
+        })
       : sellerUrl(`/mi-pulperia/ofertas/${offerId}`, presence.id, {
           ok: "fresh",
         }),
@@ -373,11 +397,15 @@ function offerError(
   code: string,
   presenceId: string,
   offerId: string | null,
+  starterDraft = false,
 ) {
   const path = offerId
     ? `/mi-pulperia/ofertas/${offerId}`
     : "/mi-pulperia/ofertas/nueva";
-  return sellerUrl(path, presenceId, { error: code });
+  return sellerUrl(path, presenceId, {
+    error: code,
+    retomar: starterDraft ? "1" : undefined,
+  });
 }
 
 async function requireOwnedPresenceFromForm(formData: FormData) {

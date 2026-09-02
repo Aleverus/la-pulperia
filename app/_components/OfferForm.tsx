@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useFormStatus } from "react-dom";
 import {
   confirmOfferAction,
@@ -18,6 +18,16 @@ import { FRESHNESS_LABEL, freshnessBand } from "@/lib/freshness";
 import type { PriceMode } from "@/lib/money";
 import { mediaPublicUrl } from "@/lib/media-url";
 import { OFFER_STATUS_LABEL, type OwnedMedia, type OwnedOffer } from "@/lib/seller";
+import {
+  parseStarterOfferDraft,
+  starterOfferDraftFromForm,
+  type StarterOfferDraft,
+} from "@/lib/starter-offer-draft";
+import {
+  clearStarterOfferDraft,
+  useStarterOfferDraftStorage,
+  writeStarterOfferDraft,
+} from "@/lib/starter-offer-draft-store";
 
 const CLASS_HELP: Record<OfferClass, string> = {
   stocked_product: "Algo que vendés por cantidad y cuya existencia podés confirmar.",
@@ -62,41 +72,86 @@ const ALLOWED_FULFILLMENTS: Record<OfferClass, FulfillmentMode[]> = {
   digital_offer: ["digital_delivery", "appointment", "direct_agreement"],
 };
 
-export function OfferForm({
-  presenceId,
-  offer,
-  media,
-  error,
-  notice,
-}: {
+type OfferFormProps = {
   presenceId: string;
   offer: OwnedOffer | null;
   media: OwnedMedia[];
   error?: string;
   notice?: string;
+  resumeStarterDraft?: boolean;
+  clearStarterDraft?: boolean;
+};
+
+export function OfferForm(props: OfferFormProps) {
+  const storedDraft = useStarterOfferDraftStorage();
+  const starterDraft = useMemo(
+    () => parseStoredDraft(storedDraft),
+    [storedDraft],
+  );
+
+  useEffect(() => {
+    if (props.clearStarterDraft) {
+      clearStarterOfferDraft();
+    }
+  }, [props.clearStarterDraft]);
+
+  return (
+    <OfferFormFields
+      key={
+        props.resumeStarterDraft
+          ? storedDraft
+            ? "starter-loaded"
+            : "starter-empty"
+          : "regular"
+      }
+      {...props}
+      starterDraft={props.resumeStarterDraft ? starterDraft : null}
+      persistStarterDraft={Boolean(props.resumeStarterDraft)}
+    />
+  );
+}
+
+function OfferFormFields({
+  presenceId,
+  offer,
+  media,
+  error,
+  notice,
+  starterDraft,
+  persistStarterDraft,
+}: OfferFormProps & {
+  starterDraft: StarterOfferDraft | null;
+  persistStarterDraft: boolean;
 }) {
   const details = offer?.availability_details ?? {};
   const [offerClass, setOfferClass] = useState<OfferClass>(
-    offer?.offer_class ?? "stocked_product",
+    offer?.offer_class ?? starterDraft?.offerClass ?? "stocked_product",
   );
   const [priceMode, setPriceMode] = useState<PriceMode>(
-    offer?.price_mode ?? "fixed",
+    offer?.price_mode ?? starterDraft?.priceMode ?? "fixed",
   );
   const [availabilityState, setAvailabilityState] =
-    useState<AvailabilityState>(offer?.availability_state ?? "available");
+    useState<AvailabilityState>(
+      offer?.availability_state ??
+        starterDraft?.availabilityState ??
+        "available",
+    );
   const [fulfillments, setFulfillments] = useState<FulfillmentMode[]>(
     offer?.fulfillment_modes.length
       ? offer.fulfillment_modes
-      : ["direct_agreement"],
+      : starterDraft?.fulfillments ?? [],
   );
   const [preview, setPreview] = useState({
-    title: offer?.title ?? "Tu oferta",
-    description: offer?.description ?? "Explicá lo esencial para quien busca.",
+    title: offer?.title ?? starterDraft?.title ?? "Tu oferta",
+    description:
+      offer?.description ??
+      starterDraft?.description ??
+      "Explicá lo esencial para quien busca.",
     price:
       offer?.price_cents === null || offer?.price_cents === undefined
-        ? ""
+        ? starterDraft?.price ?? ""
         : (offer.price_cents / 100).toFixed(2),
-    unit: offer?.unit ?? "",
+    unit: offer?.unit ?? starterDraft?.unit ?? "",
   });
   const maintenanceStartedAtRef = useRef<HTMLInputElement>(null);
 
@@ -116,7 +171,7 @@ export function OfferForm({
     if (!availabilityStatesFor(next).includes(availabilityState)) {
       setAvailabilityState("available");
     }
-    setFulfillments(["direct_agreement"]);
+    setFulfillments([]);
   }
 
   function toggleFulfillment(mode: FulfillmentMode, checked: boolean) {
@@ -125,6 +180,12 @@ export function OfferForm({
         ? Array.from(new Set([...current, mode]))
         : current.filter((item) => item !== mode),
     );
+  }
+
+  function storeStarterDraft(event: FormEvent<HTMLFormElement>) {
+    if (!persistStarterDraft) return;
+    const draft = starterOfferDraftFromForm(new FormData(event.currentTarget));
+    writeStarterOfferDraft(draft);
   }
 
   return (
@@ -136,9 +197,19 @@ export function OfferForm({
           notice={notice}
         />
       ) : null}
-      <form action={saveOfferAction} className="stack">
+      <form
+        action={saveOfferAction}
+        className="stack"
+        onInput={storeStarterDraft}
+        onChange={storeStarterDraft}
+      >
         <input type="hidden" name="presence_id" value={presenceId} />
         <input type="hidden" name="offer_id" value={offer?.id ?? ""} />
+        <input
+          type="hidden"
+          name="starter_draft"
+          value={persistStarterDraft ? "1" : ""}
+        />
         <input
           type="hidden"
           name="maintenance_started_at_ms"
@@ -177,7 +248,7 @@ export function OfferForm({
           <input
             id="offer-title"
             name="title"
-            defaultValue={offer?.title ?? ""}
+            defaultValue={offer?.title ?? starterDraft?.title ?? ""}
             onChange={(event) =>
               setPreview((current) => ({
                 ...current,
@@ -192,7 +263,7 @@ export function OfferForm({
           <textarea
             id="offer-description"
             name="description"
-            defaultValue={offer?.description ?? ""}
+            defaultValue={offer?.description ?? starterDraft?.description ?? ""}
             onChange={(event) =>
               setPreview((current) => ({
                 ...current,
@@ -226,10 +297,11 @@ export function OfferForm({
                 name="price"
                 inputMode="decimal"
                 defaultValue={
-                  offer?.price_cents === null ||
-                  offer?.price_cents === undefined
-                    ? ""
-                    : (offer.price_cents / 100).toFixed(2)
+                  offer
+                    ? offer.price_cents === null
+                      ? ""
+                      : (offer.price_cents / 100).toFixed(2)
+                    : starterDraft?.price ?? ""
                 }
                 onChange={(event) =>
                   setPreview((current) => ({
@@ -251,7 +323,7 @@ export function OfferForm({
           <input
             id="offer-unit"
             name="unit"
-            defaultValue={offer?.unit ?? ""}
+            defaultValue={offer?.unit ?? starterDraft?.unit ?? ""}
             onChange={(event) =>
               setPreview((current) => ({
                 ...current,
@@ -290,7 +362,7 @@ export function OfferForm({
               <input
                 id="stock-note"
                 name="stock_note"
-                defaultValue={details.stock_note ?? ""}
+                defaultValue={details.stock_note ?? starterDraft?.stockNote ?? ""}
                 maxLength={500}
                 placeholder="Ej. quedan pocas unidades; confirmar color"
               />
@@ -304,7 +376,9 @@ export function OfferForm({
                 id="window-start"
                 name="window_start"
                 type="datetime-local"
-                defaultValue={localDateTime(details.starts_at)}
+                defaultValue={
+                  localDateTime(details.starts_at) || starterDraft?.windowStart || ""
+                }
                 required
               />
               <label htmlFor="window-end">Fin de la ventana</label>
@@ -312,7 +386,9 @@ export function OfferForm({
                 id="window-end"
                 name="window_end"
                 type="datetime-local"
-                defaultValue={localDateTime(details.ends_at)}
+                defaultValue={
+                  localDateTime(details.ends_at) || starterDraft?.windowEnd || ""
+                }
                 required
               />
               <label htmlFor="window-cutoff">Fecha de corte (opcional)</label>
@@ -320,13 +396,17 @@ export function OfferForm({
                 id="window-cutoff"
                 name="window_cutoff"
                 type="datetime-local"
-                defaultValue={localDateTime(details.cutoff_at)}
+                defaultValue={
+                  localDateTime(details.cutoff_at) || starterDraft?.windowCutoff || ""
+                }
               />
               <label htmlFor="capacity-note">Capacidad (opcional)</label>
               <input
                 id="capacity-note"
                 name="capacity_note"
-                defaultValue={details.capacity_note ?? ""}
+                defaultValue={
+                  details.capacity_note ?? starterDraft?.capacityNote ?? ""
+                }
                 maxLength={500}
                 placeholder="Ej. cupo para 20 encargos"
               />
@@ -340,7 +420,7 @@ export function OfferForm({
               <textarea
                 id="requirements"
                 name="requirements"
-                defaultValue={details.requirements ?? ""}
+                defaultValue={details.requirements ?? starterDraft?.requirements ?? ""}
                 maxLength={500}
                 rows={3}
                 required
@@ -359,13 +439,17 @@ export function OfferForm({
                 id="next-available-at"
                 name="next_available_at"
                 type="datetime-local"
-                defaultValue={localDateTime(details.next_available_at)}
+                defaultValue={
+                  localDateTime(details.next_available_at) ||
+                  starterDraft?.nextAvailableAt ||
+                  ""
+                }
               />
               <label htmlFor="schedule-note">Nota de agenda</label>
               <input
                 id="schedule-note"
                 name="schedule_note"
-                defaultValue={details.schedule_note ?? ""}
+                defaultValue={details.schedule_note ?? starterDraft?.scheduleNote ?? ""}
                 maxLength={500}
                 placeholder="Ej. lunes a viernes, horario a confirmar"
               />
@@ -494,6 +578,15 @@ export function OfferForm({
       )}
     </div>
   );
+}
+
+function parseStoredDraft(raw: string | null): StarterOfferDraft | null {
+  if (!raw) return null;
+  try {
+    return parseStarterOfferDraft(JSON.parse(raw));
+  } catch {
+    return null;
+  }
 }
 
 function OfferMaintenancePanel({

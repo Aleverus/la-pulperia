@@ -27,7 +27,7 @@ export function HeaderNavigation({
       {sellerMode ? (
         <Link className="seller-mode-return" href="/buscar">
           <IconArrowLeft aria-hidden="true" size={20} stroke={1.9} />
-          <span>Comprar</span>
+          <span>Volver a comprar</span>
         </Link>
       ) : (
         <CartLink />
@@ -61,21 +61,26 @@ function PrimaryNavigation({
   if (sellerMode) {
     return (
       <>
-        <Link href="/mi-pulperia" className="seller-nav-link">
-          <IconBuildingStore aria-hidden="true" size={18} stroke={1.8} />
-          Mi pulpería
-        </Link>
-        {hasSellerPresence ? (
-          <Link href="/mi-pulperia/solicitudes">Solicitudes</Link>
-        ) : null}
-        <Link href="/cuenta">Cuenta</Link>
-        {isOperator ? <Link href="/operacion/reportes">Operación</Link> : null}
         {email ? (
-          <form action={signOutAction}>
-            <button type="submit">Salir</button>
-          </form>
+          <>
+            <Link
+              href={hasSellerPresence ? "/mi-pulperia" : "/vender"}
+              className="seller-nav-link"
+            >
+              <IconBuildingStore aria-hidden="true" size={18} stroke={1.8} />
+              {hasSellerPresence ? "Mi negocio" : "Primera oferta"}
+            </Link>
+            {hasSellerPresence ? (
+              <Link href="/mi-pulperia/solicitudes">Solicitudes</Link>
+            ) : null}
+            <Link href="/cuenta">Cuenta</Link>
+            {isOperator ? <Link href="/operacion/reportes">Operación</Link> : null}
+            <form action={signOutAction}>
+              <button type="submit">Salir</button>
+            </form>
+          </>
         ) : (
-          <Link href="/ingresar">Ingresar</Link>
+          <Link href="/ingresar?next=%2Fvender">Ingresar para empezar</Link>
         )}
       </>
     );
@@ -88,7 +93,7 @@ function PrimaryNavigation({
       {email ? (
         <>
           <Link href={hasSellerPresence ? "/mi-pulperia" : "/vender"}>
-            {hasSellerPresence ? "Mi pulpería" : "Vender"}
+            {hasSellerPresence ? "Mi negocio" : "Ofrecer"}
           </Link>
           <Link href="/cuenta">Cuenta</Link>
           {isOperator ? <Link href="/operacion/reportes">Operación</Link> : null}
@@ -98,7 +103,7 @@ function PrimaryNavigation({
         </>
       ) : (
         <>
-          <Link href="/vender">Vender</Link>
+          <Link href="/vender">Ofrecer</Link>
           <Link href="/ingresar">Ingresar</Link>
         </>
       )}

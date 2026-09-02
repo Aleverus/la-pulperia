@@ -35,7 +35,6 @@ export async function updateSession(request: NextRequest) {
 
   if (
     (path.startsWith("/cuenta") ||
-      path.startsWith("/vender") ||
       path.startsWith("/mi-pulperia")) &&
     !user
   ) {

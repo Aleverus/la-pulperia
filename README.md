@@ -87,23 +87,18 @@ and Corte 5 instruments are implemented and verified locally. The same schema
 and 23 migrations are deployed to the isolated `la-pulperia-preview` Supabase
 project, but its app data, Auth users, sessions, and Storage objects are now
 deliberately empty for a clean human review; public execution of privileged
-functions is limited to the audited RPC surface. The workbook
-starts every research row as pending and keeps real copies under a Git-ignored
-local directory. Interviews, the 100-business census, the comparative audit
-with 20 real searches and field use still require separate evidence and owner
-judgment. A mobile visual direction has been accepted in the parent project
-canon and is implemented locally across the active product surfaces. The
-production build and the public search → offer → cart path were inspected at
-390 px; the visual comparison has no open P0–P2 findings. This is now a
-recoverable prelaunch checkpoint published primarily at
-`https://la-pulperia-hn.vercel.app`, with
-`https://la-pulperia-coral.vercel.app` retained as a transition fallback; both
-are explicitly excluded from search indexes. Google OAuth is connected in
-controlled test mode, Supabase Email auth is disabled, and a real Google session
-started on the new domain previously returned to the authenticated cart and
-account. That session, identity, profile, and every preview fixture were removed
-after verification, so the current runtime starts empty. Publication does not
-imply owner acceptance, launch, or field evidence.
+functions is limited to the audited RPC surface. The workbook starts every
+research row as pending and keeps real copies under a Git-ignored local
+directory. Interviews, the 100-business census, the comparative audit with 20
+real searches and field use still require separate evidence and owner judgment.
+
+That prelaunch receipt also recorded an accepted mobile visual direction, a
+public path inspected at 390 px, the two Vercel URLs, noindex protections, and a
+Google OAuth exercise that returned to cart and account before cleanup. It is
+historical evidence. The current remote data count, OAuth configuration and
+deployment state were not queried in this documentation pass; they must not be
+inferred as empty, connected or current from this README. Publication at the
+recorded date did not imply owner acceptance, launch or field evidence.
 
 ## Visual direction and local implementation
 
@@ -112,7 +107,7 @@ Their explorations, global styles, favicon, generated social image, PostCSS, and
 Tailwind tooling were removed.
 
 A later Corte 6 produced an accepted mobile direction after the v2 contract and
-repairs stabilized. Corte 7 now implements that direction on the real states:
+repairs stabilized. Corte 7 implements that direction on the real states:
 global tokens and typography, responsive navigation and forms, public search,
 real map, comparable offer cards, detail, cart, buyer surfaces and seller
 maintenance. Buyer account/history and seller operation have distinct navigation,
@@ -134,9 +129,18 @@ through search, offer detail, all four request contracts, a multi-seller cart,
 buyer account/history, and seller dashboard/settings/inbox at 320, 390, and
 1440 px. Existing cart requests survive reopening, query-only history keeps the
 search controls and mobile menu synchronized, and no P0–P2 visual finding remains.
-Ale has not yet accepted the executed result. Supabase and Vercel serve a public
-prelaunch from the GitHub `prelaunch` branch, but the human runtime acceptance
-and promotion of `main` remain separate.
+The Corte 7 receipt remains a recoverable technical baseline, not human
+acceptance. Ale authorized the parent project’s **Corte 7R — Vitrina pública y
+trabajo del vendedor** for local implementation. `/vender` now explains the
+work before authentication, the same account can return to buying, and the first
+offer starts as a versioned device-local draft that stays outside the catalog.
+The seller completes the business, verified WhatsApp and a deliberately chosen
+attention/fulfilment contract before publication; no location or generic
+fulfilment is assumed. Daily maintenance names the exact request or offer, links
+or submits directly to it, and states that freshness does not change price or
+record a sale. The parent plan and implementation contract remain authoritative.
+Supabase and Vercel serve a public prelaunch from the GitHub `prelaunch` branch,
+but human runtime acceptance and promotion of `main` remain separate.
 
 The parent `../AGENTS.md` requires every product, contract, route, status, or
 evidence change to update all related documentation in the same work. The
@@ -168,15 +172,25 @@ After the bug-repair plans 001–005 on 2026-08-30, the local tree passed:
   all 32 Playwright journeys passed in mobile and desktop, including Axe and
   query-history regressions. Authenticated buyer and seller flows were also
   observed manually at 390 and 1440 px. `git diff --check` remained clean.
-- the public OAuth exercise selected the authorized Google test account,
-  consented only to basic identity and email, returned to `/carrito`, exposed
-  the authenticated navigation, and opened `/cuenta`; the remote database
-  contains one Google identity with its application profile. Google is enabled
-  and Email is disabled in Supabase.
+- A prior Corte 7R receipt recorded ESLint, generated route types, TypeScript,
+  84 Vitest tests and 36 Playwright journeys in desktop/mobile Edge, plus visual
+  inspection at 320, 390 and 1440 px. It is historical evidence for that run,
+  not proof of the current unintegrated diff. On 31 August, this checkout again
+  passed ESLint, route types, TypeScript and 84 Vitest tests; Playwright could
+  not launch its browser (`spawn EPERM`). Build, database reset, pgTAP and schema
+  lint were not re-run in this documentation pass. Corte 7R adds no migration or
+  dependency and remains unintegrated until its required gates can be repeated.
+- A prior public OAuth exercise selected the authorized Google test account,
+  consented only to basic identity and email, returned to `/carrito`, exposed the
+  authenticated navigation and opened `/cuenta`. The parent context records a
+  subsequent cleanup, while an earlier version of this README claimed one identity
+  remained. This pass did not query Supabase, so the current remote record count
+  is unverified.
 
-This local receipt proves the technical contract and exercised flows. The
-separate prelaunch runtime check proves public deployment and remote data reads;
-neither proves commercial demand, legal readiness, field use, or visual
+The historical local receipt records the technical contract and exercised flows.
+The current pass verifies only lint, types and unit tests; its browser block is
+not a green E2E result. The separate prelaunch runtime check proves public
+deployment and remote data reads at its recorded date; neither proves commercial demand, legal readiness, field use, or visual
 acceptance.
 
 ## Run locally
@@ -218,11 +232,12 @@ pnpm test:e2e   # Playwright mobile and desktop journeys
 configured public source. The regional runtime artifact is versioned so Git-based
 deployments include the same map that was verified locally.
 
-The public prelaunch uses `PULPERIA_PRELAUNCH=true`, which emits `noindex` and
-blocks crawlers until owner launch. Google OAuth is restricted to test mode and
-the authorized test account; a production consent posture, custom domain,
-automated messages, spending, seller onboarding, and field research remain
-intentionally unconfigured.
+`PULPERIA_PRELAUNCH=true` makes this code emit `noindex` and block crawlers. A
+prelaunch receipt recorded Google OAuth in test mode for the authorized account;
+verify the deployed environment before treating that configuration as current.
+A production consent posture, custom domain, automated messages, spending,
+seller onboarding, and field research remain intentionally unconfigured in this
+project contract.
 
 ## Source status
 

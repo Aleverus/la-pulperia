@@ -18,9 +18,11 @@ import type { PresenceMode } from "@/lib/catalog";
 export function PresenceForm({
   presence,
   error,
+  continueToOffer = false,
 }: {
   presence: OwnedPresence | null;
   error?: string;
+  continueToOffer?: boolean;
 }) {
   const [mode, setMode] = useState<PresenceMode | null>(
     presence?.mode ?? null,
@@ -40,7 +42,7 @@ export function PresenceForm({
     presence?.whatsapp_verification_status === "verified" &&
     e164 === presence.whatsapp_e164;
   const probeHref = e164
-    ? waMeUrl(e164, whatsappProbeMessage(name || "esta pulpería"))
+    ? waMeUrl(e164, whatsappProbeMessage(name || "este negocio"))
     : null;
 
   function placePin(nextLat: number, nextLng: number, accuracyM?: number) {
@@ -80,7 +82,7 @@ export function PresenceForm({
 
   const pin =
     mode === "fixed_location" && lat !== null && lng !== null
-      ? [{ id: "draft", name: name || "Tu pulpería", lat, lng }]
+      ? [{ id: "draft", name: name || "Tu negocio", lat, lng }]
       : [];
   const hasPublishablePin =
     mode === "fixed_location" &&
@@ -96,7 +98,12 @@ export function PresenceForm({
   return (
     <form action={savePresenceAction} className="stack presence-form">
       <input type="hidden" name="presence_id" value={presence?.id ?? ""} />
-      <label htmlFor="presence-name">Nombre de la pulpería</label>
+      <input
+        type="hidden"
+        name="continue_to_offer"
+        value={continueToOffer ? "1" : ""}
+      />
+      <label htmlFor="presence-name">Nombre del negocio</label>
       <input
         id="presence-name"
         name="name"
@@ -193,9 +200,10 @@ export function PresenceForm({
           <input
             id="presence-coverage"
             name="coverage_label"
-            defaultValue={presence?.coverage_label ?? "Siguatepeque"}
+            defaultValue={presence?.coverage_label ?? ""}
             required
             maxLength={240}
+            placeholder="Ej. barrios del centro de Siguatepeque"
           />
         </>
       ) : null}
@@ -206,9 +214,10 @@ export function PresenceForm({
           <input
             id="presence-territory"
             name="service_territory"
-            defaultValue={presence?.service_territory ?? "Atención remota"}
+            defaultValue={presence?.service_territory ?? ""}
             required
             maxLength={240}
+            placeholder="Ej. Honduras, entrega digital"
           />
         </>
       ) : null}
@@ -240,7 +249,7 @@ export function PresenceForm({
       )}
       <p role="status">
         {whatsappVerified
-          ? "WhatsApp verificado para esta pulpería."
+          ? "WhatsApp verificado para este negocio."
           : "WhatsApp sin verificar. Podés guardar el borrador, pero no publicarlo hasta comprobar el control del número."}
       </p>
 
@@ -372,7 +381,7 @@ function PresenceSubmitButtons({ canPublish }: { canPublish: boolean }) {
       >
         {pending && pendingStatus === "published"
           ? "Publicando…"
-          : "Publicar pulpería"}
+          : "Publicar negocio"}
       </button>
       {!canPublish ? (
         <span id="presence-publish-help" className="field-hint">

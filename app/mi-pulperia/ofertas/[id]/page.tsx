@@ -53,6 +53,7 @@ export default async function EditarOfertaPage({
         media={media}
         error={error ?? undefined}
         notice={notice}
+        clearStarterDraft={query.starter === "cleared"}
       />
     </main>
   );

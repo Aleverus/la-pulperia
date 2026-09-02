@@ -1,11 +1,16 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export async function requireSession(nextPath: string) {
+export async function getSession() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  return { supabase, user };
+}
+
+export async function requireSession(nextPath: string) {
+  const { supabase, user } = await getSession();
   if (!user) {
     redirect(`/ingresar?next=${encodeURIComponent(nextPath)}`);
   }

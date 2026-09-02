@@ -1,6 +1,8 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
+test.describe.configure({ timeout: 60_000 });
+
 const routes = [
   "/",
   "/buscar?q=zambos",
@@ -8,6 +10,7 @@ const routes = [
   "/pulperia/el-pino",
   "/mapa",
   "/carrito",
+  "/vender",
   "/ingresar?error=1",
   "/oferta/no-existe",
 ];

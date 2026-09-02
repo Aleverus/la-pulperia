@@ -42,6 +42,7 @@ export default async function NuevaOfertaPage({
         offer={null}
         media={[]}
         error={error ?? undefined}
+        resumeStarterDraft={params.retomar === "1"}
       />
     </main>
   );

@@ -1,9 +1,27 @@
 import { expect, test } from "@playwright/test";
 
+test.describe.configure({ timeout: 60_000 });
+
 const TINY_PNG = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAEklEQVQImWO4Y6Nxx0aDAUIBACXeBQEgOSe0AAAAAElFTkSuQmCC",
   "base64",
 );
+
+test("seller entry explains the private first offer before authentication", async ({
+  page,
+}) => {
+  await page.goto("/vender");
+
+  await expect(
+    page.getByRole("heading", { name: "Volvé encontrable una oferta real." }),
+  ).toBeVisible();
+  await expect(page.getByText("No vas a construir una tienda")).toBeVisible();
+  await expect(page.getByText("La guardás en privado")).toBeVisible();
+  await expect(page.getByText("Tu conversación sigue en WhatsApp")).toBeVisible();
+  await expect(
+    page.getByRole("main").getByRole("link", { name: "Ingresar para empezar" }),
+  ).toHaveAttribute("href", "/ingresar?next=%2Fvender");
+});
 
 test("seller saves an unverified presence and manages a stock offer privately", async ({
   page,
@@ -19,8 +37,17 @@ test("seller saves an unverified presence and manages a stock offer privately", 
   await page.getByLabel("Contraseña para la cuenta nueva").fill("pulperia-local");
   await page.getByRole("button", { name: "Crear cuenta de prueba" }).click();
 
-  await expect(page.getByRole("heading", { name: "Abrir una pulpería" })).toBeVisible();
-  await page.getByLabel("Nombre de la pulpería").fill(presenceName);
+  await expect(page.getByRole("heading", { name: "Iniciá tu primera oferta" })).toBeVisible();
+  await page.getByLabel("¿Qué ofrecés?").fill(offerTitle);
+  await page
+    .getByLabel(/¿Qué necesita saber alguien para decidir/)
+    .fill("Café molido listo para retirar");
+  await page.reload();
+  await expect(page.getByLabel("¿Qué ofrecés?")).toHaveValue(offerTitle);
+  await expect(page.getByText("Borrador privado guardado")).toBeVisible();
+  await page.getByRole("button", { name: "Guardar y seguir con el negocio" }).click();
+
+  await page.getByLabel("Nombre del negocio").fill(presenceName);
   await page.getByLabel("WhatsApp", { exact: true }).fill("99993333");
   await page.getByRole("radio", { name: /Ubicación fija/ }).check();
   await page
@@ -33,15 +60,18 @@ test("seller saves an unverified presence and manages a stock offer privately", 
   );
   await expect(page.getByText(/WhatsApp sin verificar/)).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Publicar pulpería" }),
+    page.getByRole("button", { name: "Publicar negocio" }),
   ).toBeDisabled();
   await page.getByRole("button", { name: "Guardar borrador" }).click();
 
-  await expect(page.getByRole("heading", { name: "Mi pulpería" })).toBeVisible();
-  await page.getByRole("link", { name: "Crear oferta" }).click();
-  await page.getByLabel("Título").fill(offerTitle);
+  await expect(page.getByRole("heading", { name: "Nueva oferta" })).toBeVisible();
+  await expect(page.getByLabel("Título")).toHaveValue(offerTitle);
+  await expect(page.getByLabel("Descripción")).toHaveValue(
+    "Café molido listo para retirar",
+  );
   await page.getByLabel("Precio publicado (lempiras)").fill("45");
   await page.getByLabel("Unidad o periodo").fill("bolsa");
+  await page.getByRole("checkbox", { name: "Retiro" }).check();
   await page.getByRole("button", { name: "Guardar borrador" }).click();
 
   await expect(page.getByRole("heading", { name: "Editar oferta" })).toBeVisible();
@@ -94,9 +124,9 @@ test("seller saves an unverified presence and manages a stock offer privately", 
   const secondPresenceName = `Repartos La Esquina ${suffix}`;
   await page.goto("/vender");
   await expect(
-    page.getByRole("heading", { name: "Abrir otra pulpería" }),
+    page.getByRole("heading", { name: "Ofrecé algo nuevo" }),
   ).toBeVisible();
-  await page.getByLabel("Nombre de la pulpería").fill(secondPresenceName);
+  await page.getByLabel("Nombre del negocio").fill(secondPresenceName);
   await page.getByLabel("WhatsApp", { exact: true }).fill("99994445");
   await page.getByRole("radio", { name: /Atención móvil/ }).check();
   await page
@@ -104,12 +134,12 @@ test("seller saves an unverified presence and manages a stock offer privately", 
     .fill("Siguatepeque urbano");
   await page.getByRole("button", { name: "Guardar borrador" }).click();
 
-  await expect(page.getByLabel("Nombre de la pulpería")).toHaveValue(
+  await expect(page.getByLabel("Nombre del negocio")).toHaveValue(
     secondPresenceName,
   );
-  await page.getByLabel("Pulpería activa").selectOption({ label: presenceName });
+  await page.getByLabel("Negocio activo").selectOption({ label: presenceName });
   await page.getByRole("button", { name: "Cambiar" }).click();
-  await expect(page.getByLabel("Nombre de la pulpería")).toHaveValue(
+  await expect(page.getByLabel("Nombre del negocio")).toHaveValue(
     presenceName,
   );
 });
@@ -124,7 +154,7 @@ test("fixture owner switches mobile and remote presences without mixing offers",
     .fill("pulperia-local");
   await page.getByRole("button", { name: "Ingresar" }).click();
 
-  await expect(page.getByLabel("Nombre de la pulpería")).toHaveValue(
+  await expect(page.getByLabel("Nombre del negocio")).toHaveValue(
     "La Canasta Móvil",
   );
   await expect(page.getByRole("link", { name: "Pan por encargo" })).toBeVisible();
@@ -133,11 +163,11 @@ test("fixture owner switches mobile and remote presences without mixing offers",
   ).toHaveCount(0);
 
   await page
-    .getByLabel("Pulpería activa")
+    .getByLabel("Negocio activo")
     .selectOption({ label: "Diseño Remoto Siguatepeque" });
   await page.getByRole("button", { name: "Cambiar" }).click();
 
-  await expect(page.getByLabel("Nombre de la pulpería")).toHaveValue(
+  await expect(page.getByLabel("Nombre del negocio")).toHaveValue(
     "Diseño Remoto Siguatepeque",
   );
   await expect(
@@ -148,10 +178,49 @@ test("fixture owner switches mobile and remote presences without mixing offers",
   await page.goto(
     "/mi-pulperia?presence=10000000-0000-0000-0000-999999999999",
   );
-  await expect(page.getByLabel("Nombre de la pulpería")).toHaveValue(
+  await expect(page.getByLabel("Nombre del negocio")).toHaveValue(
     "La Canasta Móvil",
   );
   await expect(page.getByText("Pulpería El Pino")).toHaveCount(0);
+});
+
+test("daily freshness task targets the exact offer and reports its boundary", async ({
+  page,
+}) => {
+  const offerTitle = "Queso seco";
+  const offerId = "10000000-0000-0000-0000-000000000023";
+  await page.goto("/ingresar?next=/mi-pulperia");
+  await page.getByLabel("Correo", { exact: true }).fill("canasta@local.test");
+  await page
+    .getByLabel("Contraseña", { exact: true })
+    .fill("pulperia-local");
+  await page.getByRole("button", { name: "Ingresar" }).click();
+
+  const task = page.getByRole("listitem").filter({
+    has: page.getByText(`Reconfirmá ${offerTitle}`, { exact: true }),
+  });
+  await expect(task).toContainText("no cambia precio ni registra una venta");
+  await expect(
+    task.getByRole("button", { name: "Reconfirmar esta oferta" }),
+  ).toBeVisible();
+  await expect(task.locator('input[name="offer_id"]')).toHaveValue(offerId);
+
+  const presenceId = new URL(page.url()).searchParams.get("presence");
+  await page.goto(
+    `/mi-pulperia?presence=${presenceId}&ok=fresh&offer=${offerId}`,
+  );
+  await expect(page.getByRole("status")).toContainText(
+    `Vigencia de ${offerTitle} confirmada`,
+  );
+  await expect(
+    page.locator('a[href*="/mi-pulperia/ofertas/nueva"]'),
+  ).toHaveCount(1);
+  await page.getByRole("link", { name: "Volver a comprar" }).click();
+  await expect(page).toHaveURL(/\/buscar$/);
+  if (await page.locator(".nav-menu summary").isVisible()) {
+    await page.locator(".nav-menu summary").click();
+  }
+  await expect(page.getByRole("link", { name: "Mi negocio" })).toBeVisible();
 });
 
 test("seller maintains food, service, and digital offers through the class-aware flow", async ({
@@ -170,29 +239,29 @@ test("seller maintains food, service, and digital offers through the class-aware
   await page.getByLabel("Contraseña para la cuenta nueva").fill("pulperia-local");
   await page.getByRole("button", { name: "Crear cuenta de prueba" }).click();
 
-  await page.getByLabel("Nombre de la pulpería").fill(`Negocio móvil ${suffix}`);
+  await page.getByRole("radio", { name: /Comida o encargo/ }).check();
+  await page.getByLabel("¿Qué ofrecés?").fill(foodTitle);
+  await page.getByRole("button", { name: "Guardar y seguir con el negocio" }).click();
+  await page.getByLabel("Nombre del negocio").fill(`Negocio móvil ${suffix}`);
   await page.getByLabel("WhatsApp", { exact: true }).fill("99994444");
   await page.getByRole("radio", { name: /Atención móvil/ }).check();
   await page
     .getByRole("textbox", { name: "Cobertura declarada" })
     .fill("Siguatepeque urbano");
   await expect(
-    page.getByRole("button", { name: "Publicar pulpería" }),
+    page.getByRole("button", { name: "Publicar negocio" }),
   ).toBeDisabled();
   await page.getByRole("button", { name: "Guardar borrador" }).click();
 
-  await page.getByRole("link", { name: "Crear oferta" }).click();
-  await expect(page.getByLabel("Nota de existencias (opcional)")).toBeVisible();
-  await expect(page.getByLabel("Inicio de la ventana")).toHaveCount(0);
-  await page.getByRole("radio", { name: /Comida o encargo/ }).check();
+  await expect(page.getByLabel("Título")).toHaveValue(foodTitle);
   await expect(page.getByLabel("Nota de existencias (opcional)")).toHaveCount(0);
   await expect(page.getByRole("checkbox", { name: "Cita" })).toHaveCount(0);
-  await page.getByLabel("Título").fill(foodTitle);
   await page.getByLabel("Precio publicado (lempiras)").fill("18");
   await page.getByLabel("Unidad o periodo").fill("unidad");
   await page.getByLabel("Inicio de la ventana").fill("2030-04-12T14:00");
   await page.getByLabel("Fin de la ventana").fill("2030-04-12T18:00");
   await page.getByLabel("Fecha de corte (opcional)").fill("2030-04-12T12:00");
+  await page.getByRole("checkbox", { name: "Retiro" }).check();
   await page.getByRole("button", { name: "Crear y publicar" }).click();
 
   await expect(page.getByRole("heading", { name: "Editar oferta" })).toBeVisible();

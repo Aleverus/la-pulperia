@@ -14,6 +14,7 @@ export default async function IngresarPage({
 }: PageProps<"/ingresar">) {
   const params = await searchParams;
   const next = typeof params.next === "string" ? params.next : "/carrito";
+  const sellerEntry = next === "/vender" || next.startsWith("/mi-pulperia");
   const errored = params.error === "1";
   const signupFailed = params.error === "signup";
   const oauthFailed = params.error === "oauth";
@@ -21,8 +22,17 @@ export default async function IngresarPage({
 
   return (
     <main className="detail-page auth-page">
-      <p className="eyebrow">Acceso seguro</p>
-      <h1>Ingresar</h1>
+      <p className="eyebrow">
+        {sellerEntry ? "Tu oferta sigue privada" : "Acceso seguro"}
+      </p>
+      <h1>{sellerEntry ? "Ingresá para empezar a ofrecer" : "Ingresar"}</h1>
+      {sellerEntry ? (
+        <p>
+          Después volvés a tu primera oferta. El negocio, cómo atendés y el
+          WhatsApp verificado se completan antes de publicar, no para mirar la
+          vitrina ni para empezar el borrador.
+        </p>
+      ) : null}
       {testAuthEnabled ? (
         <>
           <p>
@@ -109,7 +119,7 @@ export default async function IngresarPage({
             <h2>Continuar con Google</h2>
             <p>
               Usá tu cuenta de Google para guardar el carrito, revisar pedidos
-              o abrir y mantener tu pulpería.
+              o iniciar y mantener ofertas con la misma identidad.
             </p>
             {oauthFailed ? (
               <p className="field-hint is-error" role="alert">

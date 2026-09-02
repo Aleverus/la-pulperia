@@ -2,6 +2,7 @@
 
 ## Alcance y fuente
 
+- Dirección de experiencia: `../Obra/DESIGN.md`.
 - Fuente seleccionada: `../Obra/Referencias visuales/direccion-visual-base-movil-aprobada-2026-08-30.png`.
 - Estado comparado: búsqueda de `queso`, dos resultados, una presencia fija y una móvil.
 - Viewport de referencia: 390 × 844 CSS px. La captura del navegador mide 375 px de ancho útil porque excluye la barra de desplazamiento.
@@ -45,12 +46,26 @@
 
 No quedan hallazgos P0, P1 o P2 abiertos. Las diferencias P3 son conscientes, reversibles y no impiden evaluar esta dirección sobre el producto real.
 
+## Estado de evidencia
+
+Este documento conserva recibos visuales fechados. El 31 de agosto la pasada de
+realidad de Corte 7R volvió a pasar lint, tipos y 84 pruebas unitarias, pero no
+pudo relanzar Playwright porque el entorno bloqueó el navegador con `spawn
+EPERM`. Por eso ningún “passed” histórico de este archivo es una aceptación
+actual del diff sin integrar; la fuente visual aprobada en `Obra/` sí es la
+referencia que se conserva.
+
 ## Extensión operativa de dueña — 30 de agosto de 2026
 
 - Fuente visual: `../Obra/Referencias visuales/direccion-visual-base-movil-aprobada-2026-08-30.png`.
-- Implementación: `test-results/seller-ux-2026-08-30/seller-dashboard-390.png` (375 × 1829 px) y `test-results/seller-ux-2026-08-30/seller-offer-form-390.png` (375 × 2701 px), ambas capturadas desde el runtime local autenticado.
+- Implementación: el recibo histórico observó panel y formulario autenticados a
+  390 px. Sus exportaciones temporales de `test-results/` no se retienen como
+  fuente de verdad; la referencia aprobada y los checks fechados sí.
 - Viewport y densidad: 390 × 844 CSS px, factor 1; el navegador entrega 375 px útiles en las capturas por la barra de desplazamiento.
-- Comparación de una sola entrada: `test-results/seller-ux-2026-08-30/comparison-base-dashboard-390.png` (750 × 844 px) coloca la fuente normalizada a 375 × 844 a la izquierda y el primer viewport del panel a la derecha. La fuente sólo define el sistema visual público; no existe un mockup aprobado del mismo estado vendedor, por lo que no se reclama paridad de contenido.
+- Comparación de una sola entrada: el recibo histórico comparó la fuente
+  normalizada a 375 × 844 con el primer viewport del panel. La fuente sólo define
+  el sistema visual público; no existe un mockup aprobado del mismo estado
+  vendedor, por lo que no se reclama paridad de contenido.
 - Regiones revisadas: cabecera, jerarquía tipográfica, chips de estado, tarjetas de atención, CTA y borde/radio/sombra en la comparación conjunta; el formulario completo verifica la lectura de opciones de clase, campos, controles, vista previa y acciones de publicación. No hizo falta un recorte adicional porque esos controles quedan legibles a escala 1:1 en las capturas.
 
 **Hallazgos y resolución**
@@ -66,7 +81,39 @@ No quedan hallazgos P0, P1 o P2 abiertos. Las diferencias P3 son conscientes, re
 - Ritmo y layout: márgenes, bordes finos, radios contenidos y superficies cálidas siguen la base; las tarjetas de prioridad jerarquizan una sola tarea sin convertirse en un dashboard genérico.
 - Color e iconos: marfil, pino, maíz y estados semánticos reutilizan tokens existentes; los iconos son Tabler reales y no arte CSS ni SVG artesanal.
 - Activos y contenido: no se inventan fotos ni pins; el preview y la bandeja describen información que la plataforma sí conoce, y mantienen la frontera de WhatsApp.
-- Accesibilidad y respuesta: los controles conservan etiquetas semánticas; `pnpm test:e2e` pasa Axe y el reflow móvil, y la inspección local no observó desborde horizontal.
-- Interacción nueva: desde el panel a 390 px, `Reconfirmar` volvió a `/mi-pulperia?ok=fresh`, mostró el estado de éxito y movió la oferta a vigencia reciente; la captura posterior está en `test-results/seller-ux-2026-08-30/seller-dashboard-confirmed-390.png`.
+- Accesibilidad y respuesta: el recibo histórico registró Axe y reflow móvil sin
+  desborde. La repetición E2E de 31 de agosto está bloqueada por el navegador del
+  entorno, por lo que ese resultado debe repetirse antes de integrar el diff.
+- Interacción nueva: el recibo observó que `Reconfirmar` volvió a
+  `/mi-pulperia?ok=fresh`, mostró éxito y actualizó vigencia sin cambiar los
+  hechos publicados. La captura temporal ya no se conserva.
 
 Final result: passed
+
+## Corte 7R — vitrina pública y trabajo del vendedor — 31 de agosto de 2026
+
+- Superficies observadas: entrada pública `/vender` sin sesión y panel autenticado
+  `/mi-pulperia` de La Canasta Móvil.
+- Viewports: 320 × 900, 390 × 900 y 1440 × 1000 CSS px; las seis capturas completas
+  están en `.codex-work/corte-7r/public-{320,390,1440}.png` y
+  `.codex-work/corte-7r/seller-{320,390,1440}.png`.
+- Fuente de dirección: la base móvil aprobada de Corte 6 citada al inicio de este
+  documento. Corte 7R conserva sus tokens, tipografía, densidad y jerarquía sin
+  reclamar paridad de contenido con un mockup vendedor inexistente.
+- Entrada pública: explica oferta privada, publicación contextual y frontera de
+  WhatsApp antes de pedir autenticación. En escritorio y móvil mantiene una sola
+  acción primaria y una salida inequívoca a la vitrina.
+- Trabajo del vendedor: abre con tareas exactas de vigencia, cada una con la oferta
+  nombrada, mecanismo directo y límite de la señal; `Crear oferta` aparece una sola
+  vez fuera de la lista de tareas y `Volver a comprar` conserva la misma cuenta.
+- Respuesta e integridad visual: las seis superficies quedaron sin desborde
+  horizontal; la captura automatizada no observó respuestas HTTP fallidas, errores
+  de página ni overlays del producto. Se ocultó únicamente el indicador inyectado
+  por `next dev`, que no forma parte del runtime de producción.
+- Cobertura navegada: el E2E verifica además borrador local recuperable a través de
+  recarga y alta del negocio, ausencia de cumplimiento preseleccionado, etiquetas
+  no sectoriales, navegación compra/oferta y la tarea exacta de vigencia.
+
+No quedan hallazgos visuales P0, P1 o P2 en las superficies y viewports observados.
+La aceptación visual de Ale y la verificación en un build de producción siguen
+siendo estados separados.

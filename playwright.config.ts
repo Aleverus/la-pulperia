@@ -2,6 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 const port = 3001;
 const baseURL = `http://127.0.0.1:${port}`;
+const executablePath = process.env.PLAYWRIGHT_EXECUTABLE_PATH;
 
 export default defineConfig({
   testDir: "e2e",
@@ -13,6 +14,9 @@ export default defineConfig({
   use: {
     baseURL,
     trace: "on-first-retry",
+    ...(executablePath
+      ? { launchOptions: { executablePath } }
+      : {}),
   },
   webServer: {
     command: process.env.CI ? "pnpm start" : "pnpm dev",
