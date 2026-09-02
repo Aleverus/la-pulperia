@@ -1,5 +1,5 @@
+import Image from "next/image";
 import Link from "next/link";
-import { IconChristmasTreeFilled } from "@tabler/icons-react";
 import { HeaderNavigation } from "@/app/_components/HeaderNavigation";
 import { hasPublicSupabaseEnv } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
@@ -27,10 +27,25 @@ export async function Header() {
   return (
     <header className="site-header">
       <div className="site-header__inner">
-        <Link href="/" className="mark">
-          <IconChristmasTreeFilled aria-hidden="true" size={42} stroke={1.7} />
-          <span>
-            <strong>La Pulpería</strong>
+        <Link href="/" className="mark" aria-label="La Pulpería, inicio">
+          <Image
+            className="mark__monogram"
+            src="/brand/la-pulperia-monogram.png"
+            alt=""
+            aria-hidden="true"
+            width={112}
+            height={112}
+            priority
+          />
+          <span className="mark__identity">
+            <Image
+              className="mark__wordmark"
+              src="/brand/la-pulperia-wordmark.png"
+              alt="La Pulpería"
+              width={328}
+              height={160}
+              priority
+            />
             <small>Siguatepeque</small>
           </span>
         </Link>

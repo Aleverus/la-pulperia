@@ -115,6 +115,18 @@ hierarchy, empty/error states, progressive disclosure, and action feedback.
 Missing seller media uses an explicit class fallback rather than inventing a
 product photo.
 
+On 2026-09-01 Ale selected a replacement identity direction in the parent
+project: a hand-painted-sign wordmark and an `LP` monogram whose `P` contains a
+barred service window, using warm ivory, weathered cobalt and faded brick red.
+That selection is documented in `../Obra/DESIGN.md` and is now the only
+authorized direction. The three derived mobile images are closed studies, not
+competing references. Corte 7V is implemented locally: real brand assets,
+Alegreya + Fira Sans Condensed, canonical color tokens, and the new responsive
+system now cover the public journey, cart and identity, seller work, operation,
+loading, empty and error states. Browser inspection covered public, buyer and
+seller surfaces at 390/1440 px and the existing 320 px reflow receipt; no visual
+P0–P2 remains. This is technical and visual QA, not Ale's runtime acceptance.
+
 The seller operation now prioritizes requests, freshness, and inactive offers;
 offers can be reconfirmed from the dashboard without altering their published
 facts. Seller navigation keeps the buying cart out of the operating context,
@@ -174,12 +186,19 @@ After the bug-repair plans 001–005 on 2026-08-30, the local tree passed:
   observed manually at 390 and 1440 px. `git diff --check` remained clean.
 - A prior Corte 7R receipt recorded ESLint, generated route types, TypeScript,
   84 Vitest tests and 36 Playwright journeys in desktop/mobile Edge, plus visual
-  inspection at 320, 390 and 1440 px. It is historical evidence for that run,
-  not proof of the current unintegrated diff. On 31 August, this checkout again
-  passed ESLint, route types, TypeScript and 84 Vitest tests; Playwright could
-  not launch its browser (`spawn EPERM`). Build, database reset, pgTAP and schema
-  lint were not re-run in this documentation pass. Corte 7R adds no migration or
-  dependency and remains unintegrated until its required gates can be repeated.
+  inspection at 320, 390 and 1440 px. It is historical evidence for that run.
+  On 2026-09-01 the checkout was clean on `main` at
+  `a6d375f16da4618bd57d9a6068d0d41d457743f7`, with local `origin/main` and
+  `origin/HEAD` refs at the same commit. This visual-design pass did not fetch or
+  rerun lint, types, tests, build, database gates or E2E, so current verification
+  and remote/deployment state remain unverified.
+- The 2026-09-02 Corte 7V receipt rebuilt the local database and passed all 239
+  pgTAP checks, schema lint, ESLint, generated route types, TypeScript, 84 Vitest
+  tests, the production build, dependency audit and `git diff --check`. The
+  current reference/runtime comparison covers public and seller work with no
+  visual P0–P2. The 36-test Playwright retry remains environmentally blocked:
+  the sandbox could not spawn Chromium and Docker Desktop then lost its Linux
+  engine before a clean out-of-sandbox repetition. It is not reported as green.
 - A prior public OAuth exercise selected the authorized Google test account,
   consented only to basic identity and email, returned to `/carrito`, exposed the
   authenticated navigation and opened `/cuenta`. The parent context records a
@@ -188,10 +207,10 @@ After the bug-repair plans 001–005 on 2026-08-30, the local tree passed:
   is unverified.
 
 The historical local receipt records the technical contract and exercised flows.
-The current pass verifies only lint, types and unit tests; its browser block is
-not a green E2E result. The separate prelaunch runtime check proves public
-deployment and remote data reads at its recorded date; neither proves commercial demand, legal readiness, field use, or visual
-acceptance.
+The current pass verifies the gates named above and the observed browser
+surfaces; it does not claim a green E2E run. The separate prelaunch runtime check
+proves public deployment and remote data reads at its recorded date; neither
+proves commercial demand, legal readiness, field use, or visual acceptance.
 
 ## Run locally
 

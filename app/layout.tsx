@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fira_Sans_Condensed } from "next/font/google";
+import { Alegreya, Fira_Sans_Condensed } from "next/font/google";
 import { Header } from "@/app/_components/Header";
 import { prelaunchMode } from "@/lib/env";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_ORIGIN } from "@/lib/site";
@@ -11,6 +11,12 @@ const pulperiaSans = Fira_Sans_Condensed({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-pulperia-sans",
+});
+
+const pulperiaDisplay = Alegreya({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-pulperia-display",
 });
 
 export const metadata: Metadata = {
@@ -38,7 +44,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="es"
-      className={pulperiaSans.variable}
+      className={`${pulperiaSans.variable} ${pulperiaDisplay.variable}`}
       data-scroll-behavior="smooth"
     >
       <body>

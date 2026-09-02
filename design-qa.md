@@ -1,8 +1,89 @@
-# Design QA — base visual de La Pulpería
+# Design QA — Corte 7V
+
+## Resultado vigente — sistema completo
+
+- Fuente visual: `../Obra/Referencias visuales/logo-rotulo-hondureno-seleccionado-2026-09-01.png`.
+- Comparación conjunta: `.codex-work/design-qa/7v4-reference-public-seller.png`; reúne el rótulo elegido, portada pública y panel de dueña en el mismo insumo de revisión.
+- Superficies observadas con datos locales: portada, búsqueda, tarjetas, carrito multi-vendedor, ingreso, panel de dueña y oferta nueva. Se revisaron 390 y 1440 px; la cabecera y el reflow mínimo conservan la evidencia previa de 320 px.
+- Resultado responsive: las superficies observadas conservaron `scrollWidth <= innerWidth`; navegación de compra y modo vendedor permanecen separadas y el menú móvil conserva su control accesible.
+- Resultado visual: la misma pareja Alegreya/Fira Sans Condensed, marfil/cobalto/ladrillo, divisores, foco, estados, radios contenidos y activos reales gobierna recorrido público, comprador, vendedor y operación. El verde queda reservado a disponibilidad o publicación positiva.
+- Verdad de catálogo: la interfaz conserva media real cuando existe y fallback explícito por clase; no inventa fotos, pines, stock, venta, pago ni entrega.
+
+### Gates del 2 de septiembre de 2026
+
+- base local reconstruida desde migraciones y semilla; 239 pgTAP pasaron;
+- lint del esquema `public` sin errores;
+- ESLint, tipos y 84 unitarias pasaron;
+- build de producción pasó y la auditoría de dependencias de producción no encontró vulnerabilidades conocidas;
+- `git diff --check` pasó después del último cambio visual.
+
+La suite de 36 recorridos Playwright no queda verde en este recibo. Dentro del
+sandbox, Chromium no pudo abrir por `spawn EPERM`. Fuera del sandbox, una primera
+corrida encontró el servidor dev inconsistente porque un build había reutilizado
+su `.next` mientras seguía vivo: 4 casos pasaron y 32 entraron al límite global.
+Al preparar la repetición limpia, Docker Desktop cerró su motor y dejó bloqueado
+su socket interno; sin el Supabase local no se puede atribuir una nueva corrida
+al runtime. Este bloqueo de entorno no se convierte en un fallo de producto ni
+hereda el verde histórico.
+
+La revisión conjunta de referencia e implementación no deja hallazgos visuales
+P0, P1 o P2 en las superficies observadas. La aceptación humana de Ale y el E2E
+completo siguen siendo estados separados.
+
+final result: passed
+
+---
+
+## Recibo de fundación — Corte 7V-0
+
+## Resultado vigente — activos, tokens, tipografía y cabecera
+
+- Fuente visual: `../Obra/Referencias visuales/logo-rotulo-hondureno-seleccionado-2026-09-01.png` (1536 × 1024 px).
+- Implementación principal: `test-results/design-qa/7v0-header-390.png` (390 × 844 px, viewport CSS 390 × 844, `deviceScaleFactor: 1`).
+- Breakpoints adicionales: `test-results/design-qa/7v0-header-320.png` (320 × 760 px) y `test-results/design-qa/7v0-header-1440.png` (1440 × 900 px).
+- Estado: cabecera pública sin sesión; menú móvil cerrado y abierto. El cuerpo muestra el límite global de error porque Docker/Supabase local no estaba disponible; esa condición no altera la superficie evaluada en 7V-0.
+- Comparación conjunta: `test-results/design-qa/7v0-reference-vs-header-390.png` (800 × 450 px). Confronta en una sola imagen el monograma/wordmark de la lámina y su uso real en cabecera.
+- Comparación enfocada: activos a 24 px en color, una tinta e inversión en `test-results/design-qa/7v0-monogram-24.png`, `7v0-monogram-one-ink-24.png` y `7v0-monogram-inverse-24.png`.
+
+### Superficies de fidelidad
+
+- **Tipografía:** Alegreya gobierna titulares editoriales y Fira Sans Condensed conserva texto, controles, cifras, precios, `ñ` y tildes. El navegador observó ambas fuentes autoalojadas en el build de producción.
+- **Espaciado y composición:** la cabecera no desborda a 320, 390 ni 1440 px. A 320 px el monograma y wordmark ocupan 140 px, las acciones 148 px y el documento conserva `scrollWidth = 320`; a 1440 px reaparece la navegación completa y se oculta el menú móvil.
+- **Color y tokens:** marfil `#FBF5E8`, cobalto `#073B65`, ladrillo `#A53A31`, tinta `#172833` y verde `#3F7A36` sustituyen los tokens de pino/maíz. Sus contrastes sobre marfil son 10.61:1, 5.95:1, 13.93:1 y 4.77:1 respectivamente; la inversión marfil/cobalto mide 11.33:1.
+- **Activos:** el header usa recortes reproducibles de la fuente elegida, no una fuente aproximada ni un dibujo de CSS. Existen monograma y wordmark a color, una tinta e inversión; `icon.png`, `apple-icon.png` y `opengraph-image.png` salen de la misma lámina.
+- **Contenido:** se conserva el nombre `La Pulpería`, la localidad `Siguatepeque`, carrito, navegación de compra y menú de vendedor sin alterar el contrato de producto.
+
+### Historial de comparación de 7V-0
+
+| Iteración | Severidad | Hallazgo | Corrección y evidencia posterior |
+| --- | --- | --- | --- |
+| 1 | P2 | Los primeros recortes conservaban separadores verticales y velo marfil de la lámina. | Se acotaron los crops y se endureció la máscara de transparencia; la comparación conjunta ya muestra sólo monograma y wordmark. |
+| 1 | P2 | La variante una tinta derivada del monograma a color perdía claridad a 24 px. | Se tomó la variante monocroma dibujada en la propia lámina; color, una tinta e inversión conservan `LP`, ventanita y mostrador a 24 px. |
+| 2 | P2 | Faltaba evidencia del menú en el breakpoint mínimo. | `test-results/design-qa/7v0-menu-320.png` comprueba apertura, foco visible, ancho de 296 px y ausencia de desborde. |
+
+### Interacciones y consola
+
+- El enlace de marca conserva un nombre accesible y vuelve a inicio.
+- El carrito y la navegación autenticada/no autenticada conservan sus rutas y texto.
+- El menú móvil abre, recibe foco visible, muestra Buscar/Mapa/Ofrecer/Ingresar y cierra mediante el mismo control.
+- La consola registró un error React al entrar al límite global de error por `ECONNREFUSED 127.0.0.1:54321`; es el bloqueo local de Supabase ya observado, no un error introducido por la cabecera. Lint, tipos, unitarias y build de producción sí se ejecutaron sobre este diff.
+
+No quedaron diferencias P0, P1 o P2 en el alcance 7V-0. El resultado vigente de
+este documento reemplaza su límite para 7V-1–7V-4 sin reescribir el recibo
+histórico de la fundación.
+
+final result: passed
+
+---
+
+## Recibo histórico — base visual de Corte 7
+
+Este bloque conserva la verificación fechada de la dirección anterior. No valida
+por anticipado el rediseño de Corte 7V.
 
 ## Alcance y fuente
 
-- Dirección de experiencia: `../Obra/DESIGN.md`.
+- Autoridad visual actual y relación con este recibo: `../Obra/DESIGN.md`.
 - Fuente seleccionada: `../Obra/Referencias visuales/direccion-visual-base-movil-aprobada-2026-08-30.png`.
 - Estado comparado: búsqueda de `queso`, dos resultados, una presencia fija y una móvil.
 - Viewport de referencia: 390 × 844 CSS px. La captura del navegador mide 375 px de ancho útil porque excluye la barra de desplazamiento.
