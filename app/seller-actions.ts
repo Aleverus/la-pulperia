@@ -90,6 +90,28 @@ export async function savePresenceAction(formData: FormData) {
   redirect(sellerUrl("/mi-pulperia", savedPresenceId));
 }
 
+export async function confirmWhatsappOwnershipAction(formData: FormData) {
+  const presence = await requireOwnedPresenceFromForm(formData);
+  const { supabase } = await requireSession("/mi-pulperia");
+  const { data, error } = await supabase.rpc("confirm_owned_whatsapp", {
+    p_presence_id: presence.id,
+  });
+
+  if (error || data !== true) {
+    redirect(
+      sellerUrl("/mi-pulperia", presence.id, {
+        error: "verification_confirm",
+      }),
+    );
+  }
+
+  redirect(
+    sellerUrl("/mi-pulperia", presence.id, {
+      ok: "whatsapp",
+    }),
+  );
+}
+
 export async function saveOfferAction(formData: FormData) {
   const presence = await requireOwnedPresenceFromForm(formData);
   const { supabase } = await requireSession("/mi-pulperia");

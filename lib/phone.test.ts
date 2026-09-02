@@ -28,7 +28,8 @@ describe("normalizeWhatsapp", () => {
 describe("whatsappProbeMessage", () => {
   it("does not claim the number is verified", () => {
     const text = whatsappProbeMessage("Pulpería La Esquina");
-    expect(text).toMatch(/no verifica/);
+    expect(text).toMatch(/volvé a La Pulpería y confirmalo/);
+    expect(text).toMatch(/no lee este chat/);
     expect(text.toLowerCase()).not.toMatch(/verificado/);
   });
 });

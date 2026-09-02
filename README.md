@@ -151,8 +151,8 @@ acceptance. Ale authorized the parent project’s **Corte 7R — Vitrina públic
 trabajo del vendedor** for local implementation. `/vender` now explains the
 work before authentication, the same account can return to buying, and the first
 offer starts as a versioned device-local draft that stays outside the catalog.
-The seller completes the business, verified WhatsApp and a deliberately chosen
-attention/fulfilment contract before publication; no location or generic
+The seller completes the business, owner-confirmed WhatsApp and a deliberately
+chosen attention/fulfilment contract before publication; no location or generic
 fulfilment is assumed. Daily maintenance names the exact request or offer, links
 or submits directly to it, and states that freshness does not change price or
 record a sale. The parent plan and implementation contract remain authoritative.
@@ -168,6 +168,15 @@ authenticated seller flow, Axe, responsive inspection and Ale's acceptance
 remain pending. This Vercel target is the private testing runtime, stays outside
 search indexes and is not the official launch. Remote Supabase application data
 was reset and verified empty on 2026-09-02.
+
+The WhatsApp publication gate now uses an explicit two-step owner confirmation:
+send the test message to the saved destination, then return and confirm that it
+arrived. La Pulpería cannot read the chat or detect a `wa.me` send and does not
+claim otherwise. The additive RPC is restricted to authenticated callers and
+updates only the caller's own seller presence. Locally, ESLint, types, 86 unit
+tests, the production build and `git diff --check` passed; local pgTAP remained
+blocked because Docker/Postgres was unavailable. Publication and live owner
+confirmation are recorded separately from this implementation state.
 
 The parent `../AGENTS.md` requires every product, contract, route, status, or
 evidence change to update all related documentation in the same work. The

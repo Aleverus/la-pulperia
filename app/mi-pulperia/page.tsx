@@ -80,6 +80,7 @@ export default async function MiPulperiaPage({
     params.ok === "fresh" && typeof params.offer === "string"
       ? offers.find((offer) => offer.id === params.offer)
       : null;
+  const whatsappConfirmed = params.ok === "whatsapp";
 
   return (
     <main className="detail-page seller-dashboard">
@@ -106,8 +107,8 @@ export default async function MiPulperiaPage({
         <span>{PRESENCE_MODE_LABEL[presence.mode]}</span>
         <span>
           {presence.whatsapp_verification_status === "verified"
-            ? "WhatsApp verificado"
-            : "WhatsApp sin verificar"}
+            ? "WhatsApp confirmado"
+            : "WhatsApp pendiente"}
         </span>
         {presence.status === "published" ? (
           <Link href={`/pulperia/${presence.slug}`}>
@@ -127,6 +128,13 @@ export default async function MiPulperiaPage({
         <p role="status">
           Vigencia de <strong>{confirmedOffer.title}</strong> confirmada. No se
           modificaron precio, contenido ni una venta.
+        </p>
+      ) : null}
+
+      {whatsappConfirmed ? (
+        <p role="status">
+          WhatsApp confirmado. Ya podés publicar el negocio cuando los demás
+          datos estén completos.
         </p>
       ) : null}
 

@@ -1,5 +1,5 @@
 begin;
-select plan(9);
+select plan(12);
 
 select is(
   (
@@ -81,6 +81,30 @@ select is(
   ),
   'unverified',
   'the owner RPC exposes the explicit verification state'
+);
+
+select is(
+  public.confirm_owned_whatsapp(
+    (select id from public.seller_presences where owner_id = auth.uid())
+  ),
+  true,
+  'the authenticated owner can confirm the saved WhatsApp destination'
+);
+
+select is(
+  (
+    select whatsapp_verification_status::text
+    from public.seller_presences
+    where owner_id = auth.uid()
+  ),
+  'verified',
+  'owner confirmation records the verification gate'
+);
+
+select is(
+  public.confirm_owned_whatsapp('10000000-0000-0000-0000-000000000010'),
+  false,
+  'an owner cannot confirm another presence'
 );
 
 reset role;

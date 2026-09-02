@@ -96,6 +96,8 @@ const FORM_ERRORS: Record<string, string> = {
   whatsapp: "El WhatsApp tiene que ser un número hondureño usable.",
   verification:
     "Guardá el borrador. Ese número debe verificarse antes de publicar el negocio.",
+  verification_confirm:
+    "No se pudo confirmar el WhatsApp. Recargá la página e intentá de nuevo.",
   pin: "Para publicar una ubicación fija hay que confirmar que el pin será público.",
   bounds: "El pin publicado tiene que quedar dentro de Siguatepeque.",
   status: "Ese estado no es válido.",

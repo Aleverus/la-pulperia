@@ -2193,6 +2193,19 @@
     width: fit-content;
   }
 
+  .whatsapp-confirmation {
+    display: grid;
+    gap: 0.55rem;
+    border-left: 3px solid var(--cobalt);
+    background: var(--cobalt-mist);
+    padding: 0.8rem;
+  }
+
+  .whatsapp-confirmation > a,
+  .whatsapp-confirmation > button {
+    width: fit-content;
+  }
+
   .offer-maintenance {
     border-color: var(--cobalt);
     background: var(--cobalt-mist);

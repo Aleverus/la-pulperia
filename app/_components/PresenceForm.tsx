@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
 import { IconCircleCheck, IconCircleDashed } from "@tabler/icons-react";
-import { savePresenceAction } from "@/app/seller-actions";
+import {
+  confirmWhatsappOwnershipAction,
+  savePresenceAction,
+} from "@/app/seller-actions";
 import { CityMap } from "@/app/_components/CityMap";
 import {
   classifyGeolocation,
@@ -38,9 +41,14 @@ export function PresenceForm({
   const [locating, setLocating] = useState(false);
 
   const e164 = normalizeWhatsapp(whatsapp);
-  const whatsappVerified =
+  const whatsappConfirmed =
     presence?.whatsapp_verification_status === "verified" &&
     e164 === presence.whatsapp_e164;
+  const canConfirmWhatsapp =
+    Boolean(presence) &&
+    Boolean(e164) &&
+    e164 === presence?.whatsapp_e164 &&
+    !whatsappConfirmed;
   const probeHref = e164
     ? waMeUrl(e164, whatsappProbeMessage(name || "este negocio"))
     : null;
@@ -92,7 +100,7 @@ export function PresenceForm({
     withinSiguatepeque(lat, lng);
   const canPublish =
     mode !== null &&
-    whatsappVerified &&
+    whatsappConfirmed &&
     (mode !== "fixed_location" || hasPublishablePin);
 
   return (
@@ -238,19 +246,35 @@ export function PresenceForm({
         que abre el comprador autenticado.
       </p>
       {probeHref ? (
-        <p>
+        <div className="whatsapp-confirmation">
           <a href={probeHref} target="_blank" rel="noreferrer">
-            Probar número
+            1. Enviar mensaje de prueba
           </a>
-          . Eso no verifica el WhatsApp.
-        </p>
+          <p>
+            La Pulpería no puede leer tu WhatsApp ni detectar el envío. Si el
+            mensaje llegó al número correcto, volvé y confirmalo acá.
+          </p>
+          {presence ? (
+            <ConfirmWhatsappButton disabled={!canConfirmWhatsapp} />
+          ) : (
+            <p className="field-hint">
+              Primero guardá el borrador del negocio; después podrás confirmar
+              el número.
+            </p>
+          )}
+          {presence && e164 !== presence.whatsapp_e164 ? (
+            <p className="field-hint">
+              Guardá el borrador con este número antes de confirmarlo.
+            </p>
+          ) : null}
+        </div>
       ) : (
         <p>Escribí un número hondureño para ver la prueba.</p>
       )}
       <p role="status">
-        {whatsappVerified
-          ? "WhatsApp verificado para este negocio."
-          : "WhatsApp sin verificar. Podés guardar el borrador, pero no publicarlo hasta comprobar el control del número."}
+        {whatsappConfirmed
+          ? "WhatsApp confirmado por vos para este negocio."
+          : "WhatsApp pendiente de confirmación. Podés guardar el borrador, pero no publicarlo hasta confirmar que el mensaje llegó."}
       </p>
 
       {mode === "fixed_location" ? (
@@ -329,16 +353,16 @@ export function PresenceForm({
             )}
             <span>{mode ? "Forma de atención elegida" : "Elegí cómo atendés"}</span>
           </li>
-          <li className={whatsappVerified ? "is-ready" : ""}>
-            {whatsappVerified ? (
+          <li className={whatsappConfirmed ? "is-ready" : ""}>
+            {whatsappConfirmed ? (
               <IconCircleCheck aria-hidden="true" size={20} stroke={1.9} />
             ) : (
               <IconCircleDashed aria-hidden="true" size={20} stroke={1.9} />
             )}
             <span>
-              {whatsappVerified
-                ? "WhatsApp verificado"
-                : "Verificá que controlás el WhatsApp"}
+              {whatsappConfirmed
+                ? "WhatsApp confirmado"
+                : "Probá y confirmá tu WhatsApp"}
             </span>
           </li>
           {mode === "fixed_location" ? (
@@ -360,6 +384,21 @@ export function PresenceForm({
 
       <PresenceSubmitButtons canPublish={canPublish} />
     </form>
+  );
+}
+
+function ConfirmWhatsappButton({ disabled }: { disabled: boolean }) {
+  const { pending, action } = useFormStatus();
+  const confirming = pending && action === confirmWhatsappOwnershipAction;
+
+  return (
+    <button
+      type="submit"
+      formAction={confirmWhatsappOwnershipAction}
+      disabled={pending || disabled}
+    >
+      {confirming ? "Confirmando…" : "2. Confirmar que llegó"}
+    </button>
   );
 }
 

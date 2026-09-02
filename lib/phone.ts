@@ -24,5 +24,5 @@ export function waMeUrl(e164: string, text: string): string {
 }
 
 export function whatsappProbeMessage(presenceName: string): string {
-  return `Hola, estoy probando el número de ${presenceName} en La Pulpería. La plataforma no verifica este número.`;
+  return `Hola, esta es una prueba para ${presenceName} en La Pulpería. Si este mensaje llegó al WhatsApp correcto, volvé a La Pulpería y confirmalo. La plataforma no lee este chat.`;
 }
