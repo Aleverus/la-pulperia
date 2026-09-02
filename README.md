@@ -85,8 +85,9 @@ consumers, class-specific request payloads, seller maintenance flow, reviewed
 context, handoff snapshots, seller understanding signal, privacy-safe metrics,
 and Corte 5 instruments are implemented and verified locally. The same schema
 and 23 migrations are deployed to the isolated `la-pulperia-preview` Supabase
-project, but its app data, Auth users, sessions, and Storage objects are now
-deliberately empty for a clean human review; public execution of privileged
+project. The dated cleanup receipt left its app data, Auth users, sessions, and
+Storage objects empty for human review; their current counts were not queried in
+this publication pass. Public execution of privileged
 functions is limited to the audited RPC surface. The workbook starts every
 research row as pending and keeps real copies under a Git-ignored local
 directory. Interviews, the 100-business census, the comparative audit with 20
@@ -120,7 +121,8 @@ project: a hand-painted-sign wordmark and an `LP` monogram whose `P` contains a
 barred service window, using warm ivory, weathered cobalt and faded brick red.
 That selection is documented in `../Obra/DESIGN.md` and is now the only
 authorized direction. The three derived mobile images are closed studies, not
-competing references. Corte 7V is implemented locally: real brand assets,
+competing references. Corte 7V is implemented and published from GitHub `main`:
+real brand assets,
 Alegreya + Fira Sans Condensed, canonical color tokens, and the new responsive
 system now cover the public journey, cart and identity, seller work, operation,
 loading, empty and error states. Browser inspection covered public, buyer and
@@ -151,8 +153,11 @@ attention/fulfilment contract before publication; no location or generic
 fulfilment is assumed. Daily maintenance names the exact request or offer, links
 or submits directly to it, and states that freshness does not change price or
 record a sale. The parent plan and implementation contract remain authoritative.
-Supabase and Vercel serve a public prelaunch from the GitHub `prelaunch` branch,
-but human runtime acceptance and promotion of `main` remain separate.
+Commit `a2ad7bee376a7edc13ee24dc8b17c60d7cf4baba` published that visual runtime
+from GitHub `main`; Vercel reported production deployment
+`dpl_Ck7s6kmsupaAkCp7LX1c1tRvqU7L` as `READY` on the public prelaunch aliases.
+The deployment remains outside search indexes, remote Supabase data was not
+reset, and Ale's human runtime acceptance remains separate.
 
 The parent `../AGENTS.md` requires every product, contract, route, status, or
 evidence change to update all related documentation in the same work. The
@@ -208,8 +213,10 @@ After the bug-repair plans 001–005 on 2026-08-30, the local tree passed:
 
 The historical local receipt records the technical contract and exercised flows.
 The current pass verifies the gates named above and the observed browser
-surfaces; it does not claim a green E2E run. The separate prelaunch runtime check
-proves public deployment and remote data reads at its recorded date; neither
+surfaces; it does not claim a green E2E run. The production check of the visual
+commit returned 200 on home, search, map, login and `robots.txt`, with the new
+brand assets and `X-Robots-Tag: noindex, nofollow`; neither that deployment nor
+the earlier remote-data receipt
 proves commercial demand, legal readiness, field use, or visual acceptance.
 
 ## Run locally
