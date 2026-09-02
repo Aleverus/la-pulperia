@@ -169,14 +169,17 @@ remain pending. This Vercel target is the private testing runtime, stays outside
 search indexes and is not the official launch. Remote Supabase application data
 was reset and verified empty on 2026-09-02.
 
-The WhatsApp publication gate now uses an explicit two-step owner confirmation:
+Commit `1bc07fbdae2f47166fa4ba6b31b79d6fce5f837f` publishes an explicit
+two-step owner confirmation for the WhatsApp publication gate:
 send the test message to the saved destination, then return and confirm that it
 arrived. La Pulpería cannot read the chat or detect a `wa.me` send and does not
 claim otherwise. The additive RPC is restricted to authenticated callers and
 updates only the caller's own seller presence. Locally, ESLint, types, 86 unit
 tests, the production build and `git diff --check` passed; local pgTAP remained
-blocked because Docker/Postgres was unavailable. Publication and live owner
-confirmation are recorded separately from this implementation state.
+blocked because Docker/Postgres was unavailable. Vercel reported private-test
+deployment `dpl_Dr3rCVsrQ8WVxPauuTk8jUFioQeP` as `READY`; the authenticated
+panel showed both steps and kept publication disabled while confirmation was
+pending. Only Ale's real owner confirmation and acceptance remain outstanding.
 
 The parent `../AGENTS.md` requires every product, contract, route, status, or
 evidence change to update all related documentation in the same work. The
