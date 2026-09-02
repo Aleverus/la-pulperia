@@ -156,18 +156,18 @@ attention/fulfilment contract before publication; no location or generic
 fulfilment is assumed. Daily maintenance names the exact request or offer, links
 or submits directly to it, and states that freshness does not change price or
 record a sale. The parent plan and implementation contract remain authoritative.
-The current working tree adds the requested progressive seller flow: first setup
-shows the offer before the business, offer creation/editing exposes one of five
-short tasks at a time, and the final review accepts the first optional photo
-before creation. It is locally implemented over `b415bd1`, not integrated or
-published; ESLint, types, 85 unit tests, production build and `git diff --check`
-pass, while authenticated browser/E2E verification remains pending.
-Commit `a2ad7bee376a7edc13ee24dc8b17c60d7cf4baba` published that visual runtime
-from GitHub `main`; Vercel reported production deployment
-`dpl_Ck7s6kmsupaAkCp7LX1c1tRvqU7L` as `READY` on the public prelaunch aliases.
-The deployment remains outside search indexes. Remote Supabase application data
-was reset and verified empty on 2026-09-02; Ale's human runtime acceptance
-remains separate.
+Commit `d0cfd96aa7df04eb74d8001ad74911d2c63f30cb` publishes the requested
+progressive seller flow from GitHub `main`: first setup shows the offer before
+the business, offer creation/editing exposes one of five short tasks at a time,
+and the final review accepts the first optional photo before creation. ESLint,
+types, 85 unit tests, production build and `git diff --check` passed before the
+commit. Vercel reported private-test deployment
+`dpl_6VMkBmyyJMj7JiweQnXC97kssFTq` as `READY`; the browser loaded `/vender` from
+`https://la-pulperia-hn.vercel.app` without captured console errors. The
+authenticated seller flow, Axe, responsive inspection and Ale's acceptance
+remain pending. This Vercel target is the private testing runtime, stays outside
+search indexes and is not the official launch. Remote Supabase application data
+was reset and verified empty on 2026-09-02.
 
 The parent `../AGENTS.md` requires every product, contract, route, status, or
 evidence change to update all related documentation in the same work. The

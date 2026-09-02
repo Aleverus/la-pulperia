@@ -208,7 +208,7 @@ siendo estados separados.
 - Problema observado: la lógica era condicional, pero alta y edición todavía
   mostraban cuatro bloques seguidos y la primera foto sólo aparecía después de
   crear la oferta.
-- Implementación local: la primera alta separa oferta y negocio; el formulario
+- Implementación publicada: la primera alta separa oferta y negocio; el formulario
   presenta tipo, datos esenciales, disponibilidad, cumplimiento y revisión como
   tareas navegables; la revisión acepta una primera foto opcional.
 - Accesibilidad estructural: progreso con `aria-current`, botones visitados,
@@ -216,8 +216,12 @@ siendo estados separados.
   los rótulos permanecen accesibles aunque la fila visual se compacte a números.
 - Evidencia técnica posterior al cambio: ESLint, generación de tipos +
   TypeScript, 85 unitarias, build de producción y `git diff --check` pasan.
-- Límite: el servidor local compiló, pero no alcanzó Auth/Supabase. No se observó
-  el flujo autenticado ni se repitieron Playwright, Axe o capturas a
-  320/390/1440. El `passed` histórico no se aplica a este diff.
+- Publicación observada: `d0cfd96` está en `origin/main`; Vercel marcó
+  `dpl_6VMkBmyyJMj7JiweQnXC97kssFTq` como `READY`. El navegador cargó
+  `https://la-pulperia-hn.vercel.app/vender`, mostró la entrada correcta y no
+  capturó errores de consola.
+- Límite: no se observó el flujo autenticado ni se repitieron Playwright, Axe o
+  capturas a 320/390/1440. El `passed` histórico no se aplica a este ajuste y el
+  despliegue privado de prueba no es lanzamiento ni aceptación.
 
-Final result: implemented-local; visual-runtime-verification-pending
+Final result: published-private-test; public-entry-browser-verified; authenticated-visual-verification-pending
