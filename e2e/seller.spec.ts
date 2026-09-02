@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 test.describe.configure({ timeout: 60_000 });
 
@@ -6,6 +6,16 @@ const TINY_PNG = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAEklEQVQImWO4Y6Nxx0aDAUIBACXeBQEgOSe0AAAAAElFTkSuQmCC",
   "base64",
 );
+
+async function continueOffer(page: Page) {
+  await page.getByRole("button", { name: "Continuar" }).click();
+}
+
+async function advanceOfferToReview(page: Page) {
+  for (let step = 0; step < 4; step += 1) {
+    await continueOffer(page);
+  }
+}
 
 test("seller entry explains the private first offer before authentication", async ({
   page,
@@ -65,30 +75,38 @@ test("seller saves an unverified presence and manages a stock offer privately", 
   await page.getByRole("button", { name: "Guardar borrador" }).click();
 
   await expect(page.getByRole("heading", { name: "Nueva oferta" })).toBeVisible();
+  await continueOffer(page);
   await expect(page.getByLabel("Título")).toHaveValue(offerTitle);
   await expect(page.getByLabel("Descripción")).toHaveValue(
     "Café molido listo para retirar",
   );
   await page.getByLabel("Precio publicado (lempiras)").fill("45");
   await page.getByLabel("Unidad o periodo").fill("bolsa");
+  await continueOffer(page);
+  await continueOffer(page);
   await page.getByRole("checkbox", { name: "Retiro" }).check();
+  await continueOffer(page);
+  await page.getByLabel(/Primera foto/).setInputFiles({
+    name: "primera.png",
+    mimeType: "image/png",
+    buffer: TINY_PNG,
+  });
   await page.getByRole("button", { name: "Guardar borrador" }).click();
 
   await expect(page.getByRole("heading", { name: "Editar oferta" })).toBeVisible();
-  for (const [index, name] of ["primera.png", "segunda.png"].entries()) {
-    await page.getByLabel(/Foto \(opcional/).setInputFiles({
-      name,
-      mimeType: "image/png",
-      buffer: TINY_PNG,
-    });
-    await page.getByRole("button", { name: "Guardar cambios" }).click();
-    await expect(page.locator('img[alt="Foto de la oferta"]')).toHaveCount(
-      index + 1,
-    );
-  }
+  await expect(page.locator('img[alt="Foto de la oferta"]')).toHaveCount(1);
+  await advanceOfferToReview(page);
+  await page.getByLabel(/Agregar foto/).setInputFiles({
+    name: "segunda.png",
+    mimeType: "image/png",
+    buffer: TINY_PNG,
+  });
+  await page.getByRole("button", { name: "Guardar cambios" }).click();
+  await expect(page.locator('img[alt="Foto de la oferta"]')).toHaveCount(2);
   await page.getByRole("button", { name: "Quitar foto" }).first().click();
   await expect(page.locator('img[alt="Foto de la oferta"]')).toHaveCount(1);
-  await page.getByLabel(/Foto \(opcional/).setInputFiles({
+  await advanceOfferToReview(page);
+  await page.getByLabel(/Agregar foto/).setInputFiles({
     name: "reemplazo.png",
     mimeType: "image/png",
     buffer: TINY_PNG,
@@ -253,15 +271,19 @@ test("seller maintains food, service, and digital offers through the class-aware
   ).toBeDisabled();
   await page.getByRole("button", { name: "Guardar borrador" }).click();
 
+  await continueOffer(page);
   await expect(page.getByLabel("Título")).toHaveValue(foodTitle);
   await expect(page.getByLabel("Nota de existencias (opcional)")).toHaveCount(0);
   await expect(page.getByRole("checkbox", { name: "Cita" })).toHaveCount(0);
   await page.getByLabel("Precio publicado (lempiras)").fill("18");
   await page.getByLabel("Unidad o periodo").fill("unidad");
+  await continueOffer(page);
   await page.getByLabel("Inicio de la ventana").fill("2030-04-12T14:00");
   await page.getByLabel("Fin de la ventana").fill("2030-04-12T18:00");
   await page.getByLabel("Fecha de corte (opcional)").fill("2030-04-12T12:00");
+  await continueOffer(page);
   await page.getByRole("checkbox", { name: "Retiro" }).check();
+  await continueOffer(page);
   await page.getByRole("button", { name: "Crear y publicar" }).click();
 
   await expect(page.getByRole("heading", { name: "Editar oferta" })).toBeVisible();
@@ -275,34 +297,47 @@ test("seller maintains food, service, and digital offers through the class-aware
   await page.getByRole("link", { name: "Crear oferta" }).click();
   await page.getByRole("radio", { name: /Servicio local/ }).check();
   await expect(page.getByLabel("Nota de existencias (opcional)")).toHaveCount(0);
-  await expect(page.getByRole("checkbox", { name: "Retiro" })).toHaveCount(0);
-  await expect(page.getByRole("checkbox", { name: "Cita" })).toBeVisible();
+  await continueOffer(page);
   await page.getByLabel("Título").fill(serviceTitle);
   await page.getByLabel("Modalidad de precio").selectOption("quote");
   await expect(page.getByLabel("Precio publicado (lempiras)")).toHaveCount(0);
+  await continueOffer(page);
   await page.getByLabel("Nota de agenda").fill("Disponible por la tarde");
+  await continueOffer(page);
+  await expect(page.getByRole("checkbox", { name: "Retiro" })).toHaveCount(0);
+  await expect(page.getByRole("checkbox", { name: "Cita" })).toBeVisible();
   await page.getByRole("checkbox", { name: "Cita" }).check();
+  await continueOffer(page);
   await page.getByRole("button", { name: "Crear y publicar" }).click();
 
   await expect(page.getByRole("heading", { name: "Editar oferta" })).toBeVisible();
+  await continueOffer(page);
   await page.getByLabel("Título").fill(editedServiceTitle);
+  await continueOffer(page);
   await page.getByLabel("Nota de agenda").fill("Disponible de lunes a viernes");
+  await continueOffer(page);
+  await continueOffer(page);
   await page.getByRole("button", { name: "Guardar cambios" }).click();
+  await continueOffer(page);
   await expect(page.getByLabel("Título")).toHaveValue(editedServiceTitle);
 
   await page.goto("/mi-pulperia");
   await page.getByRole("link", { name: "Crear oferta" }).click();
   await page.getByRole("radio", { name: /Oferta digital/ }).check();
-  await expect(page.getByRole("checkbox", { name: "Entrega digital" })).toBeVisible();
-  await expect(page.getByRole("checkbox", { name: "Cobertura o visita local" })).toHaveCount(0);
+  await continueOffer(page);
   await page.getByLabel("Título").fill(digitalTitle);
   await page.getByLabel("Modalidad de precio").selectOption("quote");
+  await continueOffer(page);
   await page.getByLabel("Estado actual").selectOption("on_request");
   await expect(page.getByLabel("Nota de agenda")).toHaveCount(0);
   await page
     .getByLabel("Qué necesitás para responder")
     .fill("Alcance, formato y fecha deseada");
+  await continueOffer(page);
+  await expect(page.getByRole("checkbox", { name: "Entrega digital" })).toBeVisible();
+  await expect(page.getByRole("checkbox", { name: "Cobertura o visita local" })).toHaveCount(0);
   await page.getByRole("checkbox", { name: "Entrega digital" }).check();
+  await continueOffer(page);
   await page.getByRole("button", { name: "Crear y publicar" }).click();
 
   await expect(page.getByRole("heading", { name: "Editar oferta" })).toBeVisible();

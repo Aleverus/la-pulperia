@@ -20,7 +20,11 @@ const CLASS_HELP: Record<OfferClass, string> = {
   digital_offer: "Algo que atendés o entregás de forma digital.",
 };
 
-export function StarterOfferDraft() {
+export function StarterOfferDraft({
+  onContinue,
+}: {
+  onContinue?: () => void;
+}) {
   const storedDraft = useStarterOfferDraftStorage();
   const draft = useMemo(
     () => readDraft(storedDraft),
@@ -45,7 +49,11 @@ export function StarterOfferDraft() {
         onSubmit={(event) => {
           event.preventDefault();
           update(draft);
-          document.querySelector<HTMLElement>("#starter-business")?.focus();
+          if (onContinue) {
+            onContinue();
+          } else {
+            document.querySelector<HTMLElement>("#starter-business")?.focus();
+          }
         }}
       >
         <fieldset>

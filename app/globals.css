@@ -2069,6 +2069,130 @@
     font-size: 0.9rem;
   }
 
+  .seller-offer-flow {
+    gap: 1rem;
+  }
+
+  .seller-flow-progress {
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .seller-flow-progress > p {
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  .seller-flow-progress ol {
+    display: grid;
+    gap: 0.35rem;
+    list-style: none;
+  }
+
+  .seller-flow-progress.is-2 ol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .seller-flow-progress.is-5 ol {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .seller-flow-progress button {
+    width: 100%;
+    min-height: 3rem;
+    display: grid;
+    place-items: center;
+    gap: 0.14rem;
+    border-color: var(--line);
+    background: var(--paper);
+    color: var(--ink-soft);
+    padding: 0.35rem 0.2rem;
+    font-size: 0.76rem;
+  }
+
+  .seller-flow-progress button > span:first-child {
+    width: 1.35rem;
+    height: 1.35rem;
+    display: grid;
+    place-items: center;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    line-height: 1;
+  }
+
+  .seller-flow-progress button[aria-current="step"] {
+    border-color: var(--cobalt);
+    background: var(--cobalt);
+    color: #fffdf7;
+  }
+
+  .seller-flow-progress button.is-complete {
+    border-color: var(--cobalt);
+    background: var(--cobalt-mist);
+    color: var(--cobalt);
+  }
+
+  .seller-flow-progress button:disabled {
+    opacity: 0.62;
+  }
+
+  .seller-flow-panel {
+    min-width: 0;
+    display: grid;
+    gap: 0.75rem;
+    border: 1px solid var(--cobalt);
+    background: var(--paper);
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .seller-flow-panel[hidden] {
+    display: none;
+  }
+
+  .seller-flow-panel:focus {
+    outline: 3px solid var(--ivory-accent);
+    outline-offset: 0.2rem;
+  }
+
+  .seller-flow-panel > legend {
+    color: var(--cobalt);
+    padding: 0 0.25rem;
+    font-family: var(--font-display), Georgia, serif;
+    font-size: clamp(1.45rem, 4.8vw, 2rem);
+    font-weight: 800;
+  }
+
+  .seller-flow-review > div:first-child {
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .seller-flow-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.55rem;
+    border-top: 1px solid var(--line);
+    padding-top: 0.85rem;
+  }
+
+  .seller-flow-actions > .offer-submit-actions {
+    flex: 1 1 100%;
+  }
+
+  .seller-first-setup {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .seller-first-setup__back {
+    width: fit-content;
+  }
+
   .offer-maintenance {
     border-color: var(--cobalt);
     background: var(--cobalt-mist);
@@ -2571,6 +2695,26 @@
 
     .form-field--filter {
       padding-inline: 0.5rem;
+    }
+
+    .seller-flow-progress.is-5 button {
+      min-height: 2.7rem;
+      padding: 0.25rem;
+    }
+
+    .seller-flow-progress.is-5 button > span:last-child {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    .seller-flow-actions > button,
+    .offer-submit-actions > button {
+      flex: 1 1 9rem;
     }
   }
 

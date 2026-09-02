@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PresenceForm } from "@/app/_components/PresenceForm";
-import { StarterOfferDraft } from "@/app/_components/StarterOfferDraft";
+import { SellerFirstSetup } from "@/app/_components/SellerFirstSetup";
 import { formErrorMessage } from "@/lib/seller";
 import { getOwnedPresences } from "@/lib/seller-data";
 import { sellerUrl } from "@/lib/seller-routing";
@@ -93,24 +93,21 @@ export default async function VenderPage({
           </ul>
         </section>
       ) : null}
-      {firstBusiness ? <StarterOfferDraft /> : null}
-      <section className="starter-business" aria-labelledby="starter-business">
-        <p className="eyebrow">{firstBusiness ? "Paso 2 de 2" : "Otro negocio"}</p>
-        <h2 id="starter-business" tabIndex={-1}>
-          {firstBusiness
-            ? "Completá lo necesario para guardar la oferta"
-            : "Agregá otro negocio"}
-        </h2>
-        <p>
-          El modo de atención y el WhatsApp protegen la lectura pública. Una
-          ubicación exacta se pide sólo si elegís un local fijo.
-        </p>
-        <PresenceForm
-          presence={null}
-          error={error ?? undefined}
-          continueToOffer={firstBusiness}
-        />
-      </section>
+      {firstBusiness ? (
+        <SellerFirstSetup error={error ?? undefined} />
+      ) : (
+        <section className="starter-business" aria-labelledby="starter-business">
+          <p className="eyebrow">Otro negocio</p>
+          <h2 id="starter-business" tabIndex={-1}>
+            Agregá otro negocio
+          </h2>
+          <p>
+            El modo de atención y el WhatsApp protegen la lectura pública. Una
+            ubicación exacta se pide sólo si elegís un local fijo.
+          </p>
+          <PresenceForm presence={null} error={error ?? undefined} />
+        </section>
+      )}
     </main>
   );
 }

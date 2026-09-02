@@ -86,8 +86,11 @@ context, handoff snapshots, seller understanding signal, privacy-safe metrics,
 and Corte 5 instruments are implemented and verified locally. The same schema
 and 23 migrations are deployed to the isolated `la-pulperia-preview` Supabase
 project. The dated cleanup receipt left its app data, Auth users, sessions, and
-Storage objects empty for human review; their current counts were not queried in
-this publication pass. Public execution of privileged
+Storage objects empty for human review. On 2026-09-02, a fresh remote inventory
+found only seven anonymous search events; the reset removed them and verification
+confirmed zero rows across all 15 application tables, Auth users, identities,
+sessions, refresh tokens, and Storage objects. The 23 migrations, 15 RLS-enabled
+tables, and one empty bucket remain. Public execution of privileged
 functions is limited to the audited RPC surface. The workbook starts every
 research row as pending and keeps real copies under a Git-ignored local
 directory. Interviews, the 100-business census, the comparative audit with 20
@@ -153,11 +156,18 @@ attention/fulfilment contract before publication; no location or generic
 fulfilment is assumed. Daily maintenance names the exact request or offer, links
 or submits directly to it, and states that freshness does not change price or
 record a sale. The parent plan and implementation contract remain authoritative.
+The current working tree adds the requested progressive seller flow: first setup
+shows the offer before the business, offer creation/editing exposes one of five
+short tasks at a time, and the final review accepts the first optional photo
+before creation. It is locally implemented over `b415bd1`, not integrated or
+published; ESLint, types, 85 unit tests, production build and `git diff --check`
+pass, while authenticated browser/E2E verification remains pending.
 Commit `a2ad7bee376a7edc13ee24dc8b17c60d7cf4baba` published that visual runtime
 from GitHub `main`; Vercel reported production deployment
 `dpl_Ck7s6kmsupaAkCp7LX1c1tRvqU7L` as `READY` on the public prelaunch aliases.
-The deployment remains outside search indexes, remote Supabase data was not
-reset, and Ale's human runtime acceptance remains separate.
+The deployment remains outside search indexes. Remote Supabase application data
+was reset and verified empty on 2026-09-02; Ale's human runtime acceptance
+remains separate.
 
 The parent `../AGENTS.md` requires every product, contract, route, status, or
 evidence change to update all related documentation in the same work. The
@@ -206,10 +216,10 @@ After the bug-repair plans 001–005 on 2026-08-30, the local tree passed:
   engine before a clean out-of-sandbox repetition. It is not reported as green.
 - A prior public OAuth exercise selected the authorized Google test account,
   consented only to basic identity and email, returned to `/carrito`, exposed the
-  authenticated navigation and opened `/cuenta`. The parent context records a
-  subsequent cleanup, while an earlier version of this README claimed one identity
-  remained. This pass did not query Supabase, so the current remote record count
-  is unverified.
+  authenticated navigation and opened `/cuenta`. The 2026-09-02 cleanup verified
+  that no identity or session remains. `/ingresar` still exposes the Google CTA
+  and an unauthenticated `/cuenta` request redirects to login; a fresh end-to-end
+  OAuth run remains part of Ale's first-use test.
 
 The historical local receipt records the technical contract and exercised flows.
 The current pass verifies the gates named above and the observed browser

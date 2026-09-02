@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useFormStatus } from "react-dom";
+import { SellerFlowProgress } from "@/app/_components/SellerFlowProgress";
 import {
   confirmOfferAction,
   removeOfferImageAction,
@@ -71,6 +72,14 @@ const ALLOWED_FULFILLMENTS: Record<OfferClass, FulfillmentMode[]> = {
   local_service: ["local_coverage", "appointment", "direct_agreement"],
   digital_offer: ["digital_delivery", "appointment", "direct_agreement"],
 };
+
+const OFFER_FLOW_STEPS = [
+  "Tipo",
+  "Lo esencial",
+  "Disponibilidad",
+  "Entrega",
+  "Revisión",
+] as const;
 
 type OfferFormProps = {
   presenceId: string;
@@ -153,7 +162,10 @@ function OfferFormFields({
         : (offer.price_cents / 100).toFixed(2),
     unit: offer?.unit ?? starterDraft?.unit ?? "",
   });
+  const [currentStep, setCurrentStep] = useState(error ? 4 : 0);
+  const [maxVisitedStep, setMaxVisitedStep] = useState(error ? 4 : 0);
   const maintenanceStartedAtRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     if (maintenanceStartedAtRef.current) {
@@ -168,6 +180,7 @@ function OfferFormFields({
 
   function changeClass(next: OfferClass) {
     setOfferClass(next);
+    setMaxVisitedStep(0);
     if (!availabilityStatesFor(next).includes(availabilityState)) {
       setAvailabilityState("available");
     }
@@ -188,6 +201,35 @@ function OfferFormFields({
     writeStarterOfferDraft(draft);
   }
 
+  function goToStep(step: number) {
+    setCurrentStep(step);
+    requestAnimationFrame(() => {
+      formRef.current
+        ?.querySelector<HTMLElement>(`[data-offer-step="${step}"]`)
+        ?.focus();
+    });
+  }
+
+  function continueFromStep() {
+    const panel = formRef.current?.querySelector<HTMLElement>(
+      `[data-offer-step="${currentStep}"]`,
+    );
+    const controls = Array.from(
+      panel?.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(
+        "input, select, textarea",
+      ) ?? [],
+    );
+    const invalid = controls.find((control) => !control.checkValidity());
+    if (invalid) {
+      invalid.reportValidity();
+      return;
+    }
+    if (currentStep === 3 && fulfillments.length === 0) return;
+    const next = Math.min(currentStep + 1, OFFER_FLOW_STEPS.length - 1);
+    setMaxVisitedStep((visited) => Math.max(visited, next));
+    goToStep(next);
+  }
+
   return (
     <div className="stack">
       {offer ? (
@@ -199,9 +241,10 @@ function OfferFormFields({
       ) : null}
       <form
         action={saveOfferAction}
-        className="stack"
+        className="stack seller-offer-flow"
         onInput={storeStarterDraft}
         onChange={storeStarterDraft}
+        ref={formRef}
       >
         <input type="hidden" name="presence_id" value={presenceId} />
         <input type="hidden" name="offer_id" value={offer?.id ?? ""} />
@@ -216,8 +259,20 @@ function OfferFormFields({
           ref={maintenanceStartedAtRef}
         />
 
-        <fieldset>
-          <legend>1. ¿Qué ofrecés?</legend>
+        <SellerFlowProgress
+          steps={OFFER_FLOW_STEPS}
+          currentStep={currentStep}
+          maxVisitedStep={maxVisitedStep}
+          onStepChange={goToStep}
+        />
+
+        <fieldset
+          className="seller-flow-panel"
+          data-offer-step="0"
+          hidden={currentStep !== 0}
+          tabIndex={-1}
+        >
+          <legend>¿Qué ofrecés?</legend>
           {(
             [
               "stocked_product",
@@ -240,10 +295,16 @@ function OfferFormFields({
               </span>
             </label>
           ))}
+          <FlowNextButton onClick={continueFromStep} />
         </fieldset>
 
-        <fieldset>
-          <legend>2. Identificá la oferta</legend>
+        <fieldset
+          className="seller-flow-panel"
+          data-offer-step="1"
+          hidden={currentStep !== 1}
+          tabIndex={-1}
+        >
+          <legend>Contá lo esencial</legend>
           <label htmlFor="offer-title">Título</label>
           <input
             id="offer-title"
@@ -336,10 +397,19 @@ function OfferFormFields({
             maxLength={40}
             placeholder={unitPlaceholder(offerClass)}
           />
+          <FlowNavigation
+            onBack={() => goToStep(0)}
+            onNext={continueFromStep}
+          />
         </fieldset>
 
-        <fieldset>
-          <legend>3. ¿Cuándo está disponible?</legend>
+        <fieldset
+          className="seller-flow-panel"
+          data-offer-step="2"
+          hidden={currentStep !== 2}
+          tabIndex={-1}
+        >
+          <legend>¿Cuándo está disponible?</legend>
           <label htmlFor="offer-availability">Estado actual</label>
           <select
             id="offer-availability"
@@ -456,10 +526,19 @@ function OfferFormFields({
               <p>Completá una fecha, una nota de agenda o ambas.</p>
             </>
           ) : null}
+          <FlowNavigation
+            onBack={() => goToStep(1)}
+            onNext={continueFromStep}
+          />
         </fieldset>
 
-        <fieldset>
-          <legend>4. ¿Cómo puede recibirlo la persona?</legend>
+        <fieldset
+          className="seller-flow-panel"
+          data-offer-step="3"
+          hidden={currentStep !== 3}
+          tabIndex={-1}
+        >
+          <legend>¿Cómo puede recibirlo la persona?</legend>
           <p>Sólo aparecen opciones compatibles con esta clase de oferta.</p>
           {fulfillmentOptions.map(({ value, label }) => (
             <label key={value}>
@@ -476,57 +555,99 @@ function OfferFormFields({
             </label>
           ))}
           {fulfillments.length === 0 ? (
-            <p role="alert">Elegí al menos una forma de cumplimiento.</p>
+            <p className="field-hint" role="status">
+              Elegí al menos una forma de cumplimiento para continuar.
+            </p>
           ) : null}
+          <FlowNavigation
+            onBack={() => goToStep(2)}
+            onNext={continueFromStep}
+            nextDisabled={fulfillments.length === 0}
+          />
         </fieldset>
 
-        {offer ? (
-          <>
-            <input type="hidden" name="status" value={offer.status} />
+        <section
+          className="seller-flow-panel seller-flow-review"
+          data-offer-step="4"
+          hidden={currentStep !== 4}
+          tabIndex={-1}
+          aria-labelledby="offer-review-title"
+        >
+          <div>
+            <p className="eyebrow">Último paso</p>
+            <h2 id="offer-review-title">Revisá antes de guardar</h2>
+            <p>
+              Comprobá cómo se entenderá la oferta. Podés volver a cualquier
+              paso sin perder lo escrito.
+            </p>
+          </div>
+
+          <OfferPublicPreview
+            offerClass={offerClass}
+            availabilityState={availabilityState}
+            fulfillments={fulfillments}
+            priceMode={priceMode}
+            preview={preview}
+          />
+
+          <div>
+            {offer ? (
+              <input type="hidden" name="status" value={offer.status} />
+            ) : null}
             <label htmlFor="offer-image">
-              Foto (opcional, máximo 4; hasta 3 MB cada una)
+              {offer
+                ? "Agregar foto (opcional, máximo 4; hasta 3 MB cada una)"
+                : "Primera foto (opcional, hasta 3 MB)"}
             </label>
             <input
               id="offer-image"
               name="image"
               type="file"
               accept="image/*"
-              disabled={media.length >= 4}
+              disabled={Boolean(offer && media.length >= 4)}
             />
-          </>
-        ) : null}
-
-        <OfferPublicPreview
-          offerClass={offerClass}
-          availabilityState={availabilityState}
-          fulfillments={fulfillments}
-          priceMode={priceMode}
-          preview={preview}
-        />
-
-        {error ? <p role="alert">{error}</p> : null}
-        {offer ? (
-          <SubmitButton
-            label="Guardar cambios"
-            disabled={fulfillments.length === 0}
-          />
-        ) : (
-          <div className="offer-submit-actions">
-            <p>Podés guardar como borrador y revisar después, o publicar si ya representa cómo atendés hoy.</p>
-            <SubmitButton
-              label="Guardar borrador"
-              name="status"
-              value="draft"
-              disabled={fulfillments.length === 0}
-            />{" "}
-            <SubmitButton
-              label="Crear y publicar"
-              name="status"
-              value="published"
-              disabled={fulfillments.length === 0}
-            />
+            <p className="field-hint">
+              Si no agregás una, La Pulpería muestra la señal visual honesta de
+              la clase de oferta. Podés sumar más fotos después.
+            </p>
           </div>
-        )}
+
+          {error ? <p role="alert">{error}</p> : null}
+          <div className="seller-flow-actions">
+            <button
+              type="button"
+              className="secondary-action"
+              onClick={() => goToStep(3)}
+            >
+              Volver
+            </button>
+            {offer ? (
+              <SubmitButton
+                label="Guardar cambios"
+                disabled={fulfillments.length === 0}
+              />
+            ) : (
+              <div className="offer-submit-actions">
+                <p>
+                  Guardar borrador mantiene la oferta privada. Publicar la hace
+                  visible sólo si el negocio ya cumple los requisitos públicos.
+                </p>
+                <SubmitButton
+                  label="Guardar borrador"
+                  name="status"
+                  value="draft"
+                  disabled={fulfillments.length === 0}
+                />
+                <SubmitButton
+                  label="Crear y publicar"
+                  name="status"
+                  value="published"
+                  disabled={fulfillments.length === 0}
+                />
+              </div>
+            )}
+          </div>
+        </section>
       </form>
 
       {offer ? (
@@ -573,9 +694,38 @@ function OfferFormFields({
             </ul>
           ) : null}
         </section>
-      ) : (
-        <p className="field-hint">Las fotos se agregan después de crear la oferta; no son un requisito para publicar información honesta.</p>
-      )}
+      ) : null}
+    </div>
+  );
+}
+
+function FlowNextButton({ onClick }: { onClick: () => void }) {
+  return (
+    <div className="seller-flow-actions">
+      <button type="button" onClick={onClick}>
+        Continuar
+      </button>
+    </div>
+  );
+}
+
+function FlowNavigation({
+  onBack,
+  onNext,
+  nextDisabled = false,
+}: {
+  onBack: () => void;
+  onNext: () => void;
+  nextDisabled?: boolean;
+}) {
+  return (
+    <div className="seller-flow-actions">
+      <button type="button" className="secondary-action" onClick={onBack}>
+        Volver
+      </button>
+      <button type="button" onClick={onNext} disabled={nextDisabled}>
+        Continuar
+      </button>
     </div>
   );
 }

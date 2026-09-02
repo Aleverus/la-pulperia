@@ -79,12 +79,15 @@ final result: passed
 ## Recibo histórico — base visual de Corte 7
 
 Este bloque conserva la verificación fechada de la dirección anterior. No valida
-por anticipado el rediseño de Corte 7V.
+por anticipado el rediseño de Corte 7V. Ale retiró la imagen fuente después de
+quedar supersedida; el bloque conserva lo observado, pero la comparación no puede
+regenerarse contra el original.
 
 ## Alcance y fuente
 
 - Autoridad visual actual y relación con este recibo: `../Obra/DESIGN.md`.
-- Fuente seleccionada: `../Obra/Referencias visuales/direccion-visual-base-movil-aprobada-2026-08-30.png`.
+- Fuente seleccionada durante la pasada: imagen móvil de Corte 6, retirada el 2
+  de septiembre de 2026.
 - Estado comparado: búsqueda de `queso`, dos resultados, una presencia fija y una móvil.
 - Viewport de referencia: 390 × 844 CSS px. La captura del navegador mide 375 px de ancho útil porque excluye la barra de desplazamiento.
 - Fuente original: 853 × 1844 px; se normalizó a 375 px de ancho útil sin recortar ni deformar.
@@ -133,15 +136,15 @@ Este documento conserva recibos visuales fechados. El 31 de agosto la pasada de
 realidad de Corte 7R volvió a pasar lint, tipos y 84 pruebas unitarias, pero no
 pudo relanzar Playwright porque el entorno bloqueó el navegador con `spawn
 EPERM`. Por eso ningún “passed” histórico de este archivo es una aceptación
-actual del diff sin integrar; la fuente visual aprobada en `Obra/` sí es la
-referencia que se conserva.
+actual del diff sin integrar. La fuente vigente de Corte 7V permanece enlazada
+desde `../Obra/DESIGN.md`; la referencia anterior ya no se conserva.
 
 ## Extensión operativa de dueña — 30 de agosto de 2026
 
-- Fuente visual: `../Obra/Referencias visuales/direccion-visual-base-movil-aprobada-2026-08-30.png`.
+- Fuente visual durante la pasada: la imagen móvil de Corte 6 hoy retirada.
 - Implementación: el recibo histórico observó panel y formulario autenticados a
   390 px. Sus exportaciones temporales de `test-results/` no se retienen como
-  fuente de verdad; la referencia aprobada y los checks fechados sí.
+  fuente de verdad; este recibo conserva únicamente los checks fechados.
 - Viewport y densidad: 390 × 844 CSS px, factor 1; el navegador entrega 375 px útiles en las capturas por la barra de desplazamiento.
 - Comparación de una sola entrada: el recibo histórico comparó la fuente
   normalizada a 375 × 844 con el primer viewport del panel. La fuente sólo define
@@ -178,9 +181,10 @@ Final result: passed
 - Viewports: 320 × 900, 390 × 900 y 1440 × 1000 CSS px; las seis capturas completas
   están en `.codex-work/corte-7r/public-{320,390,1440}.png` y
   `.codex-work/corte-7r/seller-{320,390,1440}.png`.
-- Fuente de dirección: la base móvil aprobada de Corte 6 citada al inicio de este
-  documento. Corte 7R conserva sus tokens, tipografía, densidad y jerarquía sin
-  reclamar paridad de contenido con un mockup vendedor inexistente.
+- Fuente de dirección durante esa pasada: la base móvil de Corte 6 descrita en
+  el recibo histórico y hoy retirada. Corte 7R conserva sus tokens, tipografía,
+  densidad y jerarquía sin reclamar paridad de contenido con un mockup vendedor
+  inexistente.
 - Entrada pública: explica oferta privada, publicación contextual y frontera de
   WhatsApp antes de pedir autenticación. En escritorio y móvil mantiene una sola
   acción primaria y una salida inequívoca a la vitrina.
@@ -198,3 +202,22 @@ Final result: passed
 No quedan hallazgos visuales P0, P1 o P2 en las superficies y viewports observados.
 La aceptación visual de Ale y la verificación en un build de producción siguen
 siendo estados separados.
+
+## Ajuste 7R-P — flujo progresivo del vendedor — 2 de septiembre de 2026
+
+- Problema observado: la lógica era condicional, pero alta y edición todavía
+  mostraban cuatro bloques seguidos y la primera foto sólo aparecía después de
+  crear la oferta.
+- Implementación local: la primera alta separa oferta y negocio; el formulario
+  presenta tipo, datos esenciales, disponibilidad, cumplimiento y revisión como
+  tareas navegables; la revisión acepta una primera foto opcional.
+- Accesibilidad estructural: progreso con `aria-current`, botones visitados,
+  validación antes de avanzar y foco dirigido al panel activo. A 390 px o menos,
+  los rótulos permanecen accesibles aunque la fila visual se compacte a números.
+- Evidencia técnica posterior al cambio: ESLint, generación de tipos +
+  TypeScript, 85 unitarias, build de producción y `git diff --check` pasan.
+- Límite: el servidor local compiló, pero no alcanzó Auth/Supabase. No se observó
+  el flujo autenticado ni se repitieron Playwright, Axe o capturas a
+  320/390/1440. El `passed` histórico no se aplica a este diff.
+
+Final result: implemented-local; visual-runtime-verification-pending
