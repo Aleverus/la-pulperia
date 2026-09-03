@@ -369,3 +369,34 @@ en 390/1440; contenido representativo, base, E2E, publicación y aceptación de
 Ale pendientes.
 
 final result: local-implemented-technical-passed-focused-visual-passed; real-data-e2e-publication-owner-acceptance-pending
+
+**Publicación y observación remota — 2 de septiembre de 2026**
+
+- La reparación quedó integrada en
+  `fbca6b24639a4f2bb91ce5452b11699af5bf8002`, subida a `origin/main` y publicada
+  por Vercel en producción como `dpl_DJjGmHYaDhipNvTNBR41LnQmBRux` (`READY`),
+  con alias principal `https://la-pulperia-hn.vercel.app`.
+- El recorrido remoto observó `/buscar` a 390 y 1440 px, `/carrito`,
+  `/mi-pulperia`, `/vender`, el segundo paso de alta y el perfil público. La
+  sesión autenticada sólo navegó y avanzó el formulario sin enviarlo: no se
+  escribieron ofertas ni datos del negocio.
+- Resultados preceden al mapa; filtros y mapa abren; las cuatro pestañas globales
+  y las cuatro pestañas de dueña caben; el pie no aparece en superficies
+  privadas; el segundo paso empieza bajo la cabecera fija; perfil y búsqueda no
+  tienen ancho horizontal extra. No se capturaron errores de consola.
+- En la hora del recorrido, Vercel no registró 4xx, 5xx ni clusters de error para
+  el deployment. Supabase respondió 200 para búsqueda, catálogo, medios,
+  presencias, ofertas, sesión y solicitudes; el proyecto remoto está saludable y
+  conserva como última migración `20260902224613 confirm_owned_whatsapp`.
+- El E2E local completo no queda verde. Docker Desktop falla antes de exponer el
+  motor por el socket local `sailor-ingest.sock`; por eso no se repitieron reset,
+  pgTAP ni Playwright con fixtures. El catálogo remoto visible continúa siendo
+  material de prueba, y la aceptación de Ale sigue pendiente.
+- Evidencia visual remota:
+  `C:/Users/ozela/.codex/visualizations/2026/09/03/01a064ef-308b-71e0-ae59-77794235e35b/visual-audit-repair/remote/`.
+
+Resultado: publicado y observado en producción en superficies públicas y
+autenticadas; gates locales dependientes de Docker, contenido representativo y
+aceptación de Ale pendientes.
+
+final result: production-published-public-authenticated-observed; local-db-pgtap-full-e2e-content-owner-acceptance-pending

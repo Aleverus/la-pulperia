@@ -245,18 +245,23 @@ After the bug-repair plans 001–005 on 2026-08-30, the local tree passed:
   visual P0–P2. The 36-test Playwright retry remains environmentally blocked:
   the sandbox could not spawn Chromium and Docker Desktop then lost its Linux
   engine before a clean out-of-sandbox repetition. It is not reported as green.
-- The later 2026-09-02 product/UI audit repair is implemented only in the local
-  working tree over `578f637`. Search now leads with offers, filters and map are
-  progressive, mobile cards keep class and description with three comparable
+- The later 2026-09-02 product/UI audit repair is implemented in
+  `fbca6b24639a4f2bb91ce5452b11699af5bf8002`, pushed to `origin/main` and
+  published by Vercel as production deployment
+  `dpl_DJjGmHYaDhipNvTNBR41LnQmBRux`. Search now leads with offers; filters and
+  map are progressive; mobile cards keep class and description with three comparable
   facts, global navigation has four destinations, seller requests stay inside
   the workspace, `/vender` prioritizes publishing and management for an existing
   seller, empty states recover, the offer wizard reveals each new heading, and
   private surfaces omit the public footer. ESLint, route types, TypeScript, 89
   Vitest tests, the production build, and `git diff --check` pass. Focused local
-  visual inspection passed at 390 and 1440 px. Database reset, pgTAP, real-data
-  Playwright, publication, and owner acceptance remain pending because Docker's
-  Linux engine was unavailable. The observed test catalog is not treated as
-  representative commercial content.
+  visual inspection passed locally and in production at 390 and 1440 px,
+  including authenticated seller surfaces without writes. The deployment was
+  `READY`; the observed routes produced no 4xx, 5xx, runtime errors, console
+  errors or horizontal overflow. Local database reset, pgTAP and full Playwright
+  remain pending because Docker's Linux engine is unavailable. Owner acceptance
+  and representative content also remain pending; the observed test catalog is
+  not treated as commercial evidence.
 - A prior public OAuth exercise selected the authorized Google test account,
   consented only to basic identity and email, returned to `/carrito`, exposed the
   authenticated navigation and opened `/cuenta`. The 2026-09-02 cleanup verified
