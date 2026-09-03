@@ -26,7 +26,7 @@ import {
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Buscar ofertas locales",
+  title: "Catálogo local",
   description: "Buscá y compará ofertas publicadas en Siguatepeque.",
   alternates: { canonical: "/buscar" },
   robots: { index: false, follow: true },
@@ -45,18 +45,29 @@ export default async function BuscarPage({
   const location = parseSessionLocation(cookieStore.get(LOCATION_COOKIE)?.value);
   const sort = requestedSort === "nearby" && !location ? "organic" : requestedSort;
   const page = parseSearchPage(params.pagina);
-  const [{ offers, hasNext }, physicalPlaces] = await Promise.all([
-    searchOffers({
-      query,
-      offerClass,
-      presence,
-      availability,
-      sort,
-      page,
-      location,
-    }),
-    getPhysicalCatalogPlaces(),
-  ]);
+  let offers: Awaited<ReturnType<typeof searchOffers>>["offers"] = [];
+  let hasNext = false;
+  let physicalPlaces: Awaited<ReturnType<typeof getPhysicalCatalogPlaces>> = [];
+  let loadFailed = false;
+  try {
+    const [offerResult, places] = await Promise.all([
+      searchOffers({
+        query,
+        offerClass,
+        presence,
+        availability,
+        sort,
+        page,
+        location,
+      }),
+      getPhysicalCatalogPlaces(),
+    ]);
+    offers = offerResult.offers;
+    hasNext = offerResult.hasNext;
+    physicalPlaces = places;
+  } catch {
+    loadFailed = true;
+  }
   const fixedPresenceIds = new Set(
     offers
       .filter((offer) => offer.presence_mode === "fixed_location")
@@ -69,12 +80,16 @@ export default async function BuscarPage({
       .map((offer) => offer.presence_id),
   ).size;
 
-  return (
-    <main className="catalog-page">
-      <p className="eyebrow">Catálogo local</p>
+  const intro = (
+    <section className="catalog-intro">
       <h1 className="search-page-title">
-        {query ? `Resultados para “${query}”` : "Buscar ofertas"}
+        {query ? `Resultados para “${query}”` : "Catálogo"}
       </h1>
+      {!query ? (
+        <p className="catalog-intro__lede">
+          Productos y ofertas de negocios en Siguatepeque.
+        </p>
+      ) : null}
       <SearchForm
         defaultQuery={query}
         defaultOfferClass={offerClass}
@@ -82,7 +97,30 @@ export default async function BuscarPage({
         defaultAvailability={availability}
         defaultSort={sort}
         locationActive={location !== null}
+        compact
       />
+    </section>
+  );
+
+  if (loadFailed) {
+    return (
+      <main className="catalog-page">
+        {intro}
+        <section className="catalog-load-error" role="alert">
+          <h2>No pudimos cargar el catálogo</h2>
+          <p>
+            La búsqueda sigue disponible. Intentá de nuevo cuando vuelva la
+            conexión con la información local.
+          </p>
+          <Link href="/buscar">Intentar de nuevo</Link>
+        </section>
+      </main>
+    );
+  }
+
+  return (
+    <main className="catalog-page">
+      {intro}
       <p className="search-results-count" role="status">
         {offers.length} {offers.length === 1 ? "resultado visible" : "resultados visibles"}
         {hasNext ? " en esta página; hay más resultados." : "."}

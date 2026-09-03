@@ -28,20 +28,20 @@ export function HeaderNavigation({
   const accountHref = email ? "/cuenta" : "/ingresar?next=%2Fcuenta";
   const tabs = [
     {
+      href: "/mapa",
+      label: "Explorar",
+      icon: IconMap2,
+      active: pathname.startsWith("/mapa"),
+    },
+    {
       href: "/buscar",
-      label: "Comprar",
+      label: "Catálogo",
       icon: IconHomeSearch,
       active:
         pathname === "/" ||
         pathname.startsWith("/buscar") ||
         pathname.startsWith("/oferta/") ||
         pathname.startsWith("/pulperia/"),
-    },
-    {
-      href: "/mapa",
-      label: "Mapa",
-      icon: IconMap2,
-      active: pathname.startsWith("/mapa"),
     },
     {
       href: sellerHref,

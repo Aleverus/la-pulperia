@@ -22,7 +22,7 @@ vi.mock("@/app/_components/CartLink", () => ({
 afterEach(cleanup);
 
 describe("HeaderNavigation", () => {
-  it("keeps buying, selling and account available without a session", () => {
+  it("keeps explore, catalog, selling and account available without a session", () => {
     mocks.pathname = "/buscar";
     render(
       <HeaderNavigation
@@ -33,8 +33,11 @@ describe("HeaderNavigation", () => {
     );
 
     expect(
-      screen.getByRole("link", { name: /Comprar/ }).getAttribute("aria-current"),
+      screen.getByRole("link", { name: /Catálogo/ }).getAttribute("aria-current"),
     ).toBe("page");
+    expect(screen.getByRole("link", { name: /Explorar/ }).getAttribute("href")).toBe(
+      "/mapa",
+    );
     expect(
       screen.getByRole("link", { name: /Abrir/ }).getAttribute("href"),
     ).toBe("/vender");

@@ -30,7 +30,7 @@ export async function Header() {
         <Link href="/" className="mark" aria-label="La Pulpería, inicio">
           <Image
             className="mark__monogram"
-            src="/brand/la-pulperia-monogram.png"
+            src="/brand/la-pulperia-monogram-inverse-accent.png"
             alt=""
             aria-hidden="true"
             width={112}
@@ -40,13 +40,12 @@ export async function Header() {
           <span className="mark__identity">
             <Image
               className="mark__wordmark"
-              src="/brand/la-pulperia-wordmark.png"
+              src="/brand/la-pulperia-wordmark-inverse.png"
               alt="La Pulpería"
               width={328}
               height={160}
               priority
             />
-            <small>Siguatepeque</small>
           </span>
         </Link>
 

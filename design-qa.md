@@ -442,3 +442,86 @@ final result: production-data-virgin-verified; first-use-owner-acceptance-pendin
   documental.
 
 final result: production-published-authenticated-mobile-observed; profile-save-owner-acceptance-pending
+
+## Ajuste 7V-B — borgoña/acero y `Explorar` — 3 de septiembre de 2026
+
+**Artefactos y normalización**
+
+- Fuente visual:
+  `../Obra/Referencias visuales/direccion-borgona-acero-seleccionada-2026-09-03.png`,
+  853 × 1844 px a 72 ppp. Es una dirección móvil de catálogo poblado, no una
+  especificación literal de datos ni del estado de conexión.
+- Implementación principal:
+  `evidence/design-qa-7v-b/catalogo-mobile-390-viewport.png`, 390 × 844 px a 72 ppp,
+  viewport CSS 390 × 844 y `deviceScaleFactor=1`.
+- Comparación conjunta:
+  `evidence/design-qa-7v-b/comparacion-catalogo-mobile.png`, 800 × 844 px. La fuente
+  se normalizó a 390 × 844; una calle de 20 px separa fuente e implementación.
+- Evidencia adicional:
+  `evidence/design-qa-7v-b/explorar-mobile-390-viewport.png`,
+  `evidence/design-qa-7v-b/catalogo-desktop-1440-viewport.png` y
+  `evidence/design-qa-7v-b/explorar-desktop-1440-viewport.png`.
+- Estado: shell público sin sesión. Docker Desktop no expuso el motor Linux;
+  por eso la implementación muestra el fallo recuperable real en vez del
+  catálogo poblado de la referencia. Se compararon con precisión el lockup,
+  paleta, tipografía, búsqueda, navegación y composición; las filas de producto
+  quedan como brecha de evidencia runtime, no como coincidencia asumida.
+
+**Comparación de vista completa**
+
+- Tipografía: Alegreya conserva la voz editorial de títulos y marca; Fira Sans
+  Condensed mantiene controles y texto operativo legibles. El wordmark es el
+  activo propio, no una aproximación tipográfica. No se observaron truncamientos
+  ni envolturas rotas a 320, 390 o 1440 px.
+- Espaciado y ritmo: en móvil el bloque oscuro de catálogo continúa directamente
+  desde la cabecera, sin tarjeta flotante ni borde ornamental. En escritorio
+  vuelve a una pieza contenida dentro de la retícula. `Explorar` entrega el mapa
+  como región dominante y mantiene `Cerca`/`En línea` en un control único.
+- Color: borgoña `#42151B`, profundo `#280C10`, óxido `#8A2A2F`, mineral
+  `#ECEDEB`, acero `#BFC3C5` y tinta `#111214` reproducen la dirección elegida
+  sin fondo blanco clínico ni pastel. Los estados de error conservan semántica
+  propia y no usan el color de marca como prueba de éxito.
+- Imagen y activos: el monograma mineral con acento óxido y el wordmark mineral
+  se generan desde la fuente seleccionada y conservan transparencia y nitidez;
+  favicon, icono Apple e imagen social no muestran separadores ni halos. No se
+  inventaron fotografías de producto para cubrir la falta de datos local.
+- Copy: `Explorar`, `Catálogo`, `Abrir`/`Mi pulpería` y `Cuenta` describen tareas.
+  `Cerca` sólo promete ubicaciones fijas; `En línea` lista cobertura móvil/remota
+  sin convertirla en pines. El error de carga ofrece reintento sin afirmar cero
+  oferta.
+
+No se necesitó un recorte focal adicional: la comparación normalizada conserva
+logo, texto, controles, bordes e iconos a escala 1:1 y permite leerlos completos.
+Los activos de icono e imagen social se inspeccionaron además a resolución nativa.
+
+**Hallazgos**
+
+- No quedan hallazgos accionables P0, P1 o P2 en las superficies observables.
+- [P3] La implementación conserva `Filtros`, ausente en la referencia. Es una
+  desviación intencional porque sostiene comparación por clase, presencia,
+  disponibilidad y orden sin convertir el catálogo en una maqueta estática.
+
+**Historial de comparación**
+
+| Pasada | Severidad | Hallazgo | Corrección y evidencia posterior |
+| --- | --- | --- | --- |
+| 1 | P2 | El encabezado de catálogo parecía una tarjeta genérica separada por margen blanco e incluía el rótulo redundante `CATÁLOGO LOCAL`. | Se hizo continuo y sin radio en móvil, se retiró el rótulo y se conservó la tarjeta contenida sólo en escritorio. La comparación conjunta vigente muestra la jerarquía corregida. |
+| 1 | P2 | A 390 px el placeholder compacto rozaba el recorte antes de `negocios`. | Se fijó el tamaño del campo compacto a `1rem`; `catalogo-mobile-390-viewport.png` muestra el texto completo. |
+
+**Interacciones y resiliencia**
+
+- `Cerca` abre por defecto; `En línea` recibe clic, cambia `aria-selected` y
+  muestra su estado vacío/listado separado del mapa.
+- `/mapa` y `/buscar` conservaron `scrollWidth === innerWidth` a 320, 390 y
+  1440 px. No se capturaron errores de consola en esas seis observaciones.
+- La navegación mantiene destino activo visible, nombres accesibles y orden
+  consistente entre barra inferior móvil y cabecera de escritorio.
+
+**Brecha residual de prueba**
+
+- Falta repetir la comparación visual de filas reales, pines, hover/foco con
+  datos, pgTAP y E2E cuando Docker/Supabase local vuelva a estar disponible.
+  Esta brecha no oculta un defecto visual observado, pero impide presentar el
+  catálogo poblado como verificado en uso.
+
+final result: passed

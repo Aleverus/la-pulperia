@@ -1,28 +1,47 @@
 import type { Metadata } from "next";
-import { PublicMap } from "@/app/_components/PublicMap";
-import { getPhysicalCatalogPlaces } from "@/lib/seller-data";
+import { ExploreDirectory } from "@/app/_components/ExploreDirectory";
+import {
+  getOnlineCatalogPlaces,
+  getPhysicalCatalogPlaces,
+} from "@/lib/seller-data";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Mapa de ubicaciones fijas",
+  title: "Explorar negocios",
   description:
-    "Descubrí ubicaciones fijas de Siguatepeque con punto público confirmado.",
+    "Descubrí negocios cercanos y negocios que atienden en línea en Siguatepeque.",
   alternates: { canonical: "/mapa" },
 };
 
 export default async function MapaPage() {
-  const places = await getPhysicalCatalogPlaces();
+  let fixedPlaces: Awaited<ReturnType<typeof getPhysicalCatalogPlaces>> = [];
+  let onlinePlaces: Awaited<ReturnType<typeof getOnlineCatalogPlaces>> = [];
+  let loadFailed = false;
+  try {
+    [fixedPlaces, onlinePlaces] = await Promise.all([
+      getPhysicalCatalogPlaces(),
+      getOnlineCatalogPlaces(),
+    ]);
+  } catch {
+    loadFailed = true;
+  }
 
   return (
     <main className="map-page">
       <p className="eyebrow">Siguatepeque</p>
-      <h1>Mapa</h1>
+      <h1>Explorar negocios</h1>
       <p>
-        Sólo ubicaciones fijas con punto confirmado. La atención móvil y remota
-        aparece en el catálogo, nunca como un marcador falso.
+        Encontrá quién está cerca o quién puede atenderte en línea desde un solo
+        lugar.
       </p>
-      <PublicMap places={places} />
+      {loadFailed ? (
+        <p className="explore-load-error" role="alert">
+          No pudimos cargar el directorio. El mapa base y los modos de exploración
+          siguen disponibles para que podás intentarlo de nuevo.
+        </p>
+      ) : null}
+      <ExploreDirectory fixedPlaces={fixedPlaces} onlinePlaces={onlinePlaces} />
     </main>
   );
 }

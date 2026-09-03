@@ -56,7 +56,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <div className="site-footer__inner">
             <div className="site-footer__brand">
               <Image
-                src="/brand/la-pulperia-monogram-one-ink.png"
+                src="/brand/la-pulperia-monogram-inverse-accent.png"
                 alt=""
                 aria-hidden="true"
                 width={112}

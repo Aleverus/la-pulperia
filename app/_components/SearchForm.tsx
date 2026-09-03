@@ -14,6 +14,7 @@ export function SearchForm({
   defaultAvailability = "all",
   defaultSort = "organic",
   locationActive = false,
+  compact = false,
 }: {
   defaultQuery?: string;
   defaultOfferClass?: SearchOfferClassFilter;
@@ -21,6 +22,7 @@ export function SearchForm({
   defaultAvailability?: SearchAvailabilityFilter;
   defaultSort?: SearchSort;
   locationActive?: boolean;
+  compact?: boolean;
 }) {
   const formKey = [
     defaultQuery,
@@ -41,15 +43,17 @@ export function SearchForm({
       key={formKey}
       action="/buscar"
       role="search"
-      className="search-form"
+      className={compact ? "search-form is-compact" : "search-form"}
     >
       <label className="form-field form-field--query" htmlFor="q">
-        <span>¿Qué necesitás encontrar?</span>
+        <span className={compact ? "sr-only" : undefined}>
+          ¿Qué necesitás encontrar?
+        </span>
         <input
           id="q"
           name="q"
           defaultValue={defaultQuery}
-          placeholder="zambos picantes"
+          placeholder={compact ? "Buscar productos o negocios" : "zambos picantes"}
         />
       </label>
       <details className="search-form__filter-panel">
@@ -128,7 +132,7 @@ export function SearchForm({
       </details>
       <button type="submit" className="search-form__submit">
         <IconSearch aria-hidden="true" size={22} stroke={2} />
-        Buscar
+        <span>Buscar</span>
       </button>
     </Form>
   );

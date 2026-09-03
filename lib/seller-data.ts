@@ -124,6 +124,19 @@ export async function getOfferMedia(offerId: string): Promise<OwnedMedia[]> {
   })) as OwnedMedia[];
 }
 
+export async function getOnlineCatalogPlaces(): Promise<CatalogPresence[]> {
+  const supabase = createPublicClient();
+  const { data, error } = await supabase
+    .from("catalog_presences")
+    .select(
+      "id, name, slug, description, mode, coverage_label, service_territory, served_city, lat, lng",
+    )
+    .in("mode", ["mobile", "remote"])
+    .order("name");
+  if (error) throw error;
+  return (data ?? []) as CatalogPresence[];
+}
+
 export type OfferPreviewMedia = Pick<
   OwnedMedia,
   "id" | "storage_path" | "alt_text" | "sort_order"

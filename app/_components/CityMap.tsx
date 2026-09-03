@@ -198,6 +198,6 @@ function regionalStyle(archiveUrl: string): StyleSpecification {
           '<a href="https://protomaps.com">Protomaps</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
       },
     },
-    layers: layers("protomaps", namedFlavor("light"), { lang: "es" }),
+    layers: layers("protomaps", namedFlavor("dark"), { lang: "es" }),
   };
 }
