@@ -25,8 +25,8 @@ export default async function VenderPage({
   if (!user) {
     return (
       <main className="detail-page seller-entry">
-        <p className="eyebrow">Ofrecer en La Pulpería</p>
-        <h1>Volvé encontrable una oferta real.</h1>
+        <p className="eyebrow">Abrí una pulpería</p>
+        <h1>Empezá por una oferta real.</h1>
         <p className="lede">
           No vas a construir una tienda ni perder tu canal. Empezás una oferta
           privada, explicás cómo atendés y publicás sólo cuando la información
@@ -58,7 +58,7 @@ export default async function VenderPage({
             className="primary-action"
             href="/ingresar?next=%2Fvender"
           >
-            Ingresar para empezar
+            Ingresar y abrir mi pulpería
           </Link>
           <Link className="secondary-action" href="/buscar">
             Ver la vitrina pública
@@ -73,8 +73,8 @@ export default async function VenderPage({
 
   return (
     <main className="detail-page seller-entry">
-      <p className="eyebrow">Ofrecer en La Pulpería</p>
-      <h1>{firstBusiness ? "Iniciá tu primera oferta" : "Ofrecé algo nuevo"}</h1>
+      <p className="eyebrow">Publicar en La Pulpería</p>
+      <h1>{firstBusiness ? "Abrí tu pulpería" : "Creá una publicación"}</h1>
       <p>
         Esta misma cuenta sirve para comprar y ofrecer. No hay selector de rol
         ni una identidad separada.
@@ -97,9 +97,9 @@ export default async function VenderPage({
         <SellerFirstSetup error={error ?? undefined} />
       ) : (
         <section className="starter-business" aria-labelledby="starter-business">
-          <p className="eyebrow">Otro negocio</p>
+          <p className="eyebrow">Otra pulpería</p>
           <h2 id="starter-business" tabIndex={-1}>
-            Agregá otro negocio
+            Agregá otro perfil de negocio
           </h2>
           <p>
             El modo de atención y el WhatsApp protegen la lectura pública. Una

@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { OfferForm } from "@/app/_components/OfferForm";
+import { SellerWorkspaceNav } from "@/app/_components/SellerWorkspaceNav";
 import { formErrorMessage } from "@/lib/seller";
 import {
   getOwnedMedia,
@@ -40,13 +41,15 @@ export default async function EditarOfertaPage({
     query.ok === "fresh" ? "Vigencia confirmada. Eso no registra una venta." : undefined;
 
   return (
-    <main>
+    <main className="detail-page seller-publication-editor">
       <p>
         <Link href={sellerUrl("/mi-pulperia", presence.id)}>
           Volver a {presence.name}
         </Link>
       </p>
-      <h1>Editar oferta</h1>
+      <p className="eyebrow">Publicación</p>
+      <h1>Editar {offer.title}</h1>
+      <SellerWorkspaceNav active="publications" presenceId={presence.id} />
       <OfferForm
         presenceId={presence.id}
         offer={offer}

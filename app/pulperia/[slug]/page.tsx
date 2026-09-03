@@ -1,5 +1,11 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
+import {
+  IconArrowRight,
+  IconBuildingStore,
+  IconMapPin,
+} from "@tabler/icons-react";
 import { notFound } from "next/navigation";
 import { JsonLd } from "@/app/_components/JsonLd";
 import { OfferContext } from "@/app/_components/OfferContext";
@@ -79,10 +85,32 @@ export default async function PulperiaPage({
   return (
     <main className="detail-page presence-page">
       {structuredData ? <JsonLd data={structuredData} /> : null}
-      <section className="presence-sign">
-        <p className="eyebrow">{PRESENCE_MODE_LABEL[presence.mode]}</p>
-        <h1>{presence.name}</h1>
-        <p>{presence.served_city}</p>
+      <section className="public-profile">
+        <div className="public-profile__identity">
+          <span className="public-profile__mark" aria-hidden="true">
+            <Image
+              src="/brand/la-pulperia-monogram-one-ink.png"
+              alt=""
+              width={112}
+              height={112}
+            />
+          </span>
+          <div>
+            <p className="eyebrow">Perfil público</p>
+            <h1>{presence.name}</h1>
+            <p className="public-profile__meta">
+              <IconBuildingStore aria-hidden="true" size={18} stroke={1.8} />
+              {PRESENCE_MODE_LABEL[presence.mode]}
+              <span aria-hidden="true">·</span>
+              <IconMapPin aria-hidden="true" size={18} stroke={1.8} />
+              {presence.served_city}
+            </p>
+          </div>
+        </div>
+        <p className="lede">{presence.description}</p>
+        <div className="button-row">
+          <ShareButton label="Compartir pulpería" />
+        </div>
       </section>
       {query.reporte === "recibido" ? (
         <p role="status">Reporte recibido. Un operador lo revisará.</p>
@@ -90,41 +118,49 @@ export default async function PulperiaPage({
       {query.reporte === "error" ? (
         <p role="alert">No se pudo enviar el reporte.</p>
       ) : null}
-      {presence.mode !== "fixed_location" ? (
-        <p>
+      <section className="public-profile__context" aria-label="Cómo atiende">
+        <p className="eyebrow">Cómo atiende</p>
+        {presence.mode !== "fixed_location" ? (
+          <p>
           No aparece como punto en el mapa. {presence.coverage_label ?? presence.service_territory}
-        </p>
-      ) : (
-        <p>
-          Negocio físico. El pin es público porque el vendedor lo confirmó.{" "}
-          <Link href="/mapa">Ver en el mapa</Link>
-        </p>
-      )}
-      <p className="lede">{presence.description}</p>
-      <div className="button-row">
-        <ShareButton label="Compartir pulpería" />
-      </div>
+          </p>
+        ) : (
+          <p>
+            Negocio físico. El pin es público porque el vendedor lo confirmó.{" "}
+            <Link href="/mapa">Ver en el mapa</Link>
+          </p>
+        )}
+      </section>
       <PublicContextNotes notes={notes} />
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">Ofertas de este negocio</p>
-          <h2>Ofertas</h2>
+      <section className="publications" aria-labelledby="publications-title">
+        <div className="section-heading-row">
+          <div>
+            <p className="eyebrow">Publicaciones</p>
+            <h2 id="publications-title">Lo que ofrece esta pulpería</h2>
+          </div>
+          <span>{offers.length} {offers.length === 1 ? "oferta" : "ofertas"}</span>
         </div>
-      </div>
-      <ul className="presence-offer-list">
-        {offers.map((offer) => (
-          <li key={offer.id}>
-            <div>
-              <Link href={`/oferta/${offer.slug}`}>{offer.title}</Link>
-              <p>{OFFER_CLASS_LABEL[offer.offer_class]}</p>
-              <OfferContext offer={offer} />
-            </div>
-            <span className="price-tag">
-              {formatPublishedPrice(offer.price_cents, offer.price_mode, offer.unit)}
-            </span>
-          </li>
-        ))}
-      </ul>
+        <ul className="presence-offer-list">
+          {offers.map((offer) => (
+            <li key={offer.id}>
+              <div>
+                <p className="eyebrow">{OFFER_CLASS_LABEL[offer.offer_class]}</p>
+                <Link href={`/oferta/${offer.slug}`}>{offer.title}</Link>
+                <OfferContext offer={offer} />
+              </div>
+              <div className="presence-offer-list__action">
+                <span className="price-tag">
+                  {formatPublishedPrice(offer.price_cents, offer.price_mode, offer.unit)}
+                </span>
+                <Link href={`/oferta/${offer.slug}`}>
+                  Ver publicación
+                  <IconArrowRight aria-hidden="true" size={17} stroke={1.8} />
+                </Link>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
       <ReportForm
         presenceId={presence.id}
         returnPath={`/pulperia/${presence.slug}`}

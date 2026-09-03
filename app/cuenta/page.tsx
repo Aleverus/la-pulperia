@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   IconBrandWhatsapp,
+  IconBuildingStore,
   IconMapPin,
-  IconUserCircle,
 } from "@tabler/icons-react";
 import {
   deleteAccountAction,
@@ -23,17 +23,24 @@ export default async function AccountPage({
 }) {
   const query = await searchParams;
   const { supabase, user } = await requireSession("/cuenta");
+  const initial = (user.email?.trim().charAt(0) || "P").toLocaleUpperCase("es-HN");
   const { data: deletionPending, error: deletionStatusError } =
     await supabase.rpc("account_deletion_pending");
   const cleanupPending = deletionStatusError ? true : deletionPending === true;
   return (
     <main className="detail-page account-page">
       <p className="eyebrow">Tu espacio</p>
-      <h1>Cuenta</h1>
-      <p className="account-identity">
-        <IconUserCircle aria-hidden="true" size={22} stroke={1.8} />
-        {user.email}
-      </p>
+      <h1>Tu perfil</h1>
+      <section className="account-profile" aria-label="Perfil de la cuenta">
+        <span className="account-avatar" aria-hidden="true">{initial}</span>
+        <div>
+          <strong>{user.email}</strong>
+          <p>
+            Una sola cuenta para comprar, preparar solicitudes y administrar
+            una pulpería.
+          </p>
+        </div>
+      </section>
       <nav className="account-nav" aria-label="Opciones de cuenta">
         <Link href="/cuenta/solicitudes">
           <IconBrandWhatsapp aria-hidden="true" size={25} stroke={1.8} />
@@ -47,6 +54,13 @@ export default async function AccountPage({
           <span>
             <strong>Localidad</strong>
             <small>Elegí si querés recordar Siguatepeque sin guardar tu GPS.</small>
+          </span>
+        </Link>
+        <Link href="/mi-pulperia">
+          <IconBuildingStore aria-hidden="true" size={25} stroke={1.8} />
+          <span>
+            <strong>Mi pulpería</strong>
+            <small>Volvé al perfil, las publicaciones y los ajustes del negocio.</small>
           </span>
         </Link>
       </nav>

@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { IconArrowLeft, IconBuildingStore } from "@tabler/icons-react";
+import {
+  IconBuildingStore,
+  IconHomeSearch,
+  IconInbox,
+  IconMap2,
+  IconUserCircle,
+} from "@tabler/icons-react";
 import { signOutAction } from "@/app/actions";
 import { CartLink } from "@/app/_components/CartLink";
 import { MobileMenu } from "@/app/_components/MobileMenu";
@@ -19,94 +25,91 @@ export function HeaderNavigation({
   isOperator,
 }: HeaderNavigationProps) {
   const pathname = usePathname();
-  const sellerMode =
-    pathname === "/vender" || pathname.startsWith("/mi-pulperia");
-
-  return (
-    <div className="site-header__actions">
-      {sellerMode ? (
-        <Link className="seller-mode-return" href="/buscar">
-          <IconArrowLeft aria-hidden="true" size={20} stroke={1.9} />
-          <span>Volver a comprar</span>
-        </Link>
-      ) : (
-        <CartLink />
-      )}
-      <nav className="desktop-nav" aria-label="Navegación principal">
-        <PrimaryNavigation
-          email={email}
-          hasSellerPresence={hasSellerPresence}
-          isOperator={isOperator}
-          sellerMode={sellerMode}
-        />
-      </nav>
-      <MobileMenu>
-        <PrimaryNavigation
-          email={email}
-          hasSellerPresence={hasSellerPresence}
-          isOperator={isOperator}
-          sellerMode={sellerMode}
-        />
-      </MobileMenu>
-    </div>
-  );
-}
-
-function PrimaryNavigation({
-  email,
-  hasSellerPresence,
-  isOperator,
-  sellerMode,
-}: HeaderNavigationProps & { sellerMode: boolean }) {
-  if (sellerMode) {
-    return (
-      <>
-        {email ? (
-          <>
-            <Link
-              href={hasSellerPresence ? "/mi-pulperia" : "/vender"}
-              className="seller-nav-link"
-            >
-              <IconBuildingStore aria-hidden="true" size={18} stroke={1.8} />
-              {hasSellerPresence ? "Mi negocio" : "Primera oferta"}
-            </Link>
-            {hasSellerPresence ? (
-              <Link href="/mi-pulperia/solicitudes">Solicitudes</Link>
-            ) : null}
-            <Link href="/cuenta">Cuenta</Link>
-            {isOperator ? <Link href="/operacion/reportes">Operación</Link> : null}
-            <form action={signOutAction}>
-              <button type="submit">Salir</button>
-            </form>
-          </>
-        ) : (
-          <Link href="/ingresar?next=%2Fvender">Ingresar para empezar</Link>
-        )}
-      </>
-    );
-  }
+  const sellerHref = hasSellerPresence ? "/mi-pulperia" : "/vender";
+  const accountHref = email ? "/cuenta" : "/ingresar?next=%2Fcuenta";
+  const tabs = [
+    {
+      href: "/buscar",
+      label: "Comprar",
+      icon: IconHomeSearch,
+      active:
+        pathname === "/" ||
+        pathname.startsWith("/buscar") ||
+        pathname.startsWith("/oferta/") ||
+        pathname.startsWith("/pulperia/"),
+    },
+    {
+      href: "/mapa",
+      label: "Mapa",
+      icon: IconMap2,
+      active: pathname.startsWith("/mapa"),
+    },
+    {
+      href: sellerHref,
+      label: hasSellerPresence ? "Mi pulpería" : "Abrir",
+      icon: IconBuildingStore,
+      active:
+        pathname === "/vender" ||
+        (pathname.startsWith("/mi-pulperia") &&
+          !pathname.startsWith("/mi-pulperia/solicitudes")),
+    },
+    ...(email && hasSellerPresence
+      ? [
+          {
+            href: "/mi-pulperia/solicitudes",
+            label: "Solicitudes",
+            icon: IconInbox,
+            active: pathname.startsWith("/mi-pulperia/solicitudes"),
+          },
+        ]
+      : []),
+    {
+      href: accountHref,
+      label: email ? "Cuenta" : "Ingresar",
+      icon: IconUserCircle,
+      active:
+        pathname.startsWith("/cuenta") || pathname.startsWith("/ingresar"),
+    },
+  ];
 
   return (
     <>
-      <Link href="/buscar">Buscar</Link>
-      <Link href="/mapa">Mapa</Link>
-      {email ? (
-        <>
-          <Link href={hasSellerPresence ? "/mi-pulperia" : "/vender"}>
-            {hasSellerPresence ? "Mi negocio" : "Ofrecer"}
+      <nav className="site-tabs" aria-label="Secciones principales">
+        {tabs.map(({ href, label, icon: Icon, active }) => (
+          <Link
+            href={href}
+            key={label}
+            aria-current={active ? "page" : undefined}
+          >
+            <Icon aria-hidden="true" size={21} stroke={1.8} />
+            <span>{label}</span>
           </Link>
-          <Link href="/cuenta">Cuenta</Link>
-          {isOperator ? <Link href="/operacion/reportes">Operación</Link> : null}
-          <form action={signOutAction}>
-            <button type="submit">Salir</button>
-          </form>
-        </>
-      ) : (
-        <>
-          <Link href="/vender">Ofrecer</Link>
-          <Link href="/ingresar">Ingresar</Link>
-        </>
-      )}
+        ))}
+      </nav>
+      <div className="site-header__actions">
+        <CartLink />
+        {email ? (
+          <>
+            <div className="desktop-session-actions">
+              {isOperator ? (
+                <Link href="/operacion/reportes">Operación</Link>
+              ) : null}
+              <form action={signOutAction}>
+                <button type="submit">Salir</button>
+              </form>
+            </div>
+            <MobileMenu>
+              <Link href="/cuenta">Cuenta</Link>
+              {isOperator ? (
+                <Link href="/operacion/reportes">Operación</Link>
+              ) : null}
+              <form action={signOutAction}>
+                <button type="submit">Salir</button>
+              </form>
+            </MobileMenu>
+          </>
+        ) : null}
+      </div>
     </>
   );
 }

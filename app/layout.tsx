@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
 import { Alegreya, Fira_Sans_Condensed } from "next/font/google";
 import { Header } from "@/app/_components/Header";
 import { prelaunchMode } from "@/lib/env";
@@ -51,11 +53,41 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Header />
         {children}
         <footer className="site-footer">
-          <p>
-            La Pulpería te ayuda a encontrar y comparar. Existencia, precio
-            final, pago y entrega se confirman con cada negocio.
-          </p>
-          <small>Siguatepeque, comercio local con contexto.</small>
+          <div className="site-footer__inner">
+            <div className="site-footer__brand">
+              <Image
+                src="/brand/la-pulperia-monogram-one-ink.png"
+                alt=""
+                aria-hidden="true"
+                width={112}
+                height={112}
+              />
+              <div>
+                <strong>Encontrá. Compará. Confirmá.</strong>
+                <p>
+                  La Pulpería ordena la oferta local; cada negocio confirma
+                  existencia, precio final, pago y entrega.
+                </p>
+              </div>
+            </div>
+            <nav className="site-footer__nav" aria-label="Enlaces del sitio">
+              <div>
+                <strong>Comprar</strong>
+                <Link href="/buscar">Buscar ofertas</Link>
+                <Link href="/mapa">Ver el mapa</Link>
+                <Link href="/carrito">Abrir el carrito</Link>
+              </div>
+              <div>
+                <strong>Ofrecer</strong>
+                <Link href="/vender">Abrir una pulpería</Link>
+                <Link href="/mi-pulperia">Administrar</Link>
+              </div>
+            </nav>
+          </div>
+          <small className="site-footer__boundary">
+            Siguatepeque · La conversación y el cierre siguen en el canal de
+            cada negocio.
+          </small>
         </footer>
       </body>
     </html>

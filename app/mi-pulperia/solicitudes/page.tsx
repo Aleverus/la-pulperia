@@ -9,6 +9,7 @@ import {
 } from "@tabler/icons-react";
 import { redirect } from "next/navigation";
 import { PresenceSelector } from "@/app/_components/PresenceSelector";
+import { SellerWorkspaceNav } from "@/app/_components/SellerWorkspaceNav";
 import { confirmRequestUnderstoodAction } from "@/app/seller-actions";
 import {
   FULFILLMENT_MODE_LABEL,
@@ -60,6 +61,7 @@ export default async function SellerRequestsPage({
         activeId={presence.id}
         action="/mi-pulperia/solicitudes"
       />
+      <SellerWorkspaceNav active="requests" presenceId={presence.id} />
       <p>
         Esta vista muestra la intención estructurada. Confirmar que la entendiste
         no significa aceptarla, cobrarla, vender ni prometer cumplimiento.

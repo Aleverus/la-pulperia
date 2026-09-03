@@ -13,6 +13,7 @@ import {
 import { redirect } from "next/navigation";
 import { PresenceForm } from "@/app/_components/PresenceForm";
 import { PresenceSelector } from "@/app/_components/PresenceSelector";
+import { SellerWorkspaceNav } from "@/app/_components/SellerWorkspaceNav";
 import { confirmOfferAction } from "@/app/seller-actions";
 import {
   AVAILABILITY_STATE_LABEL,
@@ -99,6 +100,8 @@ export default async function MiPulperiaPage({
           action="/mi-pulperia"
         />
       </header>
+
+      <SellerWorkspaceNav active="overview" presenceId={presence.id} />
 
       <div className="seller-status-line" aria-label="Estado del negocio">
         <span className={`status-badge is-${presence.status}`}>
@@ -264,11 +267,15 @@ export default async function MiPulperiaPage({
         </Link>
       </nav>
 
-      <section className="seller-offers" aria-labelledby="seller-offers-title">
+      <section
+        id="publicaciones"
+        className="seller-offers"
+        aria-labelledby="seller-offers-title"
+      >
         <div className="section-heading-row">
           <div>
-            <p className="eyebrow">Oferta del negocio</p>
-            <h2 id="seller-offers-title">Tus ofertas</h2>
+            <p className="eyebrow">Publicaciones</p>
+            <h2 id="seller-offers-title">Ofertas de tu pulpería</h2>
           </div>
         </div>
         {offers.length === 0 ? (

@@ -1,5 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
+import { IconArrowLeft, IconBuildingStore } from "@tabler/icons-react";
 import { notFound } from "next/navigation";
 import { AddToSelection } from "@/app/_components/AddToSelection";
 import { JsonLd } from "@/app/_components/JsonLd";
@@ -100,15 +102,39 @@ export default async function OfferPage({
   };
 
   return (
-    <main className="detail-page">
+    <main className="detail-page offer-publication-page">
       <JsonLd data={structuredData} />
-      <p className="eyebrow">
-        <Link href={`/pulperia/${offer.presence_slug}`}>{offer.presence_name}</Link>
-        {" · "}
-        {PRESENCE_MODE_LABEL[offer.presence_mode]}
+      <p className="back-link">
+        <Link href={`/pulperia/${offer.presence_slug}`}>
+          <IconArrowLeft aria-hidden="true" size={17} stroke={1.8} />
+          Volver a {offer.presence_name}
+        </Link>
       </p>
-      <h1>{offer.title}</h1>
-      <p>{OFFER_CLASS_LABEL[offer.offer_class]}</p>
+      <section className="publication-author" aria-label="Pulpería responsable">
+        <span aria-hidden="true">
+          <Image
+            src="/brand/la-pulperia-monogram-one-ink.png"
+            alt=""
+            width={112}
+            height={112}
+          />
+        </span>
+        <div>
+          <p>Publicado por</p>
+          <Link href={`/pulperia/${offer.presence_slug}`}>
+            {offer.presence_name}
+          </Link>
+          <small>
+            <IconBuildingStore aria-hidden="true" size={15} stroke={1.8} />
+            {PRESENCE_MODE_LABEL[offer.presence_mode]}
+          </small>
+        </div>
+      </section>
+      <header className="publication-heading">
+        <p className="eyebrow">{OFFER_CLASS_LABEL[offer.offer_class]}</p>
+        <h1>{offer.title}</h1>
+        <p className="lede">{offer.description}</p>
+      </header>
       {query.reporte === "recibido" ? (
         <p role="status">Reporte recibido. Un operador lo revisará.</p>
       ) : null}
@@ -139,8 +165,8 @@ export default async function OfferPage({
         <p className="price-tag price-tag--large">
           {formatPublishedPrice(offer.price_cents, offer.price_mode, offer.unit)}
         </p>
+        <p>Precio publicado; confirmalo con la pulpería antes de cerrar.</p>
       </div>
-      <p className="lede">{offer.description}</p>
       <OfferContext offer={offer} />
       <div className="button-row">
         {!requestable ? (

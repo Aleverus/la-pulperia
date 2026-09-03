@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { OfferForm } from "@/app/_components/OfferForm";
+import { SellerWorkspaceNav } from "@/app/_components/SellerWorkspaceNav";
 import { formErrorMessage } from "@/lib/seller";
 import { getOwnedPresences } from "@/lib/seller-data";
 import { selectOwnedPresence, sellerUrl } from "@/lib/seller-routing";
@@ -29,14 +30,19 @@ export default async function NuevaOfertaPage({
   );
 
   return (
-    <main>
+    <main className="detail-page seller-publication-editor">
       <p>
         <Link href={sellerUrl("/mi-pulperia", presence.id)}>
           Volver a {presence.name}
         </Link>
       </p>
-      <h1>Nueva oferta</h1>
-      <p>El precio puede ser fijo, desde o por cotización según la clase de oferta.</p>
+      <p className="eyebrow">Nueva publicación</p>
+      <h1>Creá una oferta</h1>
+      <p>
+        Armala por partes. Podés dejarla en borrador y publicarla sólo cuando el
+        contexto sea suficiente.
+      </p>
+      <SellerWorkspaceNav active="publications" presenceId={presence.id} />
       <OfferForm
         presenceId={presence.id}
         offer={null}

@@ -225,3 +225,72 @@ siendo estados separados.
   despliegue privado de prueba no es lanzamiento ni aceptación.
 
 Final result: published-private-test; public-entry-browser-verified; authenticated-visual-verification-pending
+
+## Canonización del runtime actual — 2 de septiembre de 2026
+
+- Se volvió a observar el checkout canónico en `/vender` y
+  `/ingresar?next=%2Fvender` a 390 × 844 CSS px. La entrada conserva marfil como
+  lienzo, cobalto para marca, títulos y acción principal, ladrillo para el
+  eyebrow, Alegreya en títulos, Fira Sans Condensed en interfaz, bordes finos,
+  radios contenidos y jerarquía móvil sin desborde visible.
+- `/vender` mostró el recorrido de tres momentos, la frontera de WhatsApp, una
+  sola acción primaria para ingresar y una salida secundaria a la vitrina.
+- `/ingresar` conservó el contexto de oferta privada y presentó acceso y cuenta
+  de prueba como superficies separadas bajo la misma cabecera.
+- Las capturas de esta pasada viven fuera del repositorio, en
+  `C:/Users/ozela/.codex/visualizations/2026/09/02/01a06419-3b10-7451-812b-94522f67afbb/la-pulperia-current-design/01-vender-entry-390.png`
+  y `02-login-390.png`; son evidencia de observación, no otra fuente de diseño.
+- El backend local no estuvo disponible porque Docker Desktop y su engine no
+  estaban corriendo. Por eso no se observó la primera alta autenticada ni el
+  editor de cinco etapas, y no se repitieron Axe, 320 px o 1440 px. Su contrato
+  quedó canonizado en `../Obra/DESIGN.md` desde la implementación publicada,
+  pero su aceptación visual continúa pendiente.
+
+Final result: public-mobile-observed; authenticated-visual-verification-pending
+
+## Paquete SR-1 — shell general local — 2 de septiembre de 2026
+
+- Fuente visual de verdad:
+  `../Obra/Referencias visuales/logo-rotulo-hondureno-seleccionado-2026-09-01.png`,
+  `../Obra/DESIGN.md` y el esqueleto funcional de SR-1 en
+  `../Obra/Implementation Plan.md`.
+- Implementación: diff local sobre `d427dee`; no existe captura de implementación
+  válida para comparación.
+- Viewports requeridos: 320, 390 y 1440 CSS px. El navegador integrado sí mostró
+  el runtime privado anterior a 1280 × 720 CSS px, pero no pudo alcanzar
+  `localhost:3011` para observar este diff ni aplicar una comparación de igual
+  estado y viewport.
+- Estado intentado: entrada pública sin sesión. El shell SSR de `/`, `/buscar`,
+  `/vender` y `/ingresar` respondió 200 y su HTML contiene la nueva navegación y
+  el pie, pero el servidor registró `ECONNREFUSED 127.0.0.1:54321` en las rutas
+  dependientes de datos porque Docker/Supabase local está caído. Esto no prueba
+  el recorrido ni sustituye una observación visual.
+- Interacciones primarias: la navegación por pestañas tiene destinos reales,
+  estado activo con `aria-current` y pruebas unitarias para visita, apertura de
+  pulpería, ingreso y solicitudes. No se observaron clics ni foco en navegador.
+- Consola: no se pudo consultar en el runtime local por el mismo bloqueo.
+
+**Superficies de fidelidad**
+
+- Tipografía: conserva Alegreya y Fira Sans Condensed; no comparada visualmente.
+- Espaciado y layout: implementa cabecera de tres zonas en escritorio, pestañas
+  inferiores en móvil y reflow declarativo; no comparado visualmente.
+- Color: reutiliza los tokens canónicos marfil, cobalto, ladrillo y tinta; no
+  introduce otro rol cromático.
+- Activos: reutiliza los PNG reales del monograma; no hay SVG, emoji, CSS art ni
+  media inventada.
+- Copy: conserva precio, vigencia, disponibilidad, presencia, cumplimiento y la
+  frontera de confirmación externa. No afirma venta, stock ni cobertura.
+
+**Comparación e iteración**
+
+- No hay comparación conjunta fuente/implementación ni regiones enfocadas: falta
+  la captura browser-rendered del diff local. Por ello no se emite una lista
+  ficticia de P0–P2 ni se hereda el `passed` histórico.
+- Gates posteriores al cambio: ESLint, tipos, 88 unitarias, build de producción
+  y `git diff --check` pasaron. El runtime local de datos quedó bloqueado.
+- Para desbloquear: observar 320, 390 y 1440 px, comprobar pestañas, foco, menú,
+  perfil público, publicación, cuenta y zona de trabajo; guardar capturas
+  comparables y corregir cualquier P0–P2 antes de integrar.
+
+final result: blocked
