@@ -283,7 +283,6 @@
     border-bottom: 1px solid var(--cobalt);
     background: rgba(251, 245, 232, 0.97);
     box-shadow: 0 4px 18px rgba(7, 59, 101, 0.08);
-    backdrop-filter: blur(12px);
   }
 
   .site-header__inner {
@@ -2976,6 +2975,10 @@
   @media (min-width: 68rem) {
     body {
       padding-bottom: 0;
+    }
+
+    .site-header {
+      backdrop-filter: blur(12px);
     }
 
     .site-tabs {
