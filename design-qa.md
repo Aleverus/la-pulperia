@@ -3,7 +3,7 @@
 ## Resultado vigente — sistema completo
 
 - Fuente visual: `../Obra/Referencias visuales/logo-rotulo-hondureno-seleccionado-2026-09-01.png`.
-- Comparación conjunta: `.codex-work/design-qa/7v4-reference-public-seller.png`; reúne el rótulo elegido, portada pública y panel de dueña en el mismo insumo de revisión.
+- Comparación conjunta: `evidence/design-qa/7v4-reference-public-seller.png`; reúne el rótulo elegido, portada pública y panel de dueña en el mismo insumo de revisión.
 - Superficies observadas con datos locales: portada, búsqueda, tarjetas, carrito multi-vendedor, ingreso, panel de dueña y oferta nueva. Se revisaron 390 y 1440 px; la cabecera y el reflow mínimo conservan la evidencia previa de 320 px.
 - Resultado responsive: las superficies observadas conservaron `scrollWidth <= innerWidth`; navegación de compra y modo vendedor permanecen separadas y el menú móvil conserva su control accesible.
 - Resultado visual: la misma pareja Alegreya/Fira Sans Condensed, marfil/cobalto/ladrillo, divisores, foco, estados, radios contenidos y activos reales gobierna recorrido público, comprador, vendedor y operación. El verde queda reservado a disponibilidad o publicación positiva.
@@ -39,11 +39,9 @@ final result: passed
 ## Resultado vigente — activos, tokens, tipografía y cabecera
 
 - Fuente visual: `../Obra/Referencias visuales/logo-rotulo-hondureno-seleccionado-2026-09-01.png` (1536 × 1024 px).
-- Implementación principal: `test-results/design-qa/7v0-header-390.png` (390 × 844 px, viewport CSS 390 × 844, `deviceScaleFactor: 1`).
-- Breakpoints adicionales: `test-results/design-qa/7v0-header-320.png` (320 × 760 px) y `test-results/design-qa/7v0-header-1440.png` (1440 × 900 px).
+- Capturas originales: fueron salida temporal y ya no se conservan. Este recibo preserva el viewport, el estado observado y las medidas verificadas, no un enlace a un artefacto inexistente.
 - Estado: cabecera pública sin sesión; menú móvil cerrado y abierto. El cuerpo muestra el límite global de error porque Docker/Supabase local no estaba disponible; esa condición no altera la superficie evaluada en 7V-0.
-- Comparación conjunta: `test-results/design-qa/7v0-reference-vs-header-390.png` (800 × 450 px). Confronta en una sola imagen el monograma/wordmark de la lámina y su uso real en cabecera.
-- Comparación enfocada: activos a 24 px en color, una tinta e inversión en `test-results/design-qa/7v0-monogram-24.png`, `7v0-monogram-one-ink-24.png` y `7v0-monogram-inverse-24.png`.
+- Comparación: el recibo histórico confrontó el monograma/wordmark de la lámina con su uso real en cabecera. Las exportaciones temporales no se retienen como fuente de verdad.
 
 ### Superficies de fidelidad
 
@@ -59,7 +57,7 @@ final result: passed
 | --- | --- | --- | --- |
 | 1 | P2 | Los primeros recortes conservaban separadores verticales y velo marfil de la lámina. | Se acotaron los crops y se endureció la máscara de transparencia; la comparación conjunta ya muestra sólo monograma y wordmark. |
 | 1 | P2 | La variante una tinta derivada del monograma a color perdía claridad a 24 px. | Se tomó la variante monocroma dibujada en la propia lámina; color, una tinta e inversión conservan `LP`, ventanita y mostrador a 24 px. |
-| 2 | P2 | Faltaba evidencia del menú en el breakpoint mínimo. | `test-results/design-qa/7v0-menu-320.png` comprueba apertura, foco visible, ancho de 296 px y ausencia de desborde. |
+| 2 | P2 | Faltaba evidencia del menú en el breakpoint mínimo. | La captura histórica a 320 px confirmó apertura, foco visible, ancho de 296 px y ausencia de desborde; la exportación temporal ya no se retiene. |
 
 ### Interacciones y consola
 
@@ -91,9 +89,9 @@ regenerarse contra el original.
 - Estado comparado: búsqueda de `queso`, dos resultados, una presencia fija y una móvil.
 - Viewport de referencia: 390 × 844 CSS px. La captura del navegador mide 375 px de ancho útil porque excluye la barra de desplazamiento.
 - Fuente original: 853 × 1844 px; se normalizó a 375 px de ancho útil sin recortar ni deformar.
-- Implementación: `.codex-work/design-qa/implementation-mobile-search-final.jpg` (375 × 1413 px), capturada desde el build local de producción.
-- Comparación conjunta: `.codex-work/design-qa/comparison-full.jpg`.
-- Comparaciones enfocadas: `.codex-work/design-qa/comparison-header-search.jpg` y `.codex-work/design-qa/comparison-results.jpg`.
+- Implementación: `evidence/design-qa/implementation-mobile-search-final.jpg` (375 × 1413 px), capturada desde el build local de producción.
+- Comparación conjunta: `evidence/design-qa/comparison-full.jpg`.
+- Comparaciones enfocadas: `evidence/design-qa/comparison-header-search.jpg` y `evidence/design-qa/comparison-results.jpg`.
 
 ## Coincidencia observada
 
@@ -124,8 +122,8 @@ regenerarse contra el original.
 - Navegación: `Ver oferta` abre la ficha correcta.
 - Ficha: fallback honesto, cinco hechos completos y 390 px sin desborde.
 - Carrito: `Agregar al carrito` cambia a `En el carrito`, actualiza `Carrito (1)` y conserva oferta, vendedor y handoff de ingreso.
-- Capturas auxiliares: `.codex-work/design-qa/implementation-mobile-detail-final.jpg` y `.codex-work/design-qa/implementation-mobile-cart.jpg`.
-- Recorrido autenticado de cierre: cuenta, historial y detalle de comprador; panel, configuración e inbox de dueña; cuatro clases de intención, carrito multi-vendedor y 404. Las capturas viven en `.codex-work/audit-corte7-2026-08-30/`.
+- Capturas auxiliares: `evidence/design-qa/implementation-mobile-detail-final.jpg` y `evidence/design-qa/implementation-mobile-cart.jpg`.
+- Recorrido autenticado de cierre: cuenta, historial y detalle de comprador; panel, configuración e inbox de dueña; cuatro clases de intención, carrito multi-vendedor y 404. Las capturas viven en `evidence/audit-corte7-2026-08-30/`.
 - Gates posteriores al último cambio: base local reconstruida, 231 pruebas pgTAP, lint de esquema, ESLint, tipos, 19 archivos / 77 pruebas Vitest, build, auditoría de producción y 32 recorridos Playwright en móvil/escritorio, incluidos Axe y reflow a 320 px, pasaron. `git diff --check` pasó.
 
 No quedan hallazgos P0, P1 o P2 abiertos. Las diferencias P3 son conscientes, reversibles y no impiden evaluar esta dirección sobre el producto real.
@@ -179,8 +177,8 @@ Final result: passed
 - Superficies observadas: entrada pública `/vender` sin sesión y panel autenticado
   `/mi-pulperia` de La Canasta Móvil.
 - Viewports: 320 × 900, 390 × 900 y 1440 × 1000 CSS px; las seis capturas completas
-  están en `.codex-work/corte-7r/public-{320,390,1440}.png` y
-  `.codex-work/corte-7r/seller-{320,390,1440}.png`.
+  están en `evidence/corte-7r/public-{320,390,1440}.png` y
+  `evidence/corte-7r/seller-{320,390,1440}.png`.
 - Fuente de dirección durante esa pasada: la base móvil de Corte 6 descrita en
   el recibo histórico y hoy retirada. Corte 7R conserva sus tokens, tipografía,
   densidad y jerarquía sin reclamar paridad de contenido con un mockup vendedor
