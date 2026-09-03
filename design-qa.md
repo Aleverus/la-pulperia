@@ -400,3 +400,18 @@ autenticadas; gates locales dependientes de Docker, contenido representativo y
 aceptación de Ale pendientes.
 
 final result: production-published-public-authenticated-observed; local-db-pgtap-full-e2e-content-owner-acceptance-pending
+
+**Estado de datos posterior — 2 de septiembre de 2026**
+
+Ale autorizó volver la aplicación publicada a cero para juzgar su experiencia
+desde el primer uso. El carrito local se vació; el flujo recuperable de cuenta
+eliminó la identidad propietaria, su pulpería, oferta, medio y único objeto de
+Storage; una transacción eliminó las dos cuentas restantes y truncó las 15 tablas
+de aplicación. La verificación final devolvió cero usuarios, identidades,
+sesiones, refresh tokens, objetos y filas de aplicación. Permanecen 24
+migraciones, las 15 tablas con RLS, un bucket vacío, Google OAuth, código y
+deployment. `/cuenta` redirige a `/ingresar`, `Continuar con Google` está visible
+y el carrito no conserva artículos. Esta limpieza habilita la evaluación de Ale;
+no constituye todavía su aceptación visual.
+
+final result: production-data-virgin-verified; first-use-owner-acceptance-pending

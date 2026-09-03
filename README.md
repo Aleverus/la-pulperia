@@ -259,9 +259,13 @@ After the bug-repair plans 001–005 on 2026-08-30, the local tree passed:
   including authenticated seller surfaces without writes. The deployment was
   `READY`; the observed routes produced no 4xx, 5xx, runtime errors, console
   errors or horizontal overflow. Local database reset, pgTAP and full Playwright
-  remain pending because Docker's Linux engine is unavailable. Owner acceptance
-  and representative content also remain pending; the observed test catalog is
-  not treated as commercial evidence.
+  remain pending because Docker's Linux engine is unavailable. After the remote
+  walkthrough, Ale authorized a full data reset. The account flow removed the
+  owning account and its Storage object; a transaction removed the other two
+  accounts and truncated all 15 application tables. Final counters are zero for
+  Auth, Storage objects, and application data while 24 migrations, RLS, the
+  empty bucket, OAuth, code, and deployment remain. Owner acceptance after a
+  genuine first-use run is still pending.
 - A prior public OAuth exercise selected the authorized Google test account,
   consented only to basic identity and email, returned to `/carrito`, exposed the
   authenticated navigation and opened `/cuenta`. The 2026-09-02 cleanup verified
