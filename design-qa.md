@@ -294,3 +294,29 @@ Final result: public-mobile-observed; authenticated-visual-verification-pending
   comparables y corregir cualquier P0–P2 antes de integrar.
 
 final result: blocked
+
+## Paquete SR-1 — publicación privada del shell — 2 de septiembre de 2026
+
+- Commits de producto observados: `9ed6623` y corrección móvil `956ff62` en
+  `origin/main`.
+- Deployment observado: `dpl_8tHi2jJYVqCqCUdpME5dQeMt1Fx4`, target de
+  producción de Vercel usado sólo como prueba privada, estado `READY`, alias
+  `https://la-pulperia-hn.vercel.app`.
+- Gates repetidos después de la corrección: ESLint, route types y TypeScript,
+  88 unitarias en 24 archivos, build de producción y `git diff --check`.
+- Estado autenticado observado a tamaño de escritorio: la navegación principal
+  marcó `Mi pulpería`; el hub mostró Resumen, Publicaciones, Solicitudes y
+  Ajustes; la página pública leyó el negocio como perfil y su oferta como
+  publicación atribuida.
+- Responsive observado en `/buscar`: a 320 × 760 y 390 × 844 la barra de tareas
+  quedó fija al borde inferior, `Comprar` activo y sin ancho horizontal extra;
+  a 1440 × 900 pasó a navegación estática en el header con el mismo estado
+  activo. No hubo errores de consola capturados en esas comprobaciones.
+- Iteración durante QA: el primer deployment contenía la barra móvil dentro del
+  encabezado porque `backdrop-filter` creaba su bloque contenedor. La corrección
+  conserva ese efecto sólo desde 68 rem, donde la navegación ya es estática.
+- Límite: no se recorrieron todavía todas las interacciones, estados de foco,
+  menús y formularios de cada pestaña; la aceptación visual de Ale permanece
+  pendiente y guiará la profundización por superficie.
+
+final result: responsive-shell-published-and-observed; detailed-visual-qa-pending

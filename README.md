@@ -181,18 +181,23 @@ deployment `dpl_Dr3rCVsrQ8WVxPauuTk8jUFioQeP` as `READY`; the authenticated
 panel showed both steps and kept publication disabled while confirmation was
 pending. Only Ale's real owner confirmation and acceptance remain outstanding.
 
-The general shell of **SR-1** is now implemented as an uncommitted local change
-on top of `d427dee`: persistent task tabs connect buying, map, seller profile,
-seller requests and account; seller work has summary, publications, requests
-and settings tabs; public businesses read as profiles and offers as attributed
-publications; account and footer now share the same structure. This pass does
-not add payments, inventory authority, chat, reputation or fabricated activity.
-ESLint, generated route types and TypeScript, 88 unit tests, the production
-build and `git diff --check` passed. The local SSR shell returned HTTP 200, but
-data-dependent routes logged `ECONNREFUSED 127.0.0.1:54321` because the local
-Docker/Supabase runtime is unavailable. Browser capture was also blocked because
-the integrated browser could not reach `localhost`, so runtime, responsive
-visual QA, commit, publication and Ale's acceptance remain pending.
+The general shell of **SR-1** is published from code commits `9ed6623` and
+`956ff62`: persistent task tabs connect buying, map, seller profile, seller
+requests and account; seller work has summary, publications, requests and
+settings tabs; public businesses read as profiles and offers as attributed
+publications; account and footer share the same structure. The second commit
+keeps the mobile task bar viewport-bound instead of letting the sticky header
+contain it. This pass does not add payments, inventory authority, chat,
+reputation or fabricated activity. ESLint, generated route types and
+TypeScript, 88 unit tests, the production build and `git diff --check` passed
+after that correction. Vercel reported private-test deployment
+`dpl_8tHi2jJYVqCqCUdpME5dQeMt1Fx4` as `READY`. The connected browser observed
+the authenticated seller hub and public profile at desktop size, then verified
+the task tabs at 320, 390 and 1440 CSS px with the correct active state, no
+horizontal overflow and no captured console errors. Detailed per-tab visual
+work, complete interaction/focus QA, local pgTAP/E2E and Ale's acceptance remain
+pending; this is still the non-indexed private testing runtime, not the official
+launch.
 
 The parent `../AGENTS.md` requires every product, contract, route, status, or
 evidence change to update all related documentation in the same work. The
