@@ -69,10 +69,10 @@ export function PublicMap({
     <div className={compact ? "public-map public-map--compact" : "public-map"}>
       {!compact ? (
         <p>
-          <button type="button" onClick={useGps}>
+          <button type="button" className="secondary-action" onClick={useGps}>
             Usar mi ubicación
           </button>
-          . Sólo vale para esta sesión; no se guarda.
+          <span>Sólo para ordenar esta lista; no se guarda.</span>
         </p>
       ) : null}
       {issue ? <p>{GEO_ISSUE_LABEL[issue]}</p> : null}

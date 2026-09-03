@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default async function RequestHistoryPage() {
   const batches = await getMyRequestBatches();
   return (
-    <main className="detail-page">
+    <main className="detail-page workspace-page">
       <p className="eyebrow">Tu cuenta</p>
       <h1>Pedidos para WhatsApp</h1>
       <p>

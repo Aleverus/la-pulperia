@@ -1,7 +1,6 @@
 import {
   AVAILABILITY_STATE_LABEL,
   FULFILLMENT_MODE_LABEL,
-  PRESENCE_MODE_LABEL,
   type SearchOffer,
 } from "@/lib/catalog";
 import {
@@ -46,17 +45,11 @@ export function OfferContext({
   const freshness = compact
     ? FRESHNESS_LABEL[freshnessBand(new Date(offer.confirmed_at))]
     : offerFreshnessSummary(offer.confirmed_at);
-  const presence = compact
-    ? offer.presence_mode === "fixed_location"
-      ? PRESENCE_MODE_LABEL[offer.presence_mode]
-      : offerPresenceSummary(offer)
-    : offerPresenceSummary(offer);
   const fulfillment = compact
     ? offer.fulfillment_modes.map((mode) => FULFILLMENT_MODE_LABEL[mode]).join(", ")
     : offerFulfillmentSummary(offer.fulfillment_modes);
-  const nextStep = compact
-    ? COMPACT_NEXT_STEP[offer.offer_class]
-    : offerNextStep(offer.offer_class);
+  const presence = offerPresenceSummary(offer);
+  const nextStep = offerNextStep(offer.offer_class);
 
   return (
     <div className={compact ? "offer-context is-compact" : "offer-context"}>
@@ -75,35 +68,32 @@ export function OfferContext({
             {freshness}
           </dd>
         </div>
+        {!compact ? (
+          <div>
+            <dt>Dónde atiende</dt>
+            <dd>
+              <IconMapPin aria-hidden="true" size={18} stroke={1.8} />
+              {presence}
+            </dd>
+          </div>
+        ) : null}
         <div>
-          <dt>Atención</dt>
-          <dd>
-            <IconMapPin aria-hidden="true" size={18} stroke={1.8} />
-            {presence}
-          </dd>
-        </div>
-        <div>
-          <dt>Cumplimiento</dt>
+          <dt>Cómo lo recibís</dt>
           <dd>
             <IconTruckDelivery aria-hidden="true" size={18} stroke={1.8} />
             {fulfillment}
           </dd>
         </div>
-        <div>
-          <dt>Siguiente paso</dt>
-          <dd>
-            <IconArrowRight aria-hidden="true" size={18} stroke={1.8} />
-            {nextStep}
-          </dd>
-        </div>
+        {!compact ? (
+          <div>
+            <dt>Qué hacés ahora</dt>
+            <dd>
+              <IconArrowRight aria-hidden="true" size={18} stroke={1.8} />
+              {nextStep}
+            </dd>
+          </div>
+        ) : null}
       </dl>
     </div>
   );
 }
-
-const COMPACT_NEXT_STEP: Record<PublicOfferContext["offer_class"], string> = {
-  stocked_product: "Indicá cantidad",
-  scheduled_food: "Indicá cantidad y ventana",
-  local_service: "Describí el trabajo",
-  digital_offer: "Describí alcance o plan",
-};

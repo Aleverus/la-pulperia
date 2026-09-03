@@ -35,9 +35,13 @@ export async function OfferList({
           La Pulpería no tiene ahora una ficha pública que responda a esta
           búsqueda. Probá otra palabra o ampliá los filtros.
         </p>
-        {emptyState?.filtersApplied ? (
-          <Link href={emptyState.clearFiltersHref}>Quitar filtros</Link>
-        ) : null}
+        <div className="empty-search-actions">
+          {emptyState?.filtersApplied ? (
+            <Link href={emptyState.clearFiltersHref}>Quitar filtros</Link>
+          ) : null}
+          <Link href="/buscar">Ver todas las ofertas</Link>
+          <Link href="/mapa">Explorar ubicaciones fijas</Link>
+        </div>
       </section>
     );
   }

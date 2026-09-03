@@ -31,7 +31,7 @@ export default async function OperationReportsPage({
   );
 
   return (
-    <main>
+    <main className="workspace-page">
       <h1>Operación</h1>
       <p>Reportes privados, decisiones auditadas y métricas agregadas sin PII.</p>
       {query.ok ? <p role="status">Revisión guardada.</p> : null}

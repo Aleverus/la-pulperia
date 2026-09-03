@@ -47,7 +47,7 @@ export default async function SellerRequestsPage({
   ).length;
 
   return (
-    <main className="detail-page seller-inbox">
+    <main className="detail-page seller-inbox workspace-page">
       <p className="eyebrow">Trabajo del vendedor</p>
       <h1>Solicitudes recibidas</h1>
       <p className="back-link">
@@ -63,15 +63,15 @@ export default async function SellerRequestsPage({
       />
       <SellerWorkspaceNav active="requests" presenceId={presence.id} />
       <p>
-        Esta vista muestra la intención estructurada. Confirmar que la entendiste
-        no significa aceptarla, cobrarla, vender ni prometer cumplimiento.
+        Acá ves qué necesita cada persona antes de abrir WhatsApp. Marcá un pedido
+        como revisado cuando el detalle te resulte claro.
       </p>
       <section className="seller-inbox-summary" aria-label="Resumen de solicitudes">
         <div>
           <IconReceipt aria-hidden="true" size={22} stroke={1.8} />
           <span>
             <strong>{requests.length}</strong>
-            preparadas
+            pedidos
           </span>
         </div>
         <div>
@@ -85,12 +85,12 @@ export default async function SellerRequestsPage({
           <IconCircleCheck aria-hidden="true" size={22} stroke={1.8} />
           <span>
             <strong>{understoodRequests}</strong>
-            comprensión registrada
+            revisados
           </span>
         </div>
       </section>
       {query.ok === "understood" ? (
-        <p role="status">Confirmación de comprensión registrada.</p>
+        <p role="status">Pedido marcado como revisado.</p>
       ) : null}
       {query.error ? (
         <p role="alert">No se pudo registrar la confirmación.</p>
@@ -102,11 +102,14 @@ export default async function SellerRequestsPage({
             <strong>No hay solicitudes preparadas</strong>
             <p>
               Cuando un cliente prepare un pedido para {presence.name}, aparecerá
-              acá con el detalle antes de cualquier conversación en WhatsApp.
+              acá con el detalle antes de abrir WhatsApp.
             </p>
-            <Link href={sellerUrl("/mi-pulperia", presence.id)}>
-              Volver al panel
-            </Link>
+            <div className="empty-search-actions">
+              <Link href={sellerUrl("/mi-pulperia/ofertas/nueva", presence.id)}>
+                Crear una oferta
+              </Link>
+              <Link href={`/pulperia/${presence.slug}`}>Ver vitrina pública</Link>
+            </div>
           </div>
         </div>
       ) : (
@@ -175,7 +178,7 @@ export default async function SellerRequestsPage({
                   name="seller_request_id"
                   value={request.seller_request_id}
                 />
-                <button type="submit">Confirmar que entendí la solicitud</button>
+                <button type="submit">Marcar como revisado</button>
               </form>
             ) : (
               <p>

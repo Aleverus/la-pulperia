@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { IconMenu2 } from "@tabler/icons-react";
+import { IconUserCircle } from "@tabler/icons-react";
 
 export function MobileMenu({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -41,8 +41,8 @@ export function MobileMenu({ children }: { children: ReactNode }) {
         detailsRef.current?.querySelector("summary")?.focus();
       }}
     >
-      <summary aria-label="Abrir opciones de cuenta">
-        <IconMenu2 aria-hidden="true" size={28} stroke={1.8} />
+      <summary aria-label="Abrir menú de la cuenta">
+        <IconUserCircle aria-hidden="true" size={28} stroke={1.8} />
       </summary>
       <nav aria-label="Opciones de cuenta">{children}</nav>
     </details>

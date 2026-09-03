@@ -43,7 +43,7 @@ describe("HeaderNavigation", () => {
     ).toBe("/ingresar?next=%2Fcuenta");
   });
 
-  it("adds seller requests and marks the current work area", () => {
+  it("keeps seller requests inside the seller workspace", () => {
     mocks.pathname = "/mi-pulperia/solicitudes";
     render(
       <HeaderNavigation
@@ -57,9 +57,8 @@ describe("HeaderNavigation", () => {
       screen.getByRole("link", { name: /Mi pulpería/ }).getAttribute("href"),
     ).toBe("/mi-pulperia");
     expect(
-      screen
-        .getByRole("link", { name: /Solicitudes/ })
-        .getAttribute("aria-current"),
+      screen.getByRole("link", { name: /Mi pulpería/ }).getAttribute("aria-current"),
     ).toBe("page");
+    expect(screen.queryByRole("link", { name: /Solicitudes/ })).toBeNull();
   });
 });

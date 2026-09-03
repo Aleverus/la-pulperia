@@ -187,7 +187,7 @@ export default async function OfferPage({
             requestContextToken={offer.request_context_token}
           />
         )}
-        <ShareButton label="Compartir oferta" />
+        <ShareButton label="Compartir oferta" secondary />
       </div>
       <p className="trust-note">
         Disponibilidad, precio final, pago y entrega se confirman con el vendedor.

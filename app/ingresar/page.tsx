@@ -21,7 +21,7 @@ export default async function IngresarPage({
   const testAuthEnabled = localTestAuthEnabled();
 
   return (
-    <main className="detail-page auth-page">
+    <main className="detail-page auth-page workspace-page">
       <p className="eyebrow">
         {sellerEntry ? "Tu oferta sigue privada" : "Acceso seguro"}
       </p>

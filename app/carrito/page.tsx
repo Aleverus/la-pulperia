@@ -18,7 +18,7 @@ export default async function CartPage() {
   }
 
   return (
-    <main className="cart-page">
+    <main className="cart-page workspace-page">
       <p className="eyebrow">Tu compra local</p>
       <h1>Carrito</h1>
       <p>

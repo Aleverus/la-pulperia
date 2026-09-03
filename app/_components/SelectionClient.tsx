@@ -208,7 +208,7 @@ export function SelectionClient({ signedIn }: { signedIn: boolean }) {
               {group.presenceName}
             </Link>
           </h2>
-          <p>Este vendedor recibirá su propio pedido por WhatsApp.</p>
+          <p>Pedido separado para {group.presenceName}.</p>
           <ul className="selection-lines">
             {group.lines.map(({ selection, live: offer }) => (
               <li className="selection-line" key={offer.id}>
@@ -219,13 +219,17 @@ export function SelectionClient({ signedIn }: { signedIn: boolean }) {
                 <p className="price-tag">
                   {formatPublishedPrice(offer.price_cents, offer.price_mode, offer.unit)}
                 </p>
-                <p>{FRESHNESS_LABEL[freshnessBand(new Date(offer.confirmed_at))]}</p>
-                <OfferContext offer={offer} />
+                <p className="selection-line__freshness">
+                  {FRESHNESS_LABEL[freshnessBand(new Date(offer.confirmed_at))]}
+                </p>
+                <details className="selection-line__details">
+                  <summary>Disponibilidad y entrega</summary>
+                  <OfferContext offer={offer} />
+                </details>
                 {selectionNeedsOfferReview(selection) ? (
                   <p role="alert">
-                    Este carrito se guardó con un contrato anterior. Volvé a la
-                    oferta y configurá el pedido otra vez; no vamos a inventar
-                    unidad ni destino.
+                    Esta oferta cambió desde que la agregaste. Volvé a abrirla y
+                    configurá el pedido otra vez.
                   </p>
                 ) : selection.offerClass !== offer.offer_class ? (
                   <p role="alert">
@@ -254,7 +258,7 @@ export function SelectionClient({ signedIn }: { signedIn: boolean }) {
                         writeSelection(acceptCurrentContext(lines, offer))
                       }
                     >
-                      Revisé y acepto el contexto actual
+                      Aceptar los cambios
                     </button>
                   ) : null}
                   <button
@@ -286,13 +290,12 @@ export function SelectionClient({ signedIn }: { signedIn: boolean }) {
           </Link>
         )}
         {blocked ? (
-          <p>Resolvé los avisos de contexto antes de armar los pedidos.</p>
+          <p>Revisá los cambios marcados antes de armar los pedidos.</p>
         ) : null}
         {prepareError ? <p role="alert">{prepareError}</p> : null}
         <p>
-          La Pulpería prepara un pedido separado por vendedor. Todavía tenés que
-          abrir cada WhatsApp, revisar el mensaje y enviarlo; esto no registra una
-          venta.
+          Después vas a abrir cada WhatsApp, revisar el mensaje y enviarlo. El
+          negocio todavía debe confirmarte el pedido.
         </p>
       </section>
     </div>

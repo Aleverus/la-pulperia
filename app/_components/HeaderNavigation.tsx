@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import {
   IconBuildingStore,
   IconHomeSearch,
-  IconInbox,
   IconMap2,
   IconUserCircle,
 } from "@tabler/icons-react";
@@ -50,19 +49,8 @@ export function HeaderNavigation({
       icon: IconBuildingStore,
       active:
         pathname === "/vender" ||
-        (pathname.startsWith("/mi-pulperia") &&
-          !pathname.startsWith("/mi-pulperia/solicitudes")),
+        pathname.startsWith("/mi-pulperia"),
     },
-    ...(email && hasSellerPresence
-      ? [
-          {
-            href: "/mi-pulperia/solicitudes",
-            label: "Solicitudes",
-            icon: IconInbox,
-            active: pathname.startsWith("/mi-pulperia/solicitudes"),
-          },
-        ]
-      : []),
     {
       href: accountHref,
       label: email ? "Cuenta" : "Ingresar",
@@ -74,18 +62,6 @@ export function HeaderNavigation({
 
   return (
     <>
-      <nav className="site-tabs" aria-label="Secciones principales">
-        {tabs.map(({ href, label, icon: Icon, active }) => (
-          <Link
-            href={href}
-            key={label}
-            aria-current={active ? "page" : undefined}
-          >
-            <Icon aria-hidden="true" size={21} stroke={1.8} />
-            <span>{label}</span>
-          </Link>
-        ))}
-      </nav>
       <div className="site-header__actions">
         <CartLink />
         {email ? (
@@ -99,7 +75,7 @@ export function HeaderNavigation({
               </form>
             </div>
             <MobileMenu>
-              <Link href="/cuenta">Cuenta</Link>
+              <Link href="/cuenta">Ver cuenta</Link>
               {isOperator ? (
                 <Link href="/operacion/reportes">Operación</Link>
               ) : null}
@@ -110,6 +86,18 @@ export function HeaderNavigation({
           </>
         ) : null}
       </div>
+      <nav className="site-tabs" aria-label="Secciones principales">
+        {tabs.map(({ href, label, icon: Icon, active }) => (
+          <Link
+            href={href}
+            key={label}
+            aria-current={active ? "page" : undefined}
+          >
+            <Icon aria-hidden="true" size={21} stroke={1.8} />
+            <span>{label}</span>
+          </Link>
+        ))}
+      </nav>
     </>
   );
 }

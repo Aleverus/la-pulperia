@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 test("search reflows at 320px without horizontal overflow", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
   await page.goto("/buscar?q=queso");
+  await page.locator(".search-form__filter-panel > summary").click();
   await expect(page.getByLabel("Clase de oferta")).toBeVisible();
   await expect(page.getByLabel("Forma de atención")).toBeVisible();
   await expect

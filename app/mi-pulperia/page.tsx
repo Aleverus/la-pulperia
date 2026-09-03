@@ -84,7 +84,7 @@ export default async function MiPulperiaPage({
   const whatsappConfirmed = params.ok === "whatsapp";
 
   return (
-    <main className="detail-page seller-dashboard">
+    <main className="detail-page seller-dashboard workspace-page">
       <header className="seller-dashboard__header">
         <div>
           <p className="eyebrow">Trabajo del vendedor</p>

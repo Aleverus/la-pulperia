@@ -99,7 +99,7 @@ export default async function SolicitudPage({
   }
 
   return (
-    <main className="detail-page request-detail-page">
+    <main className="detail-page request-detail-page workspace-page">
       <p className="eyebrow">Tu cuenta</p>
       <h1>Pedidos por vendedor</h1>
       <p className="back-link">

@@ -20,6 +20,9 @@ export function SellerFlowProgress({
     >
       <p aria-live="polite">
         Paso {currentStep + 1} de {steps.length} · {steps[currentStep]}
+        {currentStep < steps.length - 1
+          ? ` · Después: ${steps[currentStep + 1]}`
+          : " · Último paso"}
       </p>
       <ol>
         {steps.map((label, index) => {

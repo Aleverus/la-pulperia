@@ -2,7 +2,13 @@
 
 import { useState } from "react";
 
-export function ShareButton({ label }: { label: string }) {
+export function ShareButton({
+  label,
+  secondary = false,
+}: {
+  label: string;
+  secondary?: boolean;
+}) {
   const [notice, setNotice] = useState("");
 
   async function share() {
@@ -23,7 +29,11 @@ export function ShareButton({ label }: { label: string }) {
 
   return (
     <div className="share-control">
-      <button type="button" onClick={share}>
+      <button
+        type="button"
+        className={secondary ? "secondary-action" : undefined}
+        onClick={share}
+      >
         {label}
       </button>
       <span aria-live="polite">{notice}</span>

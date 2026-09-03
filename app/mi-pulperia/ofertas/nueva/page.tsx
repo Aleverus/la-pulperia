@@ -30,7 +30,7 @@ export default async function NuevaOfertaPage({
   );
 
   return (
-    <main className="detail-page seller-publication-editor">
+    <main className="detail-page seller-publication-editor workspace-page">
       <p>
         <Link href={sellerUrl("/mi-pulperia", presence.id)}>
           Volver a {presence.name}

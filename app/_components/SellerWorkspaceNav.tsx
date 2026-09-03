@@ -20,19 +20,19 @@ export function SellerWorkspaceNav({
     {
       id: "overview" as const,
       href: sellerUrl("/mi-pulperia", presenceId),
-      label: "Resumen",
+      label: "Inicio",
       icon: IconLayoutDashboard,
     },
     {
       id: "publications" as const,
       href: `${sellerUrl("/mi-pulperia", presenceId)}#publicaciones`,
-      label: "Publicaciones",
+      label: "Ofertas",
       icon: IconNews,
     },
     {
       id: "requests" as const,
       href: sellerUrl("/mi-pulperia/solicitudes", presenceId),
-      label: "Solicitudes",
+      label: "Pedidos",
       icon: IconReceipt,
     },
     {

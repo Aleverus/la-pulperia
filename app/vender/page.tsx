@@ -24,7 +24,7 @@ export default async function VenderPage({
 
   if (!user) {
     return (
-      <main className="detail-page seller-entry">
+      <main className="detail-page seller-entry workspace-page">
         <p className="eyebrow">Abrí una pulpería</p>
         <h1>Empezá por una oferta real.</h1>
         <p className="lede">
@@ -72,22 +72,37 @@ export default async function VenderPage({
   const firstBusiness = presences.length === 0;
 
   return (
-    <main className="detail-page seller-entry">
+    <main className="detail-page seller-entry workspace-page">
       <p className="eyebrow">Publicar en La Pulpería</p>
-      <h1>{firstBusiness ? "Abrí tu pulpería" : "Creá una publicación"}</h1>
+      <h1>{firstBusiness ? "Abrí tu pulpería" : "Publicá desde tu negocio"}</h1>
       <p>
         Esta misma cuenta sirve para comprar y ofrecer. No hay selector de rol
         ni una identidad separada.
       </p>
       {presences.length ? (
-        <section aria-labelledby="owned-presences-heading">
-          <h2 id="owned-presences-heading">Tus negocios actuales</h2>
-          <ul>
+        <section className="seller-owned" aria-labelledby="owned-presences-heading">
+          <h2 id="owned-presences-heading">¿Dónde querés publicar?</h2>
+          <ul className="seller-owned__list">
             {presences.map((presence) => (
               <li key={presence.id}>
-                <Link href={sellerUrl("/mi-pulperia", presence.id)}>
-                  Administrar {presence.name}
-                </Link>
+                <div>
+                  <strong>{presence.name}</strong>
+                  <span>Creá una oferta o revisá el trabajo pendiente.</span>
+                </div>
+                <div className="button-row">
+                  <Link
+                    className="primary-action"
+                    href={sellerUrl("/mi-pulperia/ofertas/nueva", presence.id)}
+                  >
+                    Crear oferta
+                  </Link>
+                  <Link
+                    className="secondary-action"
+                    href={sellerUrl("/mi-pulperia", presence.id)}
+                  >
+                    Administrar
+                  </Link>
+                </div>
               </li>
             ))}
           </ul>
@@ -96,17 +111,19 @@ export default async function VenderPage({
       {firstBusiness ? (
         <SellerFirstSetup error={error ?? undefined} />
       ) : (
-        <section className="starter-business" aria-labelledby="starter-business">
-          <p className="eyebrow">Otra pulpería</p>
-          <h2 id="starter-business" tabIndex={-1}>
-            Agregá otro perfil de negocio
-          </h2>
-          <p>
-            El modo de atención y el WhatsApp protegen la lectura pública. Una
-            ubicación exacta se pide sólo si elegís un local fijo.
-          </p>
-          <PresenceForm presence={null} error={error ?? undefined} />
-        </section>
+        <details className="seller-add-business" open={Boolean(error)}>
+          <summary>Agregar otro negocio</summary>
+          <section className="starter-business" aria-labelledby="starter-business">
+            <h2 id="starter-business" tabIndex={-1}>
+              Nuevo perfil de negocio
+            </h2>
+            <p>
+              Elegí cómo atendés. La ubicación exacta se pide sólo para un local
+              fijo.
+            </p>
+            <PresenceForm presence={null} error={error ?? undefined} />
+          </section>
+        </details>
       )}
     </main>
   );

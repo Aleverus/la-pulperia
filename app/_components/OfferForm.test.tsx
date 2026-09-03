@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
 
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { OfferForm } from "@/app/_components/OfferForm";
 
@@ -12,7 +12,13 @@ vi.mock("@/app/seller-actions", () => ({
 }));
 
 describe("OfferForm progressive flow", () => {
-  beforeEach(() => window.localStorage.clear());
+  const scrollIntoView = vi.fn();
+
+  beforeEach(() => {
+    window.localStorage.clear();
+    scrollIntoView.mockReset();
+    HTMLElement.prototype.scrollIntoView = scrollIntoView;
+  });
   afterEach(cleanup);
 
   it("shows one short task at a time and allows a first photo before creation", () => {
@@ -58,5 +64,26 @@ describe("OfferForm progressive flow", () => {
     ).toBeTruthy();
     expect(screen.getByRole("button", { name: "Guardar borrador" })).toBeTruthy();
     expect(screen.getByText("Café molido")).toBeTruthy();
+  });
+
+  it("brings the next complete step below the sticky header", async () => {
+    render(
+      <OfferForm
+        presenceId="10000000-0000-0000-0000-000000000001"
+        offer={null}
+        media={[]}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Continuar" }));
+
+    const nextStep = screen.getByRole("group", { name: "Contá lo esencial" });
+    await waitFor(() => {
+      expect(scrollIntoView).toHaveBeenCalledWith({
+        block: "start",
+        behavior: "auto",
+      });
+      expect(document.activeElement).toBe(nextStep);
+    });
   });
 });

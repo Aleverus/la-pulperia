@@ -204,9 +204,11 @@ function OfferFormFields({
   function goToStep(step: number) {
     setCurrentStep(step);
     requestAnimationFrame(() => {
-      formRef.current
-        ?.querySelector<HTMLElement>(`[data-offer-step="${step}"]`)
-        ?.focus();
+      const panel = formRef.current?.querySelector<HTMLElement>(
+        `[data-offer-step="${step}"]`,
+      );
+      panel?.scrollIntoView?.({ block: "start", behavior: "auto" });
+      panel?.focus({ preventScroll: true });
     });
   }
 
@@ -556,7 +558,7 @@ function OfferFormFields({
           ))}
           {fulfillments.length === 0 ? (
             <p className="field-hint" role="status">
-              Elegí al menos una forma de cumplimiento para continuar.
+              Elegí al menos una forma de entrega para continuar.
             </p>
           ) : null}
           <FlowNavigation
@@ -865,7 +867,7 @@ function OfferPublicPreview({
                   )
                   .filter(Boolean)
                   .join(", ")
-              : "Elegí una forma de cumplimiento"}
+              : "Elegí una forma de entrega"}
           </dd>
         </div>
       </dl>

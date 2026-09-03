@@ -28,7 +28,7 @@ export default async function AccountPage({
     await supabase.rpc("account_deletion_pending");
   const cleanupPending = deletionStatusError ? true : deletionPending === true;
   return (
-    <main className="detail-page account-page">
+    <main className="detail-page account-page workspace-page">
       <p className="eyebrow">Tu espacio</p>
       <h1>Tu perfil</h1>
       <section className="account-profile" aria-label="Perfil de la cuenta">

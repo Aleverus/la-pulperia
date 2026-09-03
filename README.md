@@ -128,9 +128,10 @@ competing references. Corte 7V is implemented and published from GitHub `main`:
 real brand assets,
 Alegreya + Fira Sans Condensed, canonical color tokens, and the new responsive
 system now cover the public journey, cart and identity, seller work, operation,
-loading, empty and error states. Browser inspection covered public, buyer and
-seller surfaces at 390/1440 px and the existing 320 px reflow receipt; no visual
-P0–P2 remains. This is technical and visual QA, not Ale's runtime acceptance.
+loading, empty and error states. That publication retains its historical QA
+receipt; a later product/UI audit reopened actionable hierarchy, density,
+navigation, recovery, and form-continuity findings. The current local repair is
+described below and is not yet published or accepted by Ale.
 
 The seller operation now prioritizes requests, freshness, and inactive offers;
 offers can be reconfirmed from the dashboard without altering their published
@@ -140,13 +141,13 @@ requires an explicit serving mode, and the inbox preserves each structured
 request reference. These controls still lead to seller-owned WhatsApp; they do
 not represent payment, acceptance, a sale, delivery, or a chat inside the app.
 
-`design-qa.md` records the selected source, side-by-side comparisons, iteration
-history and the final `passed` result. The local production build was exercised
+`design-qa.md` preserves the selected source, side-by-side comparisons and the
+historical Corte 7 `passed` result. That production build was exercised
 through search, offer detail, all four request contracts, a multi-seller cart,
 buyer account/history, and seller dashboard/settings/inbox at 320, 390, and
 1440 px. Existing cart requests survive reopening, query-only history keeps the
-search controls and mobile menu synchronized, and no P0–P2 visual finding remains.
-The Corte 7 receipt remains a recoverable technical baseline, not human
+search controls and mobile menu synchronized, and at that time no P0–P2 visual
+finding remained. The receipt is a recoverable technical baseline, not human
 acceptance. Ale authorized the parent project’s **Corte 7R — Vitrina pública y
 trabajo del vendedor** for local implementation. `/vender` now explains the
 work before authentication, the same account can return to buying, and the first
@@ -244,6 +245,18 @@ After the bug-repair plans 001–005 on 2026-08-30, the local tree passed:
   visual P0–P2. The 36-test Playwright retry remains environmentally blocked:
   the sandbox could not spawn Chromium and Docker Desktop then lost its Linux
   engine before a clean out-of-sandbox repetition. It is not reported as green.
+- The later 2026-09-02 product/UI audit repair is implemented only in the local
+  working tree over `578f637`. Search now leads with offers, filters and map are
+  progressive, mobile cards keep class and description with three comparable
+  facts, global navigation has four destinations, seller requests stay inside
+  the workspace, `/vender` prioritizes publishing and management for an existing
+  seller, empty states recover, the offer wizard reveals each new heading, and
+  private surfaces omit the public footer. ESLint, route types, TypeScript, 89
+  Vitest tests, the production build, and `git diff --check` pass. Focused local
+  visual inspection passed at 390 and 1440 px. Database reset, pgTAP, real-data
+  Playwright, publication, and owner acceptance remain pending because Docker's
+  Linux engine was unavailable. The observed test catalog is not treated as
+  representative commercial content.
 - A prior public OAuth exercise selected the authorized Google test account,
   consented only to basic identity and email, returned to `/carrito`, exposed the
   authenticated navigation and opened `/cuenta`. The 2026-09-02 cleanup verified
@@ -251,13 +264,13 @@ After the bug-repair plans 001–005 on 2026-08-30, the local tree passed:
   and an unauthenticated `/cuenta` request redirects to login; a fresh end-to-end
   OAuth run remains part of Ale's first-use test.
 
-The historical local receipt records the technical contract and exercised flows.
-The current pass verifies the gates named above and the observed browser
-surfaces; it does not claim a green E2E run. The production check of the visual
-commit returned 200 on home, search, map, login and `robots.txt`, with the new
-brand assets and `X-Robots-Tag: noindex, nofollow`; neither that deployment nor
-the earlier remote-data receipt
-proves commercial demand, legal readiness, field use, or visual acceptance.
+The historical receipts record the technical contract and exercised flows. The
+current local audit repair verifies the gates and focused browser surfaces named
+above; it does not claim a green real-data E2E run. The earlier production check
+returned 200 on home, search, map, login and `robots.txt`, with the new brand
+assets and `X-Robots-Tag: noindex, nofollow`; neither that deployment nor the
+earlier remote-data receipt proves commercial demand, legal readiness, field
+use, or visual acceptance.
 
 ## Run locally
 

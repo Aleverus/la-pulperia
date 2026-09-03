@@ -87,37 +87,6 @@ export default async function BuscarPage({
         {offers.length} {offers.length === 1 ? "resultado visible" : "resultados visibles"}
         {hasNext ? " en esta página; hay más resultados." : "."}
       </p>
-      {mappedPlaces.length > 0 ? (
-        <section className="results-map" aria-labelledby="results-map-title">
-          <div className="section-heading">
-            <h2 id="results-map-title">Mapa local</h2>
-            <Link href="/mapa" className="results-map__expand">
-              <IconArrowsMaximize aria-hidden="true" size={20} stroke={1.8} />
-              Ampliar
-            </Link>
-          </div>
-          <PublicMap places={mappedPlaces} compact />
-          <p className="map-trust-note">
-            Sólo muestra ubicaciones fijas confirmadas.
-          </p>
-          {otherPresenceCount > 0 ? (
-            <p className="coverage-note">
-              {otherPresenceCount} {otherPresenceCount === 1 ? "negocio atiende" : "negocios atienden"}{" "}
-              por cobertura móvil o de forma remota; su alcance se explica en la ficha.
-            </p>
-          ) : null}
-        </section>
-      ) : null}
-      <LocationSearchControl
-        query={query}
-        offerClass={offerClass}
-        presence={presence}
-        availability={availability}
-        active={location !== null}
-      />
-      {requestedSort === "nearby" && !location ? (
-        <p>Activá “Cerca de mí” para ordenar por distancia.</p>
-      ) : null}
       <OfferList
         offers={offers}
         emptyState={{
@@ -137,6 +106,47 @@ export default async function BuscarPage({
             sort !== "organic",
         }}
       />
+      {offers.length > 0 || location !== null ? (
+        <LocationSearchControl
+          query={query}
+          offerClass={offerClass}
+          presence={presence}
+          availability={availability}
+          active={location !== null}
+        />
+      ) : null}
+      {requestedSort === "nearby" && !location && offers.length > 0 ? (
+        <p>Activá “Cerca de mí” para ordenar estos resultados por distancia.</p>
+      ) : null}
+      {mappedPlaces.length > 0 ? (
+        <details className="results-map">
+          <summary>
+            Ver {mappedPlaces.length}{" "}
+            {mappedPlaces.length === 1 ? "ubicación fija" : "ubicaciones fijas"}{" "}
+            en el mapa
+          </summary>
+          <div className="results-map__body">
+            <div className="section-heading">
+              <h2 id="results-map-title">Mapa local</h2>
+              <Link href="/mapa" className="results-map__expand">
+                <IconArrowsMaximize aria-hidden="true" size={20} stroke={1.8} />
+                Ampliar
+              </Link>
+            </div>
+            <PublicMap places={mappedPlaces} compact />
+            <p className="map-trust-note">
+              Sólo muestra ubicaciones fijas confirmadas.
+            </p>
+            {otherPresenceCount > 0 ? (
+              <p className="coverage-note">
+                {otherPresenceCount}{" "}
+                {otherPresenceCount === 1 ? "negocio atiende" : "negocios atienden"}{" "}
+                por cobertura móvil o de forma remota; su alcance se explica en la ficha.
+              </p>
+            ) : null}
+          </div>
+        </details>
+      ) : null}
       {page > 1 || hasNext ? (
         <nav aria-label="Páginas de resultados" className="pagination">
           {page > 1 ? (

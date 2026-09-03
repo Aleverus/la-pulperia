@@ -38,9 +38,8 @@ export default async function Home() {
         <p className="eyebrow">Índice vivo de comercio local</p>
         <h1>Encontrá quién ofrece lo que necesitás en Siguatepeque.</h1>
         <p>
-          Compará precio o modalidad, vigencia, disponibilidad y forma de
-          cumplimiento antes de hablar con cada vendedor. La confirmación,
-          pago y entrega ocurren fuera de La Pulpería.
+          Compará precio, vigencia, disponibilidad y cómo lo recibís. Después
+          hablás con el negocio para confirmar el pedido, el pago y la entrega.
         </p>
       </section>
       <SearchForm />

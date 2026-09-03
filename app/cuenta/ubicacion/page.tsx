@@ -15,7 +15,7 @@ export default async function SavedLocalityPage({
   const query = await searchParams;
   const locality = await getSavedLocality();
   return (
-    <main className="detail-page">
+    <main className="detail-page workspace-page">
       <p className="eyebrow">Tu cuenta</p>
       <h1>Localidad</h1>
       <p className="lede">

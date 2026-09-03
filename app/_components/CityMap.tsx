@@ -125,6 +125,22 @@ export function CityMap({
     }
   }, [here, onSelect, pins, selectedId]);
 
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !ready || pins.length === 0) return;
+    const points = pins.map((pin) => [pin.lng, pin.lat] as [number, number]);
+    if (here) points.push([here.lng, here.lat]);
+    if (points.length === 1) {
+      map.jumpTo({ center: points[0], zoom: 14 });
+      return;
+    }
+    const bounds = points.reduce(
+      (current, point) => current.extend(point),
+      new maplibregl.LngLatBounds(points[0], points[0]),
+    );
+    map.fitBounds(bounds, { padding: 56, maxZoom: 14, duration: 0 });
+  }, [here, pins, ready]);
+
   return (
     <div className="map-frame">
       <div

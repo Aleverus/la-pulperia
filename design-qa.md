@@ -320,3 +320,52 @@ final result: blocked
   pendiente y guiará la profundización por superficie.
 
 final result: responsive-shell-published-and-observed; detailed-visual-qa-pending
+
+## Reparación del audit de producto/UI — 2 de septiembre de 2026
+
+- Fuente: audit de producto y UI de la tarea Codex
+  `01a064df-6e72-7c70-bbbf-b286c9200161`, ejecutado sobre el runtime publicado.
+- Implementación: diff local sobre
+  `578f637f6856a73309da227d5ecc4d50668239fe`; no existe commit, push ni
+  deployment de esta reparación.
+- Alcance corregido: jerarquía de búsqueda, filtros, mapa, tarjetas, carrito,
+  navegación global y vendedora, continuidad del formulario, `/vender`, estados
+  vacíos, perfil público, pie y copy contractual.
+- Límite de datos: el catálogo remoto observado contiene material de prueba que
+  no sostiene confianza comercial. No se inventaron negocios, fotos, stock ni
+  ofertas para ocultarlo; el reemplazo por oferta real o representativa requiere
+  evidencia y autorización separadas.
+
+**Comparación e iteración**
+
+- A 390 px, búsqueda muestra título y resultados antes de filtros y mapa; las
+  tarjetas conservan clase, descripción y tres hechos legibles, las cuatro
+  pestañas globales caben sin desborde y los vacíos ofrecen recuperación.
+- Al avanzar de `Tipo` a `Lo esencial`, el segundo panel empieza a 26 px bajo la
+  cabecera fija (`headerBottom=86.39`, `panelTop=112.22`) y recibe foco sin caer
+  a mitad del formulario.
+- A 1440 px, la búsqueda usa una retícula de dos columnas y el hero deja de
+  desplazar la tarea principal. No se observó ancho horizontal extra.
+- En `/carrito` a 390 px, las cuatro pestañas caben sin desborde y el pie público
+  permanece fuera de la composición (`display:none`).
+- El mapa encuadra los pines recibidos y queda detrás de los resultados como
+  contexto opcional. La geolocalización se presenta como orden temporal, no como
+  requisito de producto.
+- Las capturas de esta pasada están en
+  `C:/Users/ozela/.codex/visualizations/2026/09/03/01a064ef-308b-71e0-ae59-77794235e35b/visual-audit-repair/`.
+
+**Gates posteriores al último cambio**
+
+- ESLint: passed.
+- Route types y TypeScript: passed.
+- Vitest: 24 archivos, 89 pruebas, passed.
+- Build de producción: passed.
+- `git diff --check`: passed.
+- Supabase local, pgTAP y Playwright con datos reales: no ejecutados. `pnpm
+  db:start` alcanzó Docker, pero `dockerDesktopLinuxEngine` no estaba disponible.
+
+Resultado: implementado local y verificado técnicamente; QA visual focal pasada
+en 390/1440; contenido representativo, base, E2E, publicación y aceptación de
+Ale pendientes.
+
+final result: local-implemented-technical-passed-focused-visual-passed; real-data-e2e-publication-owner-acceptance-pending

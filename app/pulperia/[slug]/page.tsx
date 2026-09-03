@@ -109,7 +109,11 @@ export default async function PulperiaPage({
         </div>
         <p className="lede">{presence.description}</p>
         <div className="button-row">
-          <ShareButton label="Compartir pulpería" />
+          <Link className="primary-action" href="#publications-title">
+            Explorar ofertas
+            <IconArrowRight aria-hidden="true" size={17} stroke={1.8} />
+          </Link>
+          <ShareButton label="Compartir pulpería" secondary />
         </div>
       </section>
       {query.reporte === "recibido" ? (
@@ -146,7 +150,8 @@ export default async function PulperiaPage({
               <div>
                 <p className="eyebrow">{OFFER_CLASS_LABEL[offer.offer_class]}</p>
                 <Link href={`/oferta/${offer.slug}`}>{offer.title}</Link>
-                <OfferContext offer={offer} />
+                <p>{offer.description}</p>
+                <OfferContext offer={offer} compact />
               </div>
               <div className="presence-offer-list__action">
                 <span className="price-tag">
