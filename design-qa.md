@@ -32,6 +32,22 @@ completo siguen siendo estados separados.
 
 final result: passed
 
+**Publicación y observación remota — 3 de septiembre de 2026**
+
+- Implementación integrada en `1e9f0a6e1008f8b283274bf45507007a24173794`
+  y subida a `origin/main`.
+- Vercel publicó el deployment de producción
+  `dpl_DiZdATeyiHDnCBD6Roiqwja1PDFS` como `READY`, con alias principal
+  `https://la-pulperia-hn.vercel.app`.
+- `/`, `/mapa`, `/buscar`, `/ingresar` y `/robots.txt` respondieron 200 y
+  conservaron `X-Robots-Tag: noindex, nofollow`.
+- El navegador observó el mapa oscuro, la navegación nueva, el cambio real entre
+  `Cerca` y `En línea`, y el estado vacío de `Catálogo`. No se escribieron datos.
+- La consulta de logs de error de la última hora no devolvió entradas. Esto no
+  sustituye monitoreo continuo ni la prueba autenticada del comprador/vendedor.
+
+final result: passed
+
 ---
 
 ## Recibo de fundación — Corte 7V-0
