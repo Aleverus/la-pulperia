@@ -1,8 +1,41 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { deleteAccountRecoverably } from "@/lib/deletion";
 import { requireSession } from "@/lib/session";
+
+export async function updateAccountProfileAction(formData: FormData) {
+  const displayName = String(formData.get("display_name") ?? "").trim();
+  const avatarPath = String(formData.get("avatar_path") ?? "").trim();
+  if (displayName.length < 1 || displayName.length > 80) {
+    redirect("/cuenta?error=perfil");
+  }
+  if (avatarPath.length > 1024) redirect("/cuenta?error=foto");
+
+  const { supabase, user } = await requireSession("/cuenta");
+  let verifiedAvatarPath: string | null = null;
+  if (avatarPath) {
+    const { data, error } = await supabase
+      .from("offer_media")
+      .select("storage_path")
+      .eq("storage_path", avatarPath)
+      .eq("deletion_pending", false)
+      .limit(1);
+    const [media] = data ?? [];
+    if (error || !media) redirect("/cuenta?error=foto");
+    verifiedAvatarPath = media.storage_path;
+  }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ display_name: displayName, avatar_url: verifiedAvatarPath })
+    .eq("id", user.id);
+  if (error) redirect("/cuenta?error=perfil");
+
+  revalidatePath("/cuenta");
+  redirect("/cuenta?perfil=guardado");
+}
 
 export async function setSavedLocalityAction(formData: FormData) {
   const remember = String(formData.get("remember") ?? "") === "true";

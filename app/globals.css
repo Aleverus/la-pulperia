@@ -19,6 +19,9 @@
     --line-strong: #aa9d8b;
     --danger: #7b2924;
     --danger-soft: #f3ddd7;
+    --account-canvas: #f1f3f4;
+    --account-surface: #ffffff;
+    --account-line: #ccd5da;
     --success: #3f7a36;
     --success-wash: #e6efe2;
     --warning: #925d11;
@@ -93,6 +96,10 @@
     line-height: 1.5;
     text-rendering: optimizeLegibility;
     padding-bottom: 4.65rem;
+  }
+
+  body:has(main.account-page) {
+    background: var(--account-canvas);
   }
 
   main {
@@ -1717,12 +1724,12 @@
   .account-nav a {
     min-width: 0;
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: start;
-    gap: 0.8rem;
-    border: 1px solid var(--line);
-    background: var(--paper);
-    padding: 0.9rem;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.9rem;
+    border: 1px solid var(--account-line);
+    background: var(--account-surface);
+    padding: 1rem;
     border-radius: var(--radius-md);
     text-decoration: none;
     box-shadow: var(--shadow-sm);
@@ -1730,7 +1737,21 @@
 
   .account-nav a:hover {
     border-color: var(--cobalt);
-    background: var(--paper-strong);
+    background: var(--cobalt-mist);
+  }
+
+  .account-nav__icon {
+    width: 2.9rem;
+    height: 2.9rem;
+    display: grid;
+    place-items: center;
+    background: var(--cobalt-mist);
+    color: var(--cobalt);
+    border-radius: var(--radius-sm);
+  }
+
+  .account-nav__chevron {
+    color: var(--ink-soft);
   }
 
   .account-nav a > span,
@@ -1760,53 +1781,223 @@
     overflow-wrap: anywhere;
   }
 
-  .account-profile {
+  .account-page {
+    max-width: 58rem;
+    gap: 1.75rem;
+  }
+
+  .account-page__heading {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .account-page__heading h1 {
+    font-size: clamp(2.8rem, 8vw, 4.5rem);
+  }
+
+  .account-profile-panel {
+    display: grid;
+    gap: 1.35rem;
+    border: 1px solid var(--account-line);
+    background: var(--account-surface);
+    padding: clamp(1rem, 3vw, 1.5rem);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 12px 32px rgba(23, 40, 51, 0.08);
+  }
+
+  .account-profile-panel__heading {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     align-items: center;
-    gap: 0.9rem;
-    border: 1px solid var(--line);
-    background: var(--paper);
-    padding: 1rem;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
+    gap: 1rem;
   }
 
-  .account-avatar {
-    width: 3.5rem;
-    height: 3.5rem;
+  .account-profile-panel__heading > div:last-child {
+    min-width: 0;
+    display: grid;
+    gap: 0.18rem;
+  }
+
+  .account-avatar-preview {
+    width: 5.5rem;
+    height: 5.5rem;
+    position: relative;
     display: grid;
     place-items: center;
+    border: 3px solid var(--account-surface);
     background: var(--cobalt);
-    color: var(--paper-strong);
+    color: #ffffff;
     font-family: var(--font-pulperia-display), Georgia, serif;
-    font-size: 1.7rem;
+    font-size: 2.4rem;
     font-weight: 700;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px var(--account-line), var(--shadow-sm);
+    overflow: visible;
+  }
+
+  .account-avatar-preview > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     border-radius: 50%;
   }
 
-  .account-profile > div {
-    min-width: 0;
+  .account-avatar-preview__edit {
+    width: 1.85rem;
+    height: 1.85rem;
+    position: absolute;
+    right: -0.15rem;
+    bottom: -0.1rem;
     display: grid;
-    gap: 0.15rem;
+    place-items: center;
+    border: 2px solid var(--account-surface);
+    background: var(--brick);
+    color: #ffffff;
+    border-radius: 50%;
   }
 
-  .account-profile strong {
-    overflow-wrap: anywhere;
-    color: var(--cobalt);
-    font-size: 1.1rem;
-  }
-
-  .account-profile p {
+  .account-profile-panel .account-identity {
     color: var(--ink-soft);
     font-size: 0.9rem;
+    overflow-wrap: anywhere;
+  }
+
+  .account-profile-form {
+    display: grid;
+    gap: 1.25rem;
+    border-top: 1px solid var(--account-line);
+    padding-top: 1.25rem;
+  }
+
+  .account-profile-form small,
+  .account-avatar-fieldset > p {
+    color: var(--ink-soft);
+    font-size: 0.88rem;
+  }
+
+  .account-avatar-fieldset {
+    min-width: 0;
+    display: grid;
+    gap: 0.7rem;
+    border: 0;
+    padding: 0;
+  }
+
+  .account-avatar-fieldset legend {
+    padding: 0;
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .account-avatar-choices {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+    gap: 0.7rem;
+  }
+
+  .account-avatar-choice {
+    min-width: 0;
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 0.45rem;
+    border: 1px solid var(--account-line);
+    background: var(--account-surface);
+    padding: 0.65rem;
+    border-radius: var(--radius-md);
+    color: var(--ink-soft);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .account-avatar-choice input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .account-avatar-choice:has(input:checked) {
+    border-color: var(--cobalt);
+    background: var(--cobalt-mist);
+    color: var(--cobalt);
+    box-shadow: 0 0 0 1px var(--cobalt);
+  }
+
+  .account-avatar-choice:has(input:focus-visible) {
+    outline: 3px solid var(--brick);
+    outline-offset: 3px;
+  }
+
+  .account-avatar-choice__image {
+    width: 4.6rem;
+    height: 4.6rem;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background: var(--cobalt-mist);
+    border-radius: 50%;
+  }
+
+  .account-avatar-choice__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .account-avatar-choice__image.is-initial {
+    background: var(--cobalt);
+    color: #ffffff;
+    font-family: var(--font-pulperia-display), Georgia, serif;
+    font-size: 2rem;
+  }
+
+  .account-avatar-choice__check {
+    position: absolute;
+    top: 0.45rem;
+    right: 0.45rem;
+    color: var(--cobalt);
+    opacity: 0;
+  }
+
+  .account-avatar-choice:has(input:checked) .account-avatar-choice__check {
+    opacity: 1;
+  }
+
+  .account-avatar-empty {
+    border-left: 0.2rem solid var(--brick);
+    background: var(--account-canvas);
+    padding: 0.65rem 0.75rem;
+    color: var(--ink-soft);
+    font-size: 0.88rem;
+  }
+
+  .account-profile-save {
+    width: fit-content;
+    justify-self: start;
+  }
+
+  .account-settings {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .account-settings > div {
+    display: grid;
+    gap: 0.25rem;
   }
 
   .danger-zone {
-    border: 1px solid #d7a69d;
-    background: var(--danger-soft);
-    padding: 1rem;
-    border-radius: var(--radius-md);
+    display: grid;
+    gap: 0.8rem;
+    border: 0;
+    border-top: 1px solid var(--account-line);
+    background: transparent;
+    padding-top: 1.5rem;
+    border-radius: 0;
   }
 
   .danger-zone summary,
@@ -1816,9 +2007,21 @@
 
   .danger-zone summary {
     width: fit-content;
-    font-size: 1.1rem;
+    min-height: 2.9rem;
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--danger);
+    background: var(--danger);
+    padding: 0.65rem 0.9rem;
+    color: #ffffff;
+    font-size: 1rem;
     font-weight: 800;
     cursor: pointer;
+    list-style: none;
+  }
+
+  .danger-zone summary::-webkit-details-marker {
+    display: none;
   }
 
   .danger-zone[open] {
@@ -2949,6 +3152,22 @@
       padding-block: 2.5rem 5rem;
     }
 
+    .account-profile-panel {
+      grid-template-columns: minmax(15rem, 0.42fr) minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .account-profile-panel__heading {
+      align-items: start;
+    }
+
+    .account-profile-form {
+      border-top: 0;
+      border-left: 1px solid var(--account-line);
+      padding-top: 0;
+      padding-left: 1.5rem;
+    }
+
     .site-header__inner {
       width: min(calc(100% - 3rem), var(--content));
       min-height: 6rem;
@@ -3099,7 +3318,6 @@
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 
-    .account-nav,
     .seller-quick-actions,
     .auth-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));

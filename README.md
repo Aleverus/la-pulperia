@@ -2,7 +2,7 @@
 
 ## Alcance
 
-Este checkout implementa el índice local de comercio. La definición de producto, la dirección visual y el estado activo no viven aquí: se consultan en `../Obra/`. No convertir esta aplicación en procesador de pagos, autoridad de inventario, delivery, chat propio ni registro de ventas.
+Este checkout implementa el índice local de comercio y una cuenta única que concentra perfil y ajustes sin separar identidades de compra y venta. La definición de producto, la dirección visual y el estado activo no viven aquí: se consultan en `../Obra/`. No convertir esta aplicación en procesador de pagos, autoridad de inventario, delivery, chat propio ni registro de ventas.
 
 ## Autoridades antes de cambiar
 

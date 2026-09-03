@@ -413,3 +413,28 @@ y el carrito no conserva artículos. Esta limpieza habilita la evaluación de Al
 no constituye todavía su aceptación visual.
 
 final result: production-data-virgin-verified; first-use-owner-acceptance-pending
+
+## SR-1 — rediseño local de `/cuenta` — 3 de septiembre de 2026
+
+- Fuente: observación anotada por Ale sobre `/cuenta` en el runtime privado a
+  854 × 910 CSS px y reglas canónicas de `../Obra/DESIGN.md`.
+- Implementación: diff local sobre `95f987b`; no existe commit de producto,
+  push ni deployment de este rediseño.
+- Comparación observada: el arnés local temporal mostró, a 1265 × 712, fondo
+  gris frío, tarjeta blanca de perfil, inicial con indicador de edición, nombre
+  editable, selector de fotos, tres accesos apilados y eliminación roja al
+  fondo. La referencia y el resultado se juzgaron en la misma revisión; el
+  arnés se retiró al terminar.
+- Comportamiento: la ruta real lee `profiles` y medios propios en paralelo. La
+  acción de servidor exige sesión, valida nombre, acepta sólo un medio visible
+  bajo RLS de la persona y actualiza únicamente su fila de perfil.
+- Límite: el mock local respondió únicamente lo necesario para renderizar el
+  arnés; no se guardó un perfil contra Supabase ni se recorrió la ruta autenticada
+  con datos reales. El runtime publicado continúa mostrando la versión anterior.
+- Gates posteriores al último cambio: ESLint, tipos, 91 pruebas en 25 archivos
+  y build de producción pasaron. El primer intento de build quedó bloqueado al
+  buscar Alegreya en Google Fonts; la repetición con acceso de red permitido
+  compiló y generó las rutas correctamente. `git diff --check` completa el gate
+  documental.
+
+final result: local-implemented-technical-passed-focused-visual-observed; real-data-publication-owner-acceptance-pending
