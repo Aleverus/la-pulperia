@@ -66,6 +66,22 @@ describe("OfferForm progressive flow", () => {
     expect(screen.getByText("Café molido")).toBeTruthy();
   });
 
+  it("starts with the publication type chosen in the seller composer", () => {
+    render(
+      <OfferForm
+        presenceId="10000000-0000-0000-0000-000000000001"
+        offer={null}
+        media={[]}
+        defaultOfferClass="local_service"
+      />,
+    );
+
+    expect(
+      (screen.getByRole("radio", { name: /Servicio local/ }) as HTMLInputElement)
+        .checked,
+    ).toBe(true);
+  });
+
   it("brings the next complete step below the sticky header", async () => {
     render(
       <OfferForm

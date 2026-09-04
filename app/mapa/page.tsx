@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { ExploreDirectory } from "@/app/_components/ExploreDirectory";
+import { getPresenceOffersByIds } from "@/lib/data";
+import type { CatalogPresenceWithOffers } from "@/lib/catalog";
 import {
   getOnlineCatalogPlaces,
   getPhysicalCatalogPlaces,
@@ -8,7 +10,7 @@ import {
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Explorar negocios",
+  title: "Explorar Siguatepeque",
   description:
     "Descubrí negocios cercanos y negocios que atienden en línea en Siguatepeque.",
   alternates: { canonical: "/mapa" },
@@ -17,31 +19,60 @@ export const metadata: Metadata = {
 export default async function MapaPage() {
   let fixedPlaces: Awaited<ReturnType<typeof getPhysicalCatalogPlaces>> = [];
   let onlinePlaces: Awaited<ReturnType<typeof getOnlineCatalogPlaces>> = [];
+  let fixedWithOffers: CatalogPresenceWithOffers[] = [];
+  let onlineWithOffers: CatalogPresenceWithOffers[] = [];
   let loadFailed = false;
+  let offerLoadFailed = false;
   try {
     [fixedPlaces, onlinePlaces] = await Promise.all([
       getPhysicalCatalogPlaces(),
       getOnlineCatalogPlaces(),
     ]);
+    fixedWithOffers = fixedPlaces.map((place) => ({
+      ...place,
+      offers: [],
+    }));
+    onlineWithOffers = onlinePlaces.map((place) => ({
+      ...place,
+      offers: [],
+    }));
   } catch {
     loadFailed = true;
   }
 
+  if (!loadFailed) {
+    try {
+      const offers = await getPresenceOffersByIds(
+        [...fixedPlaces, ...onlinePlaces].map((place) => place.id),
+      );
+      const offersByPresence = new Map<string, typeof offers>();
+      for (const offer of offers) {
+        const group = offersByPresence.get(offer.presence_id) ?? [];
+        group.push(offer);
+        offersByPresence.set(offer.presence_id, group);
+      }
+
+      fixedWithOffers = fixedPlaces.map((place) => ({
+        ...place,
+        offers: offersByPresence.get(place.id) ?? [],
+      }));
+      onlineWithOffers = onlinePlaces.map((place) => ({
+        ...place,
+        offers: offersByPresence.get(place.id) ?? [],
+      }));
+    } catch {
+      offerLoadFailed = true;
+    }
+  }
+
   return (
     <main className="map-page">
-      <p className="eyebrow">Siguatepeque</p>
-      <h1>Explorar negocios</h1>
-      <p>
-        Encontrá quién está cerca o quién puede atenderte en línea desde un solo
-        lugar.
-      </p>
-      {loadFailed ? (
-        <p className="explore-load-error" role="alert">
-          No pudimos cargar el directorio. El mapa base y los modos de exploración
-          siguen disponibles para que podás intentarlo de nuevo.
-        </p>
-      ) : null}
-      <ExploreDirectory fixedPlaces={fixedPlaces} onlinePlaces={onlinePlaces} />
+      <ExploreDirectory
+        fixedPlaces={fixedWithOffers}
+        onlinePlaces={onlineWithOffers}
+        loadFailed={loadFailed}
+        offerLoadFailed={offerLoadFailed}
+      />
     </main>
   );
 }

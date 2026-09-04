@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { IconMapPin } from "@tabler/icons-react";
 import { OfferContext } from "@/app/_components/OfferContext";
 import { OfferFallback } from "@/app/_components/OfferArtwork";
 import {
@@ -10,9 +11,21 @@ import { mediaPublicUrl } from "@/lib/media-url";
 import { formatPublishedPrice } from "@/lib/money";
 import { getOfferPreviewMedia } from "@/lib/seller-data";
 
+const MAP_SEARCH_KEYS = [
+  "q",
+  "clase",
+  "tipo",
+  "disponibilidad",
+  "orden",
+] as const;
+type MapSearchParams = Partial<
+  Record<(typeof MAP_SEARCH_KEYS)[number], string>
+>;
+
 export async function OfferList({
   offers,
   emptyState,
+  mapSearchParams,
 }: {
   offers: SearchOffer[];
   emptyState?: {
@@ -20,6 +33,7 @@ export async function OfferList({
     filtersApplied: boolean;
     clearFiltersHref: string;
   };
+  mapSearchParams?: MapSearchParams;
 }) {
   if (offers.length === 0) {
     return (
@@ -79,15 +93,39 @@ export async function OfferList({
                   {Math.round(offer.dist_meters)} m de distancia aproximada
                 </p>
               ) : null}
-              <Link className="offer-card__cta" href={`/oferta/${offer.offer_slug}`}>
-                Ver oferta
-              </Link>
+              <div className="offer-card__actions">
+                {offer.presence_mode === "fixed_location" ? (
+                  <Link
+                    className="offer-card__map-link"
+                    href={mapHref(offer.presence_id, mapSearchParams)}
+                  >
+                    <IconMapPin aria-hidden="true" size={17} stroke={1.9} />
+                    Ver en el mapa
+                  </Link>
+                ) : null}
+                <Link className="offer-card__cta" href={`/oferta/${offer.offer_slug}`}>
+                  Ver publicación
+                </Link>
+              </div>
             </div>
           </article>
         </li>
       ))}
     </ul>
   );
+}
+
+function mapHref(
+  presenceId: string,
+  searchParams: MapSearchParams = {},
+): string {
+  const params = new URLSearchParams();
+  for (const key of MAP_SEARCH_KEYS) {
+    const value = searchParams[key];
+    if (value) params.set(key, value);
+  }
+  params.set("presencia", presenceId);
+  return `/mapa?${params.toString()}`;
 }
 
 function OfferPreview({

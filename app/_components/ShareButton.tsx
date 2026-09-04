@@ -5,21 +5,25 @@ import { useState } from "react";
 export function ShareButton({
   label,
   secondary = false,
+  url,
+  title,
 }: {
   label: string;
   secondary?: boolean;
+  url?: string;
+  title?: string;
 }) {
   const [notice, setNotice] = useState("");
 
   async function share() {
-    const url = window.location.href;
+    const shareUrl = url ? new URL(url, window.location.origin).toString() : window.location.href;
     try {
       if (navigator.share) {
-        await navigator.share({ title: document.title, url });
+        await navigator.share({ title: title ?? document.title, url: shareUrl });
         setNotice("Enlace compartido.");
         return;
       }
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(shareUrl);
       setNotice("Enlace copiado.");
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") return;

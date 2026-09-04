@@ -27,7 +27,7 @@ export async function Header() {
   return (
     <header className="site-header">
       <div className="site-header__inner">
-        <Link href="/" className="mark" aria-label="La Pulpería, inicio">
+        <Link href="/mapa" className="mark" aria-label="La Pulpería, explorar">
           <Image
             className="mark__monogram"
             src="/brand/la-pulperia-monogram-inverse-accent.png"

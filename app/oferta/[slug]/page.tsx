@@ -1,7 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
-import { IconArrowLeft, IconBuildingStore } from "@tabler/icons-react";
+import {
+  IconArrowLeft,
+  IconBuildingStore,
+  IconMapPin,
+} from "@tabler/icons-react";
 import { notFound } from "next/navigation";
 import { AddToSelection } from "@/app/_components/AddToSelection";
 import { JsonLd } from "@/app/_components/JsonLd";
@@ -128,6 +132,15 @@ export default async function OfferPage({
             <IconBuildingStore aria-hidden="true" size={15} stroke={1.8} />
             {PRESENCE_MODE_LABEL[offer.presence_mode]}
           </small>
+          {offer.presence_mode === "fixed_location" ? (
+            <Link
+              className="publication-author__map"
+              href={`/mapa?presencia=${encodeURIComponent(offer.presence_id)}`}
+            >
+              <IconMapPin aria-hidden="true" size={15} stroke={1.8} />
+              Ver en el mapa
+            </Link>
+          ) : null}
         </div>
       </section>
       <header className="publication-heading">

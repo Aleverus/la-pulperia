@@ -127,6 +127,15 @@ export default async function BuscarPage({
       </p>
       <OfferList
         offers={offers}
+        mapSearchParams={{
+          ...(query ? { q: query } : {}),
+          ...(offerClass !== "all" ? { clase: offerClass } : {}),
+          ...(presence !== "all" ? { tipo: presence } : {}),
+          ...(availability !== "all"
+            ? { disponibilidad: availability }
+            : {}),
+          ...(requestedSort !== "organic" ? { orden: requestedSort } : {}),
+        }}
         emptyState={{
           query,
           clearFiltersHref: searchHref({

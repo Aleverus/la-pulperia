@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PresenceForm } from "@/app/_components/PresenceForm";
 import { SellerFirstSetup } from "@/app/_components/SellerFirstSetup";
+import { hasPublicSupabaseEnv } from "@/lib/env";
 import { formErrorMessage } from "@/lib/seller";
 import { getOwnedPresences } from "@/lib/seller-data";
 import { sellerUrl } from "@/lib/seller-routing";
@@ -17,7 +18,9 @@ export default async function VenderPage({
   searchParams,
 }: PageProps<"/vender">) {
   const params = await searchParams;
-  const { user } = await getSession();
+  const { user } = hasPublicSupabaseEnv()
+    ? await getSession()
+    : { user: null };
   const error = formErrorMessage(
     typeof params.error === "string" ? params.error : undefined,
   );
@@ -32,6 +35,17 @@ export default async function VenderPage({
           privada, explicás cómo atendés y publicás sólo cuando la información
           necesaria ya es honesta.
         </p>
+        <div className="button-row">
+          <Link
+            className="primary-action"
+            href="/ingresar?next=%2Fvender"
+          >
+            Ingresar y abrir mi pulpería
+          </Link>
+          <Link className="secondary-action" href="/buscar">
+            Ver la vitrina pública
+          </Link>
+        </div>
         <ol className="seller-setup-steps" aria-label="Qué ocurre al ofrecer">
           <li>
             <strong>1. Iniciás una oferta</strong>
@@ -53,17 +67,6 @@ export default async function VenderPage({
             No cobra, no confirma ventas y no lee tus chats.
           </p>
         </section>
-        <div className="button-row">
-          <Link
-            className="primary-action"
-            href="/ingresar?next=%2Fvender"
-          >
-            Ingresar y abrir mi pulpería
-          </Link>
-          <Link className="secondary-action" href="/buscar">
-            Ver la vitrina pública
-          </Link>
-        </div>
       </main>
     );
   }
@@ -100,7 +103,7 @@ export default async function VenderPage({
                     className="secondary-action"
                     href={sellerUrl("/mi-pulperia", presence.id)}
                   >
-                    Administrar
+                    Mi pulpería
                   </Link>
                 </div>
               </li>

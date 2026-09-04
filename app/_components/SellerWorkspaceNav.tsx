@@ -1,14 +1,13 @@
 import Link from "next/link";
 import {
   IconAdjustments,
-  IconLayoutDashboard,
   IconNews,
   IconReceipt,
 } from "@tabler/icons-react";
 import { sellerUrl } from "@/lib/seller-routing";
 
 type SellerWorkspaceNavProps = {
-  active: "overview" | "publications" | "requests" | "settings";
+  active: "publications" | "requests" | "profile";
   presenceId: string;
 };
 
@@ -18,33 +17,27 @@ export function SellerWorkspaceNav({
 }: SellerWorkspaceNavProps) {
   const items = [
     {
-      id: "overview" as const,
-      href: sellerUrl("/mi-pulperia", presenceId),
-      label: "Inicio",
-      icon: IconLayoutDashboard,
-    },
-    {
       id: "publications" as const,
       href: `${sellerUrl("/mi-pulperia", presenceId)}#publicaciones`,
-      label: "Ofertas",
+      label: "Publicaciones",
       icon: IconNews,
     },
     {
       id: "requests" as const,
       href: sellerUrl("/mi-pulperia/solicitudes", presenceId),
-      label: "Pedidos",
+      label: "Solicitudes",
       icon: IconReceipt,
     },
     {
-      id: "settings" as const,
+      id: "profile" as const,
       href: `${sellerUrl("/mi-pulperia", presenceId)}#seller-settings`,
-      label: "Ajustes",
+      label: "Perfil",
       icon: IconAdjustments,
     },
   ];
 
   return (
-    <nav className="workspace-tabs" aria-label="Administrar la pulpería">
+    <nav className="workspace-tabs" aria-label="Tu pulpería">
       {items.map(({ id, href, label, icon: Icon }) => (
         <Link
           href={href}

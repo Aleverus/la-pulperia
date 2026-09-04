@@ -1,6 +1,6 @@
-# Design QA — Corte 7V
+# Design QA — La Pulpería
 
-## Resultado vigente — sistema completo
+## Recibo histórico — Corte 7V
 
 - Fuente visual: `../Obra/Referencias visuales/logo-rotulo-hondureno-seleccionado-2026-09-01.png`.
 - Comparación conjunta: `evidence/design-qa/7v4-reference-public-seller.png`; reúne el rótulo elegido, portada pública y panel de dueña en el mismo insumo de revisión.
@@ -32,7 +32,114 @@ completo siguen siendo estados separados.
 
 final result: passed
 
-**Publicación y observación remota — 3 de septiembre de 2026**
+## Corte 7P — Plaza viva, revamp integral — 3 de septiembre de 2026
+
+**Fuente, estado y evidencia**
+
+- Referencia aceptada:
+  `../Obra/Referencias visuales/plaza-viva-seleccionada-2026-09-03.png`,
+  1280 × 1571 px. Es un tablero con dos composiciones móviles pobladas, no un
+  snapshot del catálogo local.
+- Comparación conjunta:
+  `evidence/design-qa-7p/comparacion-referencia-explorar-390.png`, 2006 × 1571
+  px. Conserva el tablero completo y normaliza la captura de Explorar a la misma
+  altura para juzgar jerarquía, mapa, controles, hoja y navegación en un solo
+  lienzo.
+- Vistas de Explorar: `explorar-320.png`, `explorar-390.png`,
+  `explorar-1440.png`, `explorar-en-linea-390.png` y
+  `explorar-filtros-390.png` dentro de `evidence/design-qa-7p/`.
+- Vistas adicionales: catálogo a 390/1440, entrada de vendedor, ingreso,
+  carrito y 404 a 390 px en la misma carpeta. `capture.cjs` deja reproducible
+  la captura con Edge/Playwright y movimiento reducido.
+- Hoja de contacto: `evidence/design-qa-7p/contact-sheet.png` reúne las vistas
+  conservadas del corte en una sola superficie de revisión.
+- Estado observado: runtime de producción local con variables públicas de
+  Supabase vacías. La evidencia muestra errores recuperables y vacíos reales;
+  no usa la base remota ni inventa negocios, ofertas, fotos o actividad.
+
+**Comparación de vista completa**
+
+- El mapa ocupa el lienzo desde el primer viewport. Búsqueda, Cerca/En línea,
+  filtros por las cuatro clases y ubicación voluntaria viven sobre la escena;
+  la hoja inferior queda anclada sobre la navegación móvil y el panel de
+  escritorio usa 28 rem sin angostar el mapa.
+- Ciruela, hueso, papel, terracota, selección profunda, destello cálido y mapa
+  claro sustituyen el sistema borgoña/acero. Los alias heredados resuelven a la
+  paleta Plaza viva; no queda un segundo sistema activo.
+- Alegreya y Fira Sans Condensed se sirven desde `app/fonts/`; el monograma y el
+  wordmark usan los raster propios de `public/brand/`. No hay fotos ficticias,
+  SVG dibujado a mano, emoji ni ilustración de relleno.
+- La composición móvil conserva la jerarquía del tablero: mapa primero,
+  controles flotantes, selección territorial y hoja inferior. La composición
+  de vendedor implementa identidad y perfil primero, un compositor, una franja
+  de atención y tres pestañas; no se añadió una segunda acción de creación.
+
+**Hallazgos e iteración**
+
+| Pasada | Severidad | Hallazgo | Corrección verificada |
+| --- | --- | --- | --- |
+| 1 | P1 | En 320 px el directorio heredaba una altura de 20 rem; la hoja quedaba flotando a mitad del viewport. | `ExploreDirectory` ocupa el contenedor posicionado completo. La hoja termina exactamente sobre la navegación inferior en 320 y 390 px. |
+| 1 | P1 | El aviso de conexión cubría la cabecera de la hoja y el control de ubicación. | El aviso pasó al grupo de controles, se compactó y la ubicación cambia de posición sólo durante el fallo. Sus rectángulos quedan separados en 320 px. |
+| 2 | P1 | Faltaba el filtro de Explorar exigido por el contrato. | Se añadieron Todo, Productos, Encargos, Servicios y Digital; el valor queda en `?clase=` y filtra Cerca y En línea. |
+| 2 | P2 | El control de zoom de MapLibre chocaba con Filtros en móvil. | Se oculta bajo 68 rem, donde el mapa conserva gestos, teclado y selección por lista; en 1440 sigue visible. |
+| 2 | P2 | Publicaciones repetía el acceso a crear fuera del compositor. | Se retiró `Nueva publicación`; el compositor es la única superficie de creación. |
+
+### Revisión bloqueante posterior del diff
+
+La revisión de código posterior encontró que el filtro por clase conservaba
+publicaciones de otras clases dentro de una presencia, que un fallo del
+enriquecimiento de publicaciones descartaba también las presencias y que la
+hoja del mapa mostraba vigencia sin disponibilidad. También encontró el token
+tipográfico inexistente del `legend`, el CTA principal de `/vender` después de
+todo el recorrido explicativo y la pérdida de filtros al abrir `Ver en el mapa`.
+
+Esos hallazgos quedaron corregidos localmente: clase y consulta reducen el
+arreglo de publicaciones que reciben mapa y lista; un fallo de publicaciones
+conserva las presencias con `offers: []` y una advertencia propia; la hoja usa
+el resumen canónico de disponibilidad; el `legend` usa el token definido; los
+CTA existentes aparecen antes de los pasos; y el enlace al mapa conserva `q`,
+`clase`, `tipo`, `disponibilidad` y `orden`. Se añadieron regresiones unitarias,
+pero no se ejecutaron.
+
+Los hallazgos visuales de la pasada anterior permanecen cerrados sólo para el
+runtime observado entonces. El estado poblado, la selección pin/lista con mapa
+real y el hogar vendedor autenticado no se marcan como observados: dependen del
+runtime definitivo y no fueron revisados después de estas correcciones.
+
+**Interacciones, accesibilidad y resiliencia**
+
+- `scrollWidth - innerWidth` fue 0 en Explorar a 320, 390 y 1440, y en catálogo
+  a 390/1440. Cerca abre por defecto; En línea actualiza la URL y mantuvo cero
+  `.map-pin`; Servicios produjo `?clase=local_service`.
+- Una pasada de teclado en 320 recorrió marca, carrito, cuatro destinos,
+  búsqueda, Cerca, En línea, reintento y mapa. Cada foco observado tuvo outline
+  sólido de 3 px. `prefers-reduced-motion: reduce` estuvo activo.
+- Catálogo, ingreso, carrito, entrada de vendedor y 404 respondieron con su
+  encabezado final; una visita independiente del build de producción a
+  `/buscar` no produjo errores de consola. La advertencia de hidratación vista
+  durante una captura anterior provenía de la supresión temporal del caret de
+  Playwright y desapareció usando `caret: "initial"`.
+
+**Gates y límite de evidencia**
+
+- `corepack pnpm lint`: passed.
+- `corepack pnpm typecheck`: passed.
+- `corepack pnpm test`: 26 archivos y 94 pruebas, passed.
+- `corepack pnpm build` con variables públicas de Supabase vacías: passed.
+- `git diff --check`: passed.
+- `pnpm db:start` alcanzó Docker, pero `dockerDesktopLinuxEngine` no estaba
+  disponible; por eso no se ejecutaron reset, pgTAP ni Playwright con fixtures.
+
+Los gates listados arriba preceden la revisión bloqueante y no validan sus
+correcciones. Por instrucción de Ale no se ejecutaron lint, tipos, unitarias,
+build, servidor ni navegador después del cambio. Resultado actual:
+implementación local no verificada; runtime definitivo, sincronización
+documental en `Obra/`, commit, publicación y aceptación humana permanecen
+pendientes.
+
+final result: blocked
+
+## Recibo histórico — Publicación y observación remota de Corte 7V-B — 3 de septiembre de 2026
 
 - Implementación integrada en `1e9f0a6e1008f8b283274bf45507007a24173794`
   y subida a `origin/main`.

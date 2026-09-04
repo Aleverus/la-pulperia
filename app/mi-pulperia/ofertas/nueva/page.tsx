@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { OfferForm } from "@/app/_components/OfferForm";
 import { SellerWorkspaceNav } from "@/app/_components/SellerWorkspaceNav";
 import { formErrorMessage } from "@/lib/seller";
+import type { OfferClass } from "@/lib/catalog";
 import { getOwnedPresences } from "@/lib/seller-data";
 import { selectOwnedPresence, sellerUrl } from "@/lib/seller-routing";
 
@@ -28,6 +29,7 @@ export default async function NuevaOfertaPage({
   const error = formErrorMessage(
     typeof params.error === "string" ? params.error : undefined,
   );
+  const defaultOfferClass = parseOfferClass(params.clase);
 
   return (
     <main className="detail-page seller-publication-editor workspace-page">
@@ -49,7 +51,17 @@ export default async function NuevaOfertaPage({
         media={[]}
         error={error ?? undefined}
         resumeStarterDraft={params.retomar === "1"}
+        defaultOfferClass={defaultOfferClass}
       />
     </main>
   );
+}
+
+function parseOfferClass(value: unknown): OfferClass | undefined {
+  return value === "stocked_product" ||
+    value === "scheduled_food" ||
+    value === "local_service" ||
+    value === "digital_offer"
+    ? value
+    : undefined;
 }

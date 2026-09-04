@@ -89,6 +89,7 @@ type OfferFormProps = {
   notice?: string;
   resumeStarterDraft?: boolean;
   clearStarterDraft?: boolean;
+  defaultOfferClass?: OfferClass;
 };
 
 export function OfferForm(props: OfferFormProps) {
@@ -126,6 +127,7 @@ function OfferFormFields({
   media,
   error,
   notice,
+  defaultOfferClass,
   starterDraft,
   persistStarterDraft,
 }: OfferFormProps & {
@@ -134,7 +136,10 @@ function OfferFormFields({
 }) {
   const details = offer?.availability_details ?? {};
   const [offerClass, setOfferClass] = useState<OfferClass>(
-    offer?.offer_class ?? starterDraft?.offerClass ?? "stocked_product",
+    offer?.offer_class ??
+      starterDraft?.offerClass ??
+      defaultOfferClass ??
+      "stocked_product",
   );
   const [priceMode, setPriceMode] = useState<PriceMode>(
     offer?.price_mode ?? starterDraft?.priceMode ?? "fixed",

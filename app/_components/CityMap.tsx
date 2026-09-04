@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { layers, namedFlavor } from "@protomaps/basemaps";
+import { layers, namedFlavor, type Flavor } from "@protomaps/basemaps";
 import * as maplibregl from "maplibre-gl";
 import type {
   LngLatBoundsLike,
@@ -112,7 +112,7 @@ export function CityMap({
       element.className = selected ? "map-pin is-selected" : "map-pin";
       element.setAttribute("aria-label", pin.name);
       if (selected) element.setAttribute("aria-current", "true");
-      element.textContent = pin.name;
+      element.textContent = initials(pin.name);
       element.addEventListener("click", (event) => {
         event.stopPropagation();
         onSelect?.(pin.id);
@@ -140,6 +140,16 @@ export function CityMap({
     );
     map.fitBounds(bounds, { padding: 56, maxZoom: 14, duration: 0 });
   }, [here, pins, ready]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    const selected = pins.find((pin) => pin.id === selectedId);
+    if (!map || !ready || !selected) return;
+    map.easeTo({
+      center: [selected.lng, selected.lat],
+      duration: reducedMotion() ? 0 : 260,
+    });
+  }, [pins, ready, selectedId]);
 
   return (
     <div className="map-frame">
@@ -198,6 +208,64 @@ function regionalStyle(archiveUrl: string): StyleSpecification {
           '<a href="https://protomaps.com">Protomaps</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
       },
     },
-    layers: layers("protomaps", namedFlavor("dark"), { lang: "es" }),
+    layers: layers("protomaps", plazaMapFlavor(), { lang: "es" }),
   };
+}
+
+function plazaMapFlavor(): Flavor {
+  return {
+    ...namedFlavor("light"),
+    background: "#dcd7cd",
+    earth: "#dcd7cd",
+    buildings: "#cec8bd",
+    industrial: "#cec8bd",
+    school: "#e7dfd3",
+    hospital: "#e7dfd3",
+    park_a: "#d6d0c5",
+    park_b: "#cec8bd",
+    wood_a: "#d6d0c5",
+    wood_b: "#cec8bd",
+    scrub_a: "#d6d0c5",
+    scrub_b: "#cec8bd",
+    pedestrian: "#eee9df",
+    water: "#c8b8b8",
+    minor_service_casing: "#d6c9be",
+    minor_casing: "#d6c9be",
+    link_casing: "#d6c9be",
+    major_casing_late: "#d6c9be",
+    highway_casing_late: "#d6c9be",
+    other: "#f5f0e8",
+    minor_service: "#f5f0e8",
+    minor_a: "#f5f0e8",
+    minor_b: "#fffaf2",
+    link: "#fffaf2",
+    major_casing_early: "#d6c9be",
+    major: "#fffaf2",
+    highway_casing_early: "#d6c9be",
+    highway: "#fffaf2",
+    roads_label_minor: "#6c615e",
+    roads_label_minor_halo: "#fffdf8",
+    roads_label_major: "#281b1e",
+    roads_label_major_halo: "#fffdf8",
+    subplace_label: "#6c615e",
+    subplace_label_halo: "#eee9df",
+    city_label: "#281b1e",
+    city_label_halo: "#eee9df",
+    address_label: "#6c615e",
+    address_label_halo: "#fffdf8",
+  };
+}
+
+function initials(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toLocaleUpperCase("es-HN");
+}
+
+function reducedMotion(): boolean {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }

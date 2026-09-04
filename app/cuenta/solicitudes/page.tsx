@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Pedidos para WhatsApp",
   robots: { index: false, follow: false },
 };
+export const dynamic = "force-dynamic";
 
 export default async function RequestHistoryPage() {
   const batches = await getMyRequestBatches();

@@ -2,7 +2,7 @@
 
 ## Alcance
 
-Este checkout implementa el índice local de comercio y una cuenta única que concentra perfil y ajustes sin separar identidades de compra y venta. `Explorar` usa el mapa para ubicaciones fijas y una lista separada para negocios móviles o remotos; `Catálogo` organiza productos y ofertas y conduce a la publicación y al negocio responsable. La definición de producto, la dirección visual y el estado activo no viven aquí: se consultan en `../Obra/`. No convertir esta aplicación en procesador de pagos, autoridad de inventario, delivery, chat propio ni registro de ventas.
+Este checkout implementa el índice local de comercio bajo la dirección **Plaza viva**: `Explorar` hace del mapa el hogar, cada negocio es una presencia responsable y cada oferta es una publicación honesta. Ubicaciones fijas usan pines y una hoja o panel sincronizado; negocios móviles o remotos permanecen en `En línea`. El hogar vendedor es la misma presencia vista desde adentro, con compositor, atención puntual y publicaciones. La definición de producto, la dirección visual y el estado activo viven en `../Obra/`. No convertir esta aplicación en procesador de pagos, autoridad de inventario, delivery, chat propio, registro de ventas, grafo social ni ranking de popularidad.
 
 ## Autoridades antes de cambiar
 

@@ -98,6 +98,23 @@ export async function getPresenceOffers(
   return (data ?? []) as CatalogOffer[];
 }
 
+export async function getPresenceOffersByIds(
+  presenceIds: string[],
+): Promise<CatalogOffer[]> {
+  const uniqueIds = Array.from(new Set(presenceIds));
+  if (uniqueIds.length === 0) return [];
+  const supabase = createPublicClient();
+  const { data, error } = await supabase
+    .from("catalog_offers")
+    .select(
+      "id, slug, offer_class, title, description, price_cents, price_mode, unit, availability_model, availability_state, availability_details, confirmed_at, presence_id, presence_slug, presence_name, presence_mode, coverage_label, service_territory, fulfillment_modes, request_context_token",
+    )
+    .in("presence_id", uniqueIds)
+    .order("confirmed_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as CatalogOffer[];
+}
+
 export async function getPublicSitemapEntries(): Promise<{
   offerSlugs: string[];
   presenceSlugs: string[];

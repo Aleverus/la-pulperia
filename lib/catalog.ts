@@ -67,6 +67,10 @@ export type CatalogPresence = {
   lng: number | null;
 };
 
+export type CatalogPresenceWithOffers = CatalogPresence & {
+  offers: CatalogOffer[];
+};
+
 export const OFFER_CLASS_LABEL: Record<OfferClass, string> = {
   stocked_product: "Producto con stock",
   scheduled_food: "Comida o encargo",

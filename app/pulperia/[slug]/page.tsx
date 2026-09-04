@@ -15,6 +15,7 @@ import { ShareButton } from "@/app/_components/ShareButton";
 import { getPresence, getPresenceOffers } from "@/lib/data";
 import { OFFER_CLASS_LABEL, PRESENCE_MODE_LABEL } from "@/lib/catalog";
 import { formatPublishedPrice } from "@/lib/money";
+import { FRESHNESS_LABEL, freshnessBand } from "@/lib/freshness";
 import { getPublicContextNotes } from "@/lib/operations";
 import { absoluteUrl, metadataDescription } from "@/lib/site";
 
@@ -57,6 +58,13 @@ export default async function PulperiaPage({
     getPresenceOffers(presence.id),
     getPublicContextNotes({ presenceId: presence.id }),
   ]);
+  const latestConfirmation = offers.reduce<string | null>(
+    (latest, offer) =>
+      !latest || new Date(offer.confirmed_at) > new Date(latest)
+        ? offer.confirmed_at
+        : latest,
+    null,
+  );
   const structuredData =
     presence.mode === "fixed_location"
       ? {
@@ -105,6 +113,14 @@ export default async function PulperiaPage({
               <IconMapPin aria-hidden="true" size={18} stroke={1.8} />
               {presence.served_city}
             </p>
+            <p className="public-profile__activity">
+              {offers.length} {offers.length === 1 ? "publicación" : "publicaciones"}
+              {latestConfirmation
+                ? ` · ${FRESHNESS_LABEL[
+                    freshnessBand(new Date(latestConfirmation))
+                  ]}`
+                : " · Sin publicaciones vigentes"}
+            </p>
           </div>
         </div>
         <p className="lede">{presence.description}</p>
@@ -131,7 +147,9 @@ export default async function PulperiaPage({
         ) : (
           <p>
             Negocio físico. El pin es público porque el vendedor lo confirmó.{" "}
-            <Link href="/mapa">Ver en el mapa</Link>
+            <Link href={`/mapa?presencia=${encodeURIComponent(presence.id)}`}>
+              Ver en el mapa
+            </Link>
           </p>
         )}
       </section>

@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Operación",
   robots: { index: false, follow: false },
 };
+export const dynamic = "force-dynamic";
 
 const EVENT_LABELS = {
   search: "Búsquedas",

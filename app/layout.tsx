@@ -1,30 +1,38 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Alegreya, Fira_Sans_Condensed } from "next/font/google";
+import localFont from "next/font/local";
 import { Header } from "@/app/_components/Header";
 import { prelaunchMode } from "@/lib/env";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_ORIGIN } from "@/lib/site";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./globals.css";
 
-const pulperiaSans = Fira_Sans_Condensed({
-  weight: ["400", "500", "600", "700", "800"],
-  subsets: ["latin"],
+const pulperiaSans = localFont({
+  src: [
+    { path: "./fonts/fira-sans-condensed-400-latin.woff2", weight: "400" },
+    { path: "./fonts/fira-sans-condensed-500-latin.woff2", weight: "500" },
+    { path: "./fonts/fira-sans-condensed-600-latin.woff2", weight: "600" },
+    { path: "./fonts/fira-sans-condensed-700-latin.woff2", weight: "700" },
+    { path: "./fonts/fira-sans-condensed-800-latin.woff2", weight: "800" },
+  ],
   display: "swap",
   variable: "--font-pulperia-sans",
+  fallback: ["Arial Narrow", "Arial", "sans-serif"],
 });
 
-const pulperiaDisplay = Alegreya({
-  subsets: ["latin"],
+const pulperiaDisplay = localFont({
+  src: "./fonts/alegreya-latin.woff2",
+  weight: "400 900",
   display: "swap",
   variable: "--font-pulperia-display",
+  fallback: ["Georgia", "serif"],
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_ORIGIN),
   title: {
-    default: `${SITE_NAME} — catálogo local de Siguatepeque`,
+    default: `${SITE_NAME} — plaza local de Siguatepeque`,
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
@@ -33,7 +41,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "es_HN",
     siteName: SITE_NAME,
-    title: `${SITE_NAME} — catálogo local de Siguatepeque`,
+    title: `${SITE_NAME} — plaza local de Siguatepeque`,
     description: SITE_DESCRIPTION,
     url: "/",
   },
@@ -80,7 +88,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <div>
                 <strong>Ofrecer</strong>
                 <Link href="/vender">Abrir una pulpería</Link>
-                <Link href="/mi-pulperia">Administrar</Link>
+                <Link href="/mi-pulperia">Mi pulpería</Link>
               </div>
             </nav>
           </div>

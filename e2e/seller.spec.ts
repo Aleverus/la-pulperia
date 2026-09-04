@@ -23,13 +23,15 @@ test("seller entry explains the private first offer before authentication", asyn
   await page.goto("/vender");
 
   await expect(
-    page.getByRole("heading", { name: "Volvé encontrable una oferta real." }),
+    page.getByRole("heading", { name: "Empezá por una oferta real." }),
   ).toBeVisible();
   await expect(page.getByText("No vas a construir una tienda")).toBeVisible();
   await expect(page.getByText("La guardás en privado")).toBeVisible();
   await expect(page.getByText("Tu conversación sigue en WhatsApp")).toBeVisible();
   await expect(
-    page.getByRole("main").getByRole("link", { name: "Ingresar para empezar" }),
+    page
+      .getByRole("main")
+      .getByRole("link", { name: "Ingresar y abrir mi pulpería" }),
   ).toHaveAttribute("href", "/ingresar?next=%2Fvender");
 });
 
@@ -230,9 +232,7 @@ test("daily freshness task targets the exact offer and reports its boundary", as
   await expect(page.getByRole("status")).toContainText(
     `Vigencia de ${offerTitle} confirmada`,
   );
-  await expect(
-    page.locator('a[href*="/mi-pulperia/ofertas/nueva"]'),
-  ).toHaveCount(1);
+  await expect(page.locator(".seller-composer")).toHaveCount(1);
   await page.getByRole("link", { name: "Volver a comprar" }).click();
   await expect(page).toHaveURL(/\/buscar$/);
   if (await page.locator(".nav-menu summary").isVisible()) {
@@ -294,7 +294,7 @@ test("seller maintains food, service, and digital offers through the class-aware
   await page.getByRole("button", { name: "Volver a publicar" }).click();
 
   await page.goto("/mi-pulperia");
-  await page.getByRole("link", { name: "Crear oferta" }).click();
+  await page.getByRole("link", { name: "Servicio", exact: true }).click();
   await page.getByRole("radio", { name: /Servicio local/ }).check();
   await expect(page.getByLabel("Nota de existencias (opcional)")).toHaveCount(0);
   await continueOffer(page);
@@ -322,7 +322,7 @@ test("seller maintains food, service, and digital offers through the class-aware
   await expect(page.getByLabel("Título")).toHaveValue(editedServiceTitle);
 
   await page.goto("/mi-pulperia");
-  await page.getByRole("link", { name: "Crear oferta" }).click();
+  await page.getByRole("link", { name: "Digital", exact: true }).click();
   await page.getByRole("radio", { name: /Oferta digital/ }).check();
   await continueOffer(page);
   await page.getByLabel("Título").fill(digitalTitle);
