@@ -53,6 +53,9 @@ final result: passed
   la captura con Edge/Playwright y movimiento reducido.
 - Hoja de contacto: `evidence/design-qa-7p/contact-sheet.png` reúne las vistas
   conservadas del corte en una sola superficie de revisión.
+- Observación remota final:
+  `evidence/design-qa-7p/remote-final-contact-sheet.png` reúne el viewport
+  in-app de Mapa, entrada de Vendedor y Catálogo servido por el alias principal.
 - Estado observado: runtime de producción local con variables públicas de
   Supabase vacías. La evidencia muestra errores recuperables y vacíos reales;
   no usa la base remota ni inventa negocios, ofertas, fotos o actividad.
@@ -85,8 +88,10 @@ final result: passed
 | 2 | P2 | Publicaciones repetía el acceso a crear fuera del compositor. | Se retiró `Nueva publicación`; el compositor es la única superficie de creación. |
 
 El hallazgo remoto de ventana baja (776 × 508 px), donde la navegación fija
-cubría la hoja, se corrigió localmente en CSS. Falta repetir la observación tras
-el próximo deployment; este cambio todavía no está verificado.
+cubría la hoja, quedó corregido en `8b5fa78725f0c367faff8e3377fc11856b5f01c1`.
+En el alias publicado, `.map-page` y la hoja terminan en `y=433.61` y
+`.site-tabs` empieza en `y=433.61`: solapamiento medido de 0 px. La hoja conserva
+desplazamiento interno cuando la altura no permite mostrarla completa.
 
 ### Revisión bloqueante posterior del diff
 
@@ -105,10 +110,12 @@ CTA existentes aparecen antes de los pasos; y el enlace al mapa conserva `q`,
 `clase`, `tipo`, `disponibilidad` y `orden`. Se añadieron regresiones unitarias,
 pero no se ejecutaron.
 
-Los hallazgos visuales de la pasada anterior permanecen cerrados sólo para el
-runtime observado entonces. El estado poblado, la selección pin/lista con mapa
-real y el hogar vendedor autenticado no se marcan como observados: dependen del
-runtime definitivo y no fueron revisados después de estas correcciones.
+Los hallazgos bloqueantes quedaron publicados. La búsqueda de `Explorar`
+normaliza tildes, pero aún no comparte el ranking y la tolerancia tipográfica
+completos de `search_offers`; esa unificación requiere un corte de búsqueda y no
+se presenta como resuelta. El estado poblado, la selección pin/lista con datos
+reales y el hogar vendedor autenticado tampoco se marcan como observados porque
+la base remota permanece virgen y el navegador no tenía sesión.
 
 **Interacciones, accesibilidad y resiliencia**
 
@@ -134,12 +141,23 @@ runtime definitivo y no fueron revisados después de estas correcciones.
 - `pnpm db:start` alcanzó Docker, pero `dockerDesktopLinuxEngine` no estaba
   disponible; por eso no se ejecutaron reset, pgTAP ni Playwright con fixtures.
 
-Los gates listados arriba preceden la revisión bloqueante y no validan sus
-correcciones. Por instrucción de Ale no se ejecutaron lint, tipos, unitarias,
-build, servidor ni navegador después del cambio. Resultado actual:
-implementación local no verificada; runtime definitivo, sincronización
-documental en `Obra/`, commit, publicación y aceptación humana permanecen
-pendientes.
+Los gates locales listados arriba preceden la revisión bloqueante y no validan
+sus correcciones. Por instrucción de Ale no se repitieron lint, tipos,
+unitarias, build, servidor ni navegador local después del cambio. Vercel sí
+compiló el estado definitivo y publicó
+`8b5fa78725f0c367faff8e3377fc11856b5f01c1` como
+`dpl_F2kJfK5TFVg4PRAq4MFYLpzA9gV1` (`READY`) bajo
+`https://la-pulperia-hn.vercel.app`.
+
+El navegador in-app observó `/mapa`, `/buscar`, `/vender`, `/carrito` e
+`/ingresar`; `/mi-pulperia` redirigió a
+`/ingresar?next=%2Fmi-pulperia`. En `Explorar`, el mapa reportó `ready`, el
+archivo PMTiles remoto respondió rangos `206`, no hubo desborde horizontal ni
+errores de consola y `Cerca`/`En línea`, `Servicios` y la consulta `café`
+quedaron reflejados en la URL. El CTA vendedor principal quedó completo antes
+de la navegación inferior. No se inició OAuth, no se escribieron datos y no se
+observó el hogar vendedor autenticado. La aceptación visual de Ale permanece
+pendiente y separada de esta publicación privada.
 
 final result: blocked
 
