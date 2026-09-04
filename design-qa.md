@@ -84,6 +84,10 @@ final result: passed
 | 2 | P2 | El control de zoom de MapLibre chocaba con Filtros en móvil. | Se oculta bajo 68 rem, donde el mapa conserva gestos, teclado y selección por lista; en 1440 sigue visible. |
 | 2 | P2 | Publicaciones repetía el acceso a crear fuera del compositor. | Se retiró `Nueva publicación`; el compositor es la única superficie de creación. |
 
+El hallazgo remoto de ventana baja (776 × 508 px), donde la navegación fija
+cubría la hoja, se corrigió localmente en CSS. Falta repetir la observación tras
+el próximo deployment; este cambio todavía no está verificado.
+
 ### Revisión bloqueante posterior del diff
 
 La revisión de código posterior encontró que el filtro por clase conservaba
