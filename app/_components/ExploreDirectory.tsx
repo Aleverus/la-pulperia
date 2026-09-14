@@ -28,21 +28,38 @@ const FILTER_OPTIONS: { value: ExploreOfferClass; label: string }[] = [
   { value: "digital_offer", label: "Digital" },
 ];
 
-export function ExploreDirectory({
-  fixedPlaces,
-  onlinePlaces,
-  loadFailed = false,
-  offerLoadFailed = false,
-}: {
+type ExploreDirectoryProps = {
   fixedPlaces: CatalogPresenceWithOffers[];
   onlinePlaces: CatalogPresenceWithOffers[];
   loadFailed?: boolean;
   offerLoadFailed?: boolean;
-}) {
+};
+
+export function ExploreDirectory(props: ExploreDirectoryProps) {
+  const search = useSearchParams().toString();
+  const stateKey = [
+    search,
+    props.loadFailed ?? false,
+    props.offerLoadFailed ?? false,
+    props.fixedPlaces
+      .map((place) =>
+        [place.id, ...place.offers.map((offer) => offer.id)].join(":"),
+      )
+      .join(","),
+  ].join("|");
+
+  return <ExploreDirectoryState key={stateKey} {...props} search={search} />;
+}
+
+function ExploreDirectoryState({
+  fixedPlaces,
+  onlinePlaces,
+  loadFailed = false,
+  offerLoadFailed = false,
+  search,
+}: ExploreDirectoryProps & { search: string }) {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const search = searchParams.toString();
   const initialState = readUrlState(
     search,
     fixedPlaces,
@@ -61,30 +78,26 @@ export function ExploreDirectory({
   );
 
   useEffect(() => {
-    const next = readUrlState(
-      search,
-      fixedPlaces,
-      loadFailed,
-      offerLoadFailed,
-    );
-    setMode(next.mode);
-    setQuery(next.query);
-    setQueryDraft(next.query);
-    setOfferClass(next.offerClass);
-    setSelectedId(next.selectedId);
-
     const canonical = buildCanonicalSearch(search, {
-      mode: next.mode,
-      query: next.query,
-      offerClass: next.offerClass,
-      selectedId: next.canonicalSelectedId,
+      mode: initialState.mode,
+      query: initialState.query,
+      offerClass: initialState.offerClass,
+      selectedId: initialState.canonicalSelectedId,
     });
     if (canonical !== search) {
       router.replace(canonical ? `${pathname}?${canonical}` : pathname, {
         scroll: false,
       });
     }
-  }, [fixedPlaces, loadFailed, offerLoadFailed, pathname, router, search]);
+  }, [
+    initialState.canonicalSelectedId,
+    initialState.mode,
+    initialState.offerClass,
+    initialState.query,
+    pathname,
+    router,
+    search,
+  ]);
 
   const filteredFixed = useMemo(
     () =>
