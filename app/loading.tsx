@@ -1,8 +1,9 @@
 export default function Loading() {
   return (
-    <main
+    <section
       className="route-loading detail-page state-page workspace-page"
       aria-busy="true"
+      aria-label="Cargando contenido"
     >
       <p className="eyebrow">La Pulpería</p>
       <h1>Cargando el puesto…</h1>
@@ -10,6 +11,6 @@ export default function Loading() {
         <span className="loading-pulse" aria-hidden="true" />
         <span>Estamos preparando la información local.</span>
       </div>
-    </main>
+    </section>
   );
 }
