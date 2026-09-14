@@ -7,7 +7,7 @@ const executablePath = process.env.PLAYWRIGHT_EXECUTABLE_PATH;
 export default defineConfig({
   testDir: "e2e",
   fullyParallel: true,
-  workers: process.env.CI ? 1 : 4,
+  workers: 4,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
   expect: { timeout: 10_000 },
